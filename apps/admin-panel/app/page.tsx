@@ -62,7 +62,7 @@ export default function ProductsPage() {
 
       const res = await fetch(`${API_BASE}/products?${params.toString()}`);
       const data = await res.json();
-      if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+      if (data.success && Array.isArray(data.data)) {
         setProducts(data.data);
         if (data.totalPages) setTotalPages(data.totalPages);
       }

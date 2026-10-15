@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   FiSearch,
   FiShoppingCart,
@@ -14,6 +15,8 @@ import {
   FiPhone,
   FiMail,
   FiCheckCircle,
+  FiStar,
+  FiEye,
 } from "react-icons/fi";
 import { FaWhatsapp, FaPinterest } from "react-icons/fa";
 
@@ -21,6 +24,18 @@ export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [activeTab, setActiveTab] = useState("all");
+  const [productsList, setProductsList] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/products?limit=50")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.data)) {
+          setProductsList(data.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const testimonials = [
     {
@@ -1420,6 +1435,269 @@ export default function HomePage() {
               <span style={{ color: "#BB8E43", fontSize: "22px" }}>✦</span>
             </span>
           ))}
+        </div>
+      </section>
+
+      {/* =========================================================================
+          6.5. FEATURED PRODUCTS & CURATED EDITS (Loaded Live from Backend)
+         ========================================================================= */}
+      <section
+        id="featured"
+        style={{
+          width: "100%",
+          maxWidth: "1360px",
+          margin: "0 auto 90px auto",
+          padding: "0 24px",
+          boxSizing: "border-box",
+        }}
+      >
+        <div style={{ textAlign: "center", marginBottom: "36px" }}>
+          <span
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: "13px",
+              fontWeight: 600,
+              letterSpacing: "3px",
+              textTransform: "uppercase",
+              color: "#BA8E43",
+              display: "block",
+              marginBottom: "8px",
+            }}
+          >
+            HANDPICKED COLLECTIONS
+          </span>
+          <h2
+            style={{
+              fontFamily: "var(--font-serif)",
+              fontSize: "clamp(30px, 3.2vw, 44px)",
+              fontWeight: 700,
+              color: "#5A2035",
+              margin: "0 0 12px 0",
+            }}
+          >
+            Featured Creations & New Arrivals
+          </h2>
+          <p
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: "14.5px",
+              color: "#685F53",
+              maxWidth: "600px",
+              margin: "0 auto",
+              lineHeight: 1.6,
+            }}
+          >
+            Explore our royal repertoire of festive sarees, bridal jewellery, and contemporary silhouettes.
+          </p>
+
+          {/* Category Tabs */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "10px",
+              flexWrap: "wrap",
+              marginTop: "24px",
+            }}
+          >
+            {[
+              { id: "all", label: "All Items" },
+              { id: "Saree", label: "Sarees" },
+              { id: "Casual Wear", label: "Casual Wear" },
+              { id: "Jewellery", label: "Jewellery" },
+              { id: "Decorative Items", label: "Decor" },
+            ].map((tab) => {
+              const isSelected = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  style={{
+                    padding: "8px 22px",
+                    borderRadius: "9999px",
+                    border: isSelected ? "1.5px solid #5A2035" : "1px solid #D8C4AA",
+                    backgroundColor: isSelected ? "#5A2035" : "#FFFFFF",
+                    color: isSelected ? "#FFFFFF" : "#5A2035",
+                    fontSize: "13px",
+                    fontWeight: isSelected ? 700 : 500,
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Products Grid */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+            gap: "28px",
+          }}
+        >
+          {productsList
+            .filter((p) => {
+              if (activeTab === "all") return true;
+              return p.category === activeTab || p.categoryName === activeTab;
+            })
+            .slice(0, 8)
+            .map((p) => {
+              const mainPrice = p.sellingPrice || p.rawPrice || 0;
+              const hasDiscount = p.mrp && p.mrp > mainPrice;
+              const discountVal = hasDiscount ? Math.round(((p.mrp - mainPrice) / p.mrp) * 100) : 0;
+              const imgUrl = p.img || (p.images && p.images[0]) || "/homepage/casual_model1.jpg";
+
+              return (
+                <div
+                  key={p._id || p.id}
+                  style={{
+                    backgroundColor: "#FFFFFF",
+                    borderRadius: "16px",
+                    overflow: "hidden",
+                    border: "1px solid #EFE8E0",
+                    boxShadow: "0 8px 24px rgba(90, 32, 53, 0.05)",
+                    display: "flex",
+                    flexDirection: "column",
+                    transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                  }}
+                  className="float-hover"
+                >
+                  {/* Image container */}
+                  <div
+                    style={{
+                      width: "100%",
+                      height: "300px",
+                      position: "relative",
+                      overflow: "hidden",
+                      backgroundColor: "#FAF6F0",
+                    }}
+                  >
+                    <Link href={`/products/${p._id || p.id || p.slug}`}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={imgUrl}
+                        alt={p.name || p.productName}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          transition: "transform 0.5s ease",
+                        }}
+                      />
+                    </Link>
+
+                    {/* Badges */}
+                    <div style={{ position: "absolute", top: 12, left: 12, display: "flex", flexDirection: "column", gap: 4 }}>
+                      {p.featured && (
+                        <span
+                          style={{
+                            backgroundColor: "#BA8E43",
+                            color: "#FFFFFF",
+                            fontSize: "10px",
+                            fontWeight: 700,
+                            padding: "3px 8px",
+                            borderRadius: "12px",
+                            letterSpacing: "0.5px",
+                            textTransform: "uppercase",
+                          }}
+                        >
+                          Featured
+                        </span>
+                      )}
+                      {p.isNewArrival && (
+                        <span
+                          style={{
+                            backgroundColor: "#16A34A",
+                            color: "#FFFFFF",
+                            fontSize: "10px",
+                            fontWeight: 700,
+                            padding: "3px 8px",
+                            borderRadius: "12px",
+                            letterSpacing: "0.5px",
+                            textTransform: "uppercase",
+                          }}
+                        >
+                          New
+                        </span>
+                      )}
+                    </div>
+
+                    {discountVal > 0 && (
+                      <span
+                        style={{
+                          position: "absolute",
+                          top: 12,
+                          right: 12,
+                          backgroundColor: "#DC2626",
+                          color: "#FFFFFF",
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          padding: "3px 8px",
+                          borderRadius: "12px",
+                        }}
+                      >
+                        {discountVal}% OFF
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Details */}
+                  <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", flex: 1, justifyContent: "space-between" }}>
+                    <div>
+                      <span style={{ fontSize: "11.5px", color: "#BA8E43", fontWeight: 600, letterSpacing: "1px", textTransform: "uppercase" }}>
+                        {p.brand || p.category || "Sree Collections"}
+                      </span>
+                      <h3
+                        style={{
+                          fontFamily: "var(--font-serif)",
+                          fontSize: "17px",
+                          fontWeight: 700,
+                          color: "#2F2C24",
+                          margin: "4px 0 10px 0",
+                          lineHeight: 1.3,
+                        }}
+                      >
+                        <Link href={`/products/${p._id || p.id || p.slug}`} style={{ color: "inherit", textDecoration: "none" }}>
+                          {p.name || p.productName}
+                        </Link>
+                      </h3>
+                    </div>
+
+                    <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", paddingTop: "12px", borderTop: "1px solid #FAF4EB" }}>
+                      <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
+                        <span style={{ fontSize: "18px", fontWeight: 800, color: "#5A2035" }}>
+                          ₹{mainPrice.toLocaleString("en-IN")}
+                        </span>
+                        {hasDiscount && (
+                          <span style={{ fontSize: "12px", color: "#9CA3AF", textDecoration: "line-through" }}>
+                            ₹{p.mrp}
+                          </span>
+                        )}
+                      </div>
+
+                      <Link
+                        href={`/products/${p._id || p.id || p.slug}`}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "4px",
+                          fontSize: "12px",
+                          fontWeight: 700,
+                          color: "#BA8E43",
+                          textDecoration: "none",
+                        }}
+                      >
+                        View <FiChevronRight size={13} />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
         </div>
       </section>
 
