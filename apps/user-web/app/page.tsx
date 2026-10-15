@@ -128,7 +128,7 @@ export default function HomePage() {
               About
             </a>
             <a
-              href="#categories"
+              href="/categories"
               style={{
                 fontFamily: "var(--font-serif)",
                 fontSize: "17px",
@@ -144,7 +144,7 @@ export default function HomePage() {
 
             {/* CONTACT US Pill Button */}
             <a
-              href="#contact"
+              href="/contact"
               style={{
                 background: "#BA8E43",
                 color: "#FFFFFF",
@@ -251,8 +251,8 @@ export default function HomePage() {
             <nav style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "20px" }}>
               <a href="#home" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 600 }}>Home</a>
               <a href="#about" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500 }}>About</a>
-              <a href="#categories" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500 }}>Categories</a>
-              <a href="#contact" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500 }}>Contact Us</a>
+              <a href="/categories" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500 }}>Categories</a>
+              <a href="/contact" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500 }}>Contact Us</a>
             </nav>
           </div>
         </div>
@@ -1347,79 +1347,180 @@ export default function HomePage() {
       </section>
 
       {/* =========================================================================
-          6. MARQUEE STRIP — "Your Style / Your Rules / Empower Your Fashion"
+          6. EDITORIAL BANNER: "Your Style [img] / [img] Your Rules / Empower Your Fashion"
          ========================================================================= */}
       <section
         style={{
           width: "100%",
-          margin: "0 0 80px 0",
-          overflow: "hidden",
-          background: "linear-gradient(90deg, #FBF3E2 0%, #F5E4C4 50%, #FBF3E2 100%)",
-          borderTop: "1.5px solid #DFBE7E",
-          borderBottom: "1.5px solid #DFBE7E",
-          padding: "18px 0",
+          background: "#F5EBD3",
+          padding: "70px 24px 75px 24px",
+          margin: "0 0 90px 0",
+          boxSizing: "border-box",
         }}
       >
         <div
           style={{
+            maxWidth: "900px",
+            margin: "0 auto",
             display: "flex",
+            flexDirection: "column",
             alignItems: "center",
-            gap: "0",
-            animation: "marquee 22s linear infinite",
-            whiteSpace: "nowrap",
-            width: "max-content",
+            textAlign: "center",
           }}
         >
-          {[0, 1, 2, 3].map((rep) => (
+          {/* Line 1: Your Style + Pill Image 1 */}
+          <div
+            className="editorial-banner-row"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "18px",
+            }}
+          >
             <span
-              key={rep}
+              className="editorial-banner-text"
               style={{
+                fontFamily: "'Blacker Display', var(--font-serif)",
+                fontWeight: 400,
+                fontStyle: "normal",
+                fontSize: "48px",
+                lineHeight: "150%",
+                letterSpacing: "0",
+                textTransform: "capitalize",
+                color: "#5D2030",
+              }}
+            >
+              Your Style
+            </span>
+            <img
+              src="/homepage/your_style_pill1_hd.jpg"
+              alt="Luxury saree and pearls"
+              className="editorial-banner-img"
+              style={{
+                width: "200px",
+                height: "50px",
+                borderRadius: "45px",
+                objectFit: "cover",
+                opacity: 1,
+                display: "block",
+              }}
+            />
+          </div>
+
+          {/* Line 2: Pill Image 2 + Your Rules */}
+          <div
+            className="editorial-banner-row"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "18px",
+            }}
+          >
+            <img
+              src="/homepage/your_style_pill2_hd.jpg"
+              alt="Jewelry display"
+              className="editorial-banner-img"
+              style={{
+                width: "200px",
+                height: "50px",
+                borderRadius: "45px",
+                objectFit: "cover",
+                opacity: 1,
+                display: "block",
+              }}
+            />
+            <span
+              className="editorial-banner-text"
+              style={{
+                fontFamily: "'Blacker Display', var(--font-serif)",
+                fontWeight: 400,
+                fontStyle: "normal",
+                fontSize: "48px",
+                lineHeight: "150%",
+                letterSpacing: "0",
+                textTransform: "capitalize",
+                color: "#5D2030",
+              }}
+            >
+              Your Rules
+            </span>
+          </div>
+
+          {/* Line 3: Empower Your Fashion */}
+          <div
+            className="editorial-banner-row"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <span
+              className="editorial-banner-text"
+              style={{
+                fontFamily: "'Blacker Display', var(--font-serif)",
+                fontWeight: 400,
+                fontStyle: "normal",
+                fontSize: "48px",
+                lineHeight: "150%",
+                letterSpacing: "0",
+                textTransform: "capitalize",
+                color: "#5D2030",
+              }}
+            >
+              Empower Your Fashion
+            </span>
+          </div>
+
+          {/* Line 4: Button */}
+          <div style={{ marginTop: "36px" }}>
+            <button
+              className="editorial-shop-btn"
+              style={{
+                width: "416px",
+                maxWidth: "100%",
+                height: "56px",
+                borderRadius: "77px",
+                opacity: 1,
+                gap: "10px",
+                padding: "20px 99px",
+                background: "#BB8E43",
+                border: "none",
+                cursor: "pointer",
+                boxSizing: "border-box",
                 display: "inline-flex",
                 alignItems: "center",
-                gap: "0",
+                justifyContent: "center",
+                transition: "all 0.3s ease",
               }}
             >
               <span
                 style={{
-                  fontFamily: "var(--font-serif)",
-                  fontWeight: 700,
-                  fontSize: "22px",
-                  color: "#5D2030",
-                  letterSpacing: "0.02em",
-                  padding: "0 28px",
+                  fontFamily: "'Blacker Display', var(--font-serif)",
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  letterSpacing: "0.14em",
+                  color: "#FFFFFF",
+                  textTransform: "uppercase",
+                  whiteSpace: "nowrap",
                 }}
               >
-                Your Style
+                SHOP NOW
               </span>
-              <span style={{ color: "#BB8E43", fontSize: "22px" }}>✦</span>
-              <span
-                style={{
-                  fontFamily: "var(--font-serif)",
-                  fontWeight: 700,
-                  fontSize: "22px",
-                  color: "#5D2030",
-                  letterSpacing: "0.02em",
-                  padding: "0 28px",
-                }}
+              <svg
+                width="46"
+                height="12"
+                viewBox="0 0 46 12"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                style={{ stroke: "#FFFFFF", strokeWidth: "1.2px", overflow: "visible", flexShrink: 0 }}
               >
-                Your Rules
-              </span>
-              <span style={{ color: "#BB8E43", fontSize: "22px" }}>✦</span>
-              <span
-                style={{
-                  fontFamily: "var(--font-serif)",
-                  fontWeight: 700,
-                  fontSize: "22px",
-                  color: "#5D2030",
-                  letterSpacing: "0.02em",
-                  padding: "0 28px",
-                }}
-              >
-                Empower Your Fashion
-              </span>
-              <span style={{ color: "#BB8E43", fontSize: "22px" }}>✦</span>
-            </span>
-          ))}
+                <path d="M0 6H44M38 1.5L44 6L38 10.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          </div>
         </div>
       </section>
 
@@ -2193,7 +2294,7 @@ export default function HomePage() {
       </footer>
 
       {/* Responsive Styles */}
-      <style jsx global>{`
+      <style>{`
         @media (min-width: 992px) {
           .desktop-nav {
             display: flex !important;
@@ -2317,6 +2418,32 @@ export default function HomePage() {
         @keyframes marquee {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
+        }
+
+        .editorial-shop-btn:hover {
+          background: #A97E37 !important;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(187, 142, 67, 0.35);
+        }
+
+        @media (max-width: 640px) {
+          .editorial-banner-text {
+            font-size: 28px !important;
+            line-height: 130% !important;
+          }
+          .editorial-banner-img {
+            width: 120px !important;
+            height: 36px !important;
+            border-radius: 30px !important;
+          }
+          .editorial-banner-row {
+            gap: 10px !important;
+          }
+          .editorial-shop-btn {
+            width: 300px !important;
+            height: 50px !important;
+            padding: 14px 30px !important;
+          }
         }
 
         .nav-link:hover {
