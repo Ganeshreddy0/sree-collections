@@ -680,3 +680,186 @@ a {
 .sc-page-btn.arrow {
   border-radius: 4px;
 }
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE — Tablet (768px – 1023px)
+═══════════════════════════════════════════════════ */
+@media (max-width: 1023px) {
+  /* Main content less padding on tablet */
+  .sc-main-content {
+    padding: 20px 20px;
+  }
+
+  /* Header search narrower */
+  .sc-header-search {
+    width: 220px;
+    margin-left: 20px;
+  }
+
+  /* Page header wraps if needed */
+  .sc-page-header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  /* Table wraps with horizontal scroll */
+  .sc-card {
+    overflow-x: auto;
+  }
+  .sc-table {
+    min-width: 600px;
+  }
+
+  /* Form grids collapse to 1 col */
+  .sc-form-grid,
+  .sc-form-grid-3 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE — Mobile (< 768px)
+═══════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+
+  /* ── Header ── */
+  .sc-header {
+    padding: 0 12px 0 0;
+    height: 60px;
+  }
+
+  /* Hide search bar on small screens */
+  .sc-header-search-responsive {
+    display: none !important;
+  }
+
+  /* Hide settings icon on mobile */
+  .sc-hide-mobile {
+    display: none !important;
+  }
+
+  /* ── Main content ── */
+  .sc-main-content {
+    padding: 16px 14px;
+  }
+
+  /* ── Page header ── */
+  .sc-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .sc-page-title {
+    font-size: 17px;
+  }
+
+  .sc-action-buttons {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  /* ── Table card ── */
+  .sc-card {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .sc-table {
+    min-width: 580px;
+  }
+
+  /* ── Toolbar wraps on mobile ── */
+  .sc-table-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px 12px;
+  }
+
+  .sc-card-search {
+    width: 100%;
+  }
+
+  .sc-filter-group {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .sc-status-filter select,
+  .sc-select-filter select {
+    font-size: 11px;
+  }
+
+  /* ── Table footer wraps ── */
+  .sc-table-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 12px;
+  }
+
+  /* ── Form grids go 1 col on mobile ── */
+  .sc-form-grid,
+  .sc-form-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .sc-form-actions {
+    flex-wrap: wrap;
+    justify-content: stretch;
+    gap: 8px;
+  }
+
+  .sc-btn-cancel,
+  .sc-btn-submit {
+    flex: 1;
+    text-align: center;
+    justify-content: center;
+  }
+
+  /* ── Section body tighter ── */
+  .sc-section-body {
+    padding: 14px;
+  }
+
+  /* ── Pagination responsive ── */
+  .sc-pagination {
+    gap: 2px;
+  }
+
+  /* ── Sidebar (handled by JS drawer, hide normal sidebar) ── */
+  .sc-sidebar {
+    display: none !important;
+  }
+
+  /* ── Workspace no sidebar ── */
+  .sc-workspace {
+    display: block;
+  }
+
+  /* ── Radio group wraps ── */
+  .sc-radio-group {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  /* ── Table cells smaller text ── */
+  .sc-table td,
+  .sc-table th {
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+
+  /* ── Action buttons smaller on mobile ── */
+  .sc-btn-add {
+    font-size: 12px;
+    height: 32px;
+    padding: 0 12px;
+  }
+
+  .sc-btn-export {
+    width: 30px;
+    height: 30px;
+  }
+}
