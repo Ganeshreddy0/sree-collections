@@ -1,14 +1,18 @@
+import 'dotenv/config';
 import mongoose from 'mongoose';
 
 const connectDB = async () => {
+  const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/sreecollections';
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/sreecollections', {
-      serverSelectionTimeoutMS: 5000,
+    const isAtlas = uri.includes('mongodb+srv');
+    console.log(`[MongoDB] Connecting to ${isAtlas ? 'MongoDB Atlas' : 'Local MongoDB'}...`);
+    
+    const conn = await mongoose.connect(uri, {
+      serverSelectionTimeoutMS: 8000,
     });
     console.log(`[MongoDB] Connected successfully: ${conn.connection.host}/${conn.connection.name}`);
   } catch (error) {
-    console.error(`[MongoDB] Error connecting to database: ${error.message}`);
-    // Don't crash immediately in dev mode to allow local testing
+    console.error(`[MongoDB] Connection failed: ${error.message}`);
     if (process.env.NODE_ENV === 'production') {
       process.exit(1);
     }
