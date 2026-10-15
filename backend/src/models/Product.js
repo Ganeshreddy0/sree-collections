@@ -2,29 +2,98 @@ import mongoose from 'mongoose';
 
 const productSchema = new mongoose.Schema(
   {
+    // Product Information
+    productName: {
+      type: String,
+      required: [true, 'Product name is required'],
+      trim: true,
+    },
     title: {
       type: String,
-      required: [true, 'Product title is required'],
       trim: true,
     },
     slug: {
       type: String,
-      required: true,
+      required: [true, 'Slug is required'],
       unique: true,
       lowercase: true,
+      trim: true,
+    },
+    productCode: {
+      type: String,
+      required: [true, 'Product code is required'],
+      unique: true,
+      trim: true,
     },
     sku: {
       type: String,
       unique: true,
       sparse: true,
+      trim: true,
+    },
+    sellingType: {
+      type: String,
+      enum: ['B2B', 'B2C', 'Both', ''],
+      default: 'B2C',
+    },
+    category: {
+      type: mongoose.Schema.Types.Mixed, // Can be ObjectId ref or string name
+      required: [true, 'Category is required'],
+    },
+    categoryName: {
+      type: String,
+      default: '',
+    },
+    subCategory: {
+      type: String,
+      default: '',
+    },
+    brand: {
+      type: String,
+      default: '',
+    },
+    unit: {
+      type: String,
+      default: 'Pc',
     },
     description: {
       type: String,
-      required: [true, 'Product description is required'],
+      default: '',
+    },
+
+    // Pricing & Stocks
+    productType: {
+      type: String,
+      enum: ['Single Product', 'Variable Product'],
+      default: 'Single Product',
+    },
+    quantity: {
+      type: Number,
+      required: [true, 'Quantity is required'],
+      default: 0,
+      min: 0,
+    },
+    stock: {
+      type: Number,
+      default: 0,
+      min: 0,
     },
     price: {
       type: Number,
       required: [true, 'Price is required'],
+      min: 0,
+    },
+    taxType: {
+      type: String,
+      default: 'GST 5%',
+    },
+    discountType: {
+      type: String,
+      default: 'None',
+    },
+    discountValue: {
+      type: Number,
+      default: 0,
       min: 0,
     },
     discountPrice: {
@@ -32,53 +101,36 @@ const productSchema = new mongoose.Schema(
       default: null,
       min: 0,
     },
-    category: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Category',
-      required: [true, 'Category is required'],
-    },
-    categoryName: {
-      type: String,
-      default: '',
-    },
-    stock: {
+    quantityAlert: {
       type: Number,
-      required: [true, 'Stock is required'],
-      default: 0,
+      default: 5,
       min: 0,
     },
+
+    // Variant Attributes
+    variantType: {
+      type: String,
+      enum: ['Single Product', 'Variable Product'],
+      default: 'Single Product',
+    },
+    attributes: {
+      size: { type: String, default: '' },
+      colour: { type: String, default: '' },
+      weight: { type: String, default: '' },
+      pattern: { type: String, default: '' },
+      style: { type: String, default: '' },
+      material: { type: String, default: '' },
+    },
+
+    // Images
     images: [
       {
         type: String,
         required: true,
       },
     ],
-    fabric: {
-      type: String,
-      default: 'Pure Silk',
-    },
-    occasion: {
-      type: String,
-      default: 'Festive & Wedding',
-    },
-    color: {
-      type: String,
-      default: 'Multicolor',
-    },
-    blouseIncluded: {
-      type: Boolean,
-      default: true,
-    },
-    rating: {
-      type: Number,
-      default: 4.8,
-      min: 0,
-      max: 5,
-    },
-    numReviews: {
-      type: Number,
-      default: 12,
-    },
+
+    // Meta & Status
     featured: {
       type: Boolean,
       default: false,
@@ -97,8 +149,31 @@ const productSchema = new mongoose.Schema(
   }
 );
 
+// Pre-save hook to keep title and productName in sync, as well as stock and quantity
+productSchema.pre('save', function (next) {
+  if (this.productName && !this.title) {
+    this.title = this.productName;
+  } else if (this.title && !this.productName) {
+    this.productName = this.title;
+  }
+
+  if (this.productCode && !this.sku) {
+    this.sku = this.productCode;
+  } else if (this.sku && !this.productCode) {
+    this.productCode = this.sku;
+  }
+
+  if (this.quantity !== undefined && this.stock === 0) {
+    this.stock = this.quantity;
+  } else if (this.stock !== undefined && this.quantity === 0) {
+    this.quantity = this.stock;
+  }
+
+  next();
+});
+
 // Text index for search
-productSchema.index({ title: 'text', description: 'text', fabric: 'text' });
+productSchema.index({ productName: 'text', title: 'text', description: 'text', productCode: 'text' });
 
 const Product = mongoose.model('Product', productSchema);
 export default Product;

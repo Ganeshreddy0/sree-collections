@@ -4,6 +4,7 @@ import {
   getProductByIdOrSlug,
   createProduct,
   updateProduct,
+  toggleProductStatus,
   deleteProduct,
 } from '../controllers/productController.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
@@ -16,6 +17,7 @@ router.get('/:idOrSlug', getProductByIdOrSlug);
 // Admin protected routes
 router.post('/', protect, requireAdmin, createProduct);
 router.put('/:id', protect, requireAdmin, updateProduct);
+router.patch('/:id/status', protect, requireAdmin, toggleProductStatus);
 router.delete('/:id', protect, requireAdmin, deleteProduct);
 
 export default router;
