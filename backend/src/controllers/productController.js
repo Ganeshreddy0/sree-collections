@@ -8,51 +8,50 @@ export const getProducts = async (req, res, next) => {
     const {
       search,
       category,
-      fabric,
-      occasion,
+      brand,
+      status,
       minPrice,
       maxPrice,
       featured,
       sort,
       page = 1,
-      limit = 20,
+      limit = 50,
     } = req.query;
 
-    const query = { isActive: true };
+    const query = {};
+    if (status && status !== 'Status') {
+      query.isActive = status === 'Active';
+    } else if (req.query.isActive !== undefined) {
+      query.isActive = req.query.isActive === 'true';
+    }
 
-    // Search by title or description
+    // Search by name, title, code, brand, description
     if (search) {
       query.$or = [
+        { productName: { $regex: search, $options: 'i' } },
         { title: { $regex: search, $options: 'i' } },
+        { productCode: { $regex: search, $options: 'i' } },
+        { sku: { $regex: search, $options: 'i' } },
+        { brand: { $regex: search, $options: 'i' } },
         { description: { $regex: search, $options: 'i' } },
-        { fabric: { $regex: search, $options: 'i' } },
       ];
     }
 
     // Filter by Category
-    if (category) {
-      // Check if ObjectId or slug
-      if (category.match(/^[0-9a-fA-F]{24}$/)) {
+    if (category && category !== 'Category') {
+      if (typeof category === 'string' && category.match(/^[0-9a-fA-F]{24}$/)) {
         query.category = category;
       } else {
-        const catDoc = await Category.findOne({ slug: category });
-        if (catDoc) query.category = catDoc._id;
+        query.$or = [
+          { categoryName: { $regex: `^${category}$`, $options: 'i' } },
+          { category: category },
+        ];
       }
     }
 
-    // Filter by Fabric
-    if (fabric) {
-      query.fabric = { $regex: fabric, $options: 'i' };
-    }
-
-    // Filter by Occasion
-    if (occasion) {
-      query.occasion = { $regex: occasion, $options: 'i' };
-    }
-
-    // Filter by Featured
-    if (featured === 'true') {
-      query.featured = true;
+    // Filter by Brand
+    if (brand && brand !== 'Brand') {
+      query.brand = { $regex: `^${brand}$`, $options: 'i' };
     }
 
     // Price Range
@@ -66,24 +65,54 @@ export const getProducts = async (req, res, next) => {
     let sortOptions = { createdAt: -1 };
     if (sort === 'price-low') sortOptions = { price: 1 };
     if (sort === 'price-high') sortOptions = { price: -1 };
-    if (sort === 'rating') sortOptions = { rating: -1 };
-    if (sort === 'popular') sortOptions = { numReviews: -1 };
 
     const skip = (Number(page) - 1) * Number(limit);
     const total = await Product.countDocuments(query);
     const products = await Product.find(query)
-      .populate('category', 'name slug')
       .sort(sortOptions)
       .skip(skip)
       .limit(Number(limit));
+
+    // Map to normalized frontend format while keeping full document
+    const formatted = products.map((p) => ({
+      _id: p._id,
+      id: p._id.toString(),
+      code: p.productCode || p.sku || 'PT000',
+      productCode: p.productCode || p.sku,
+      name: p.productName || p.title || 'Untitled',
+      productName: p.productName || p.title,
+      category: p.categoryName || (typeof p.category === 'string' ? p.category : 'General'),
+      subCategory: p.subCategory || '',
+      brand: p.brand || '---',
+      price: `$${p.price}`,
+      rawPrice: p.price,
+      unit: p.unit || 'Pc',
+      qty: p.quantity !== undefined ? p.quantity : p.stock,
+      quantity: p.quantity !== undefined ? p.quantity : p.stock,
+      img: p.images && p.images.length > 0 ? p.images[0] : 'https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=100&q=80',
+      images: p.images || [],
+      sellingType: p.sellingType,
+      productType: p.productType,
+      taxType: p.taxType,
+      discountType: p.discountType,
+      discountValue: p.discountValue,
+      quantityAlert: p.quantityAlert,
+      variantType: p.variantType,
+      attributes: p.attributes || {},
+      description: p.description,
+      isActive: p.isActive !== false,
+      status: p.isActive !== false ? 'Active' : 'Inactive',
+      createdAt: p.createdAt,
+    }));
 
     res.json({
       success: true,
       count: products.length,
       total,
-      totalPages: Math.ceil(total / Number(limit)),
+      totalPages: Math.ceil(total / Number(limit)) || 1,
       currentPage: Number(page),
-      data: products,
+      data: formatted,
+      raw: products,
     });
   } catch (error) {
     next(error);
@@ -98,9 +127,11 @@ export const getProductByIdOrSlug = async (req, res, next) => {
     let product;
 
     if (idOrSlug.match(/^[0-9a-fA-F]{24}$/)) {
-      product = await Product.findById(idOrSlug).populate('category', 'name slug');
+      product = await Product.findById(idOrSlug);
     } else {
-      product = await Product.findOne({ slug: idOrSlug }).populate('category', 'name slug');
+      product = await Product.findOne({
+        $or: [{ slug: idOrSlug }, { productCode: idOrSlug }, { sku: idOrSlug }],
+      });
     }
 
     if (!product) {
@@ -121,53 +152,143 @@ export const getProductByIdOrSlug = async (req, res, next) => {
 export const createProduct = async (req, res, next) => {
   try {
     const {
+      productName,
       title,
-      description,
-      price,
-      discountPrice,
+      slug: reqSlug,
+      productCode,
+      sku,
+      sellingType,
       category,
+      subCategory,
+      brand,
+      unit,
+      description,
+      productType,
+      quantity,
       stock,
+      price,
+      taxType,
+      discountType,
+      discountValue,
+      quantityAlert,
+      variantType,
+      size,
+      colour,
+      weight,
+      pattern,
+      style,
+      material,
+      attributes: reqAttributes,
       images,
-      fabric,
-      occasion,
-      color,
-      blouseIncluded,
-      featured,
     } = req.body;
 
-    const slug = (
-      title.toLowerCase().replace(/[^a-z0-9]+/g, '-') +
-      '-' +
-      Math.floor(1000 + Math.random() * 9000)
-    ).replace(/(^-|-$)/g, '');
+    const finalName = productName || title;
+    if (!finalName) {
+      return res.status(400).json({ success: false, message: 'Product Name is required' });
+    }
 
-    const catDoc = await Category.findById(category);
+    // Auto generate slug if missing
+    let finalSlug = reqSlug;
+    if (!finalSlug || finalSlug.trim() === '') {
+      finalSlug = (
+        finalName.toLowerCase().replace(/[^a-z0-9]+/g, '-') +
+        '-' +
+        Math.floor(1000 + Math.random() * 9000)
+      ).replace(/(^-|-$)/g, '');
+    }
+
+    // Ensure slug is unique
+    const existingSlug = await Product.findOne({ slug: finalSlug });
+    if (existingSlug) {
+      finalSlug = `${finalSlug}-${Date.now().toString().slice(-4)}`;
+    }
+
+    // Auto generate product code if missing
+    let finalCode = productCode || sku;
+    if (!finalCode || finalCode.trim() === '') {
+      const count = await Product.countDocuments();
+      finalCode = `PT${String(count + 1).padStart(3, '0')}`;
+    }
+
+    // Ensure productCode is unique
+    const existingCode = await Product.findOne({ productCode: finalCode });
+    if (existingCode) {
+      finalCode = `${finalCode}-${Date.now().toString().slice(-3)}`;
+    }
+
+    // Resolve category name
+    let catName = '';
+    let categoryValue = category || 'General';
+    if (category && typeof category === 'string' && category.match(/^[0-9a-fA-F]{24}$/)) {
+      const catDoc = await Category.findById(category);
+      if (catDoc) {
+        catName = catDoc.name;
+        categoryValue = catDoc._id;
+        // increment category count
+        await Category.findByIdAndUpdate(catDoc._id, { $inc: { itemCount: 1 } });
+      }
+    } else if (typeof category === 'string') {
+      catName = category;
+      const catDoc = await Category.findOne({ name: category });
+      if (catDoc) {
+        categoryValue = catDoc._id;
+        await Category.findByIdAndUpdate(catDoc._id, { $inc: { itemCount: 1 } });
+      }
+    }
+
+    // Handle attributes
+    const attributes = reqAttributes || {
+      size: size || '',
+      colour: colour || '',
+      weight: weight || '',
+      pattern: pattern || '',
+      style: style || '',
+      material: material || '',
+    };
+
+    // Calculate discount price
+    const numPrice = Number(price) || 0;
+    const numDiscount = Number(discountValue) || 0;
+    let discountPrice = null;
+    if (discountType === 'Percentage' && numDiscount > 0) {
+      discountPrice = Math.max(0, numPrice - (numPrice * numDiscount) / 100);
+    } else if (discountType === 'Fixed' && numDiscount > 0) {
+      discountPrice = Math.max(0, numPrice - numDiscount);
+    }
+
+    const finalQuantity = Number(quantity) !== undefined && quantity !== '' ? Number(quantity) : Number(stock) || 0;
 
     const product = await Product.create({
-      title,
-      slug,
-      sku: `SREE-${Date.now().toString().slice(-6)}`,
-      description,
-      price: Number(price),
-      discountPrice: discountPrice ? Number(discountPrice) : null,
-      category,
-      categoryName: catDoc ? catDoc.name : '',
-      stock: Number(stock) || 0,
-      images: Array.isArray(images) ? images : [images],
-      fabric: fabric || 'Silk',
-      occasion: occasion || 'Festive',
-      color: color || 'Classic',
-      blouseIncluded: Boolean(blouseIncluded),
-      featured: Boolean(featured),
+      productName: finalName,
+      title: finalName,
+      slug: finalSlug,
+      productCode: finalCode,
+      sku: finalCode,
+      sellingType: sellingType || 'B2C',
+      category: categoryValue,
+      categoryName: catName || (typeof category === 'string' ? category : 'General'),
+      subCategory: subCategory || '',
+      brand: brand || '---',
+      unit: unit || 'Pc',
+      description: description || '',
+      productType: productType || 'Single Product',
+      quantity: finalQuantity,
+      stock: finalQuantity,
+      price: numPrice,
+      taxType: taxType || 'GST 5%',
+      discountType: discountType || 'None',
+      discountValue: numDiscount,
+      discountPrice,
+      quantityAlert: Number(quantityAlert) || 5,
+      variantType: variantType || 'Single Product',
+      attributes,
+      images: Array.isArray(images) && images.length > 0 ? images : ['https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=100&q=80'],
+      isActive: req.body.status !== undefined ? req.body.status === 'Active' : (req.body.isActive !== undefined ? Boolean(req.body.isActive) : true),
     });
-
-    // Update item count on category
-    if (catDoc) {
-      await Category.findByIdAndUpdate(category, { $inc: { itemCount: 1 } });
-    }
 
     res.status(201).json({
       success: true,
+      message: 'Product created successfully',
       data: product,
     });
   } catch (error) {
@@ -182,7 +303,7 @@ export const updateProduct = async (req, res, next) => {
     const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
-    }).populate('category', 'name slug');
+    });
 
     if (!product) {
       return res.status(404).json({ success: false, message: 'Product not found' });
@@ -206,7 +327,7 @@ export const deleteProduct = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
 
-    if (product.category) {
+    if (product.category && typeof product.category === 'string' && product.category.match(/^[0-9a-fA-F]{24}$/)) {
       await Category.findByIdAndUpdate(product.category, { $inc: { itemCount: -1 } });
     }
 
@@ -214,6 +335,21 @@ export const deleteProduct = async (req, res, next) => {
       success: true,
       message: 'Product deleted successfully',
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Toggle product Active / Inactive status
+// @route   PATCH /api/products/:id/status
+export const toggleProductStatus = async (req, res, next) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
+    product.isActive = !product.isActive;
+    await product.save();
+    const statusLabel = product.isActive ? 'Active' : 'Inactive';
+    res.json({ success: true, message: `Product marked ${statusLabel}`, data: { isActive: product.isActive, status: statusLabel } });
   } catch (error) {
     next(error);
   }
