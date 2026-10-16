@@ -128,13 +128,13 @@ export default function HomePage() {
           - Right-aligned: Home (with active underline), About, Categories,
             "CONTACT US" golden pill button, Search icon, Cart icon
          ========================================================================= */}
-      <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+      <div style={{ width: "100%", display: "flex", justifyContent: "center", position: "sticky", top: 0, zIndex: 100, backgroundColor: "#FCF8F2" }}>
         <header
           style={{
             width: "100%",
             maxWidth: "1360px",
             minHeight: "95px",
-            margin: "12px auto 0 auto",
+            margin: "0 auto",
             padding: "0 20px",
             display: "flex",
             alignItems: "center",
@@ -171,23 +171,28 @@ export default function HomePage() {
             className="desktop-nav"
           >
             {/* CMS-driven nav links */}
-            {navLinks.map((link) => (
-              <a
-                key={link.itemId}
-                href={link.linkUrl}
-                style={{
-                  fontFamily: "var(--font-serif)",
-                  fontSize: "17px",
-                  fontWeight: 700,
-                  color: "#5A2035",
-                  transition: "opacity 0.2s",
-                  lineHeight: 1.2,
-                }}
-                className="nav-link"
-              >
-                {link.title}
-              </a>
-            ))}
+            {navLinks.map((link) => {
+              const isHome = link.itemId === "nav-home" || link.linkUrl === "#home";
+              return (
+                <a
+                  key={link.itemId}
+                  href={link.linkUrl}
+                  style={{
+                    fontFamily: "var(--font-serif)",
+                    fontSize: "17px",
+                    fontWeight: 700,
+                    color: "#5A2035",
+                    borderBottom: isHome ? "2.5px solid #5A2035" : undefined,
+                    paddingBottom: isHome ? "3px" : undefined,
+                    transition: "opacity 0.2s",
+                    lineHeight: 1.2,
+                  }}
+                  className={isHome ? undefined : "nav-link"}
+                >
+                  {link.title}
+                </a>
+              );
+            })}
 
             {/* CONTACT US Pill Button */}
             <a
@@ -298,10 +303,23 @@ export default function HomePage() {
               </button>
             </div>
             <nav style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "20px" }}>
-              {navLinks.map(link => (
-                <a key={link.itemId} href={link.linkUrl} onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: link.itemId === "nav-home" ? 600 : 500 }}>{link.title}</a>
+              {navLinks.map((link) => (
+                <a
+                  key={link.itemId}
+                  href={link.linkUrl}
+                  onClick={() => setMobileMenuOpen(false)}
+                  style={{ fontSize: "16px", fontWeight: link.itemId === "nav-home" ? 600 : 500 }}
+                >
+                  {link.title}
+                </a>
               ))}
-              <a href={S("header").ctaLink || "/contact"} onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500 }}>{S("header").ctaText || "Contact Us"}</a>
+              <a
+                href={S("header").ctaLink || "/contact"}
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ fontSize: "16px", fontWeight: 500 }}
+              >
+                {S("header").ctaText || "Contact Us"}
+              </a>
             </nav>
           </div>
         </div>
@@ -364,46 +382,51 @@ export default function HomePage() {
             textAlign: "left",
           }}
         >
-          {/* Line 1: Dive Into A W❂rld Of Endless */}
+          {/* Line 1: Dive Into A W❂Rld Of Endless */}
           <h1
+            className="hero-main-title"
             style={{
-              fontFamily: "'Blacker Display', var(--font-serif)",
-              fontSize: "clamp(34px, 4.3vw, 56px)",
-              fontWeight: 700,
+              fontFamily: "'Blacker Display', Georgia, serif",
+              fontWeight: 400,
+              fontStyle: "normal",
+              fontSize: "clamp(34px, 5.8vw, 86px)",
+              lineHeight: "130%",
+              letterSpacing: "-0.03em",
+              textTransform: "capitalize",
               color: "#5A2035",
-              lineHeight: 1.15,
               margin: "0 0 6px 0",
-              letterSpacing: "-0.5px",
             }}
           >
-            Dive Into A W<span
+            Dive Into A W
+            <span
               style={{
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
                 verticalAlign: "middle",
-                margin: "0 1px",
-                width: "0.82em",
-                height: "0.82em",
+                margin: "0 4px",
+                width: "0.8em",
+                height: "0.8em",
                 transform: "translateY(-0.06em)",
               }}
             >
               <svg viewBox="0 0 100 100" style={{ width: "100%", height: "100%", display: "block" }}>
                 <circle cx="50" cy="50" r="48" fill="#BA8E43" />
-                <circle cx="50" cy="50" r="43" fill="#B3863B" stroke="#DFC487" strokeWidth="1.5" />
+                <circle cx="50" cy="50" r="44" fill="#B3863B" stroke="#DFC487" strokeWidth="1.2" />
                 <g fill="#FFFDF8">
                   {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
                     <path
                       key={i}
-                      d="M 50 15 C 54.5 15, 55 35, 50 41 C 45 35, 45.5 15, 50 15 Z"
+                      d="M 50 16 C 54.5 16, 55 35, 50 41 C 45 35, 45.5 16, 50 16 Z"
                       transform={`rotate(${angle} 50 50)`}
                     />
                   ))}
                 </g>
-                <circle cx="50" cy="50" r="8" fill="#BA8E43" stroke="#FFFDF8" strokeWidth="2.5" />
+                <circle cx="50" cy="50" r="7.5" fill="#BA8E43" stroke="#FFFDF8" strokeWidth="2" />
                 <circle cx="50" cy="50" r="2.5" fill="#FFFDF8" />
               </svg>
-            </span>rld Of Endless
+            </span>
+            Rld Of Endless
           </h1>
 
           {/* Line 2: Fashion Possibilities + Subtitle */}
@@ -412,18 +435,22 @@ export default function HomePage() {
               display: "flex",
               alignItems: "center",
               justifyContent: "flex-start",
-              gap: "28px",
+              gap: "32px",
               flexWrap: "wrap",
             }}
           >
             <span
+              className="hero-second-title"
               style={{
-                fontFamily: "'Blacker Display', var(--font-serif)",
-                fontSize: "clamp(34px, 4.3vw, 56px)",
-                fontWeight: 700,
+                fontFamily: "'Blacker Display', Georgia, serif",
+                fontWeight: 400,
+                fontStyle: "normal",
+                fontSize: "clamp(34px, 5.8vw, 86px)",
+                lineHeight: "130%",
+                letterSpacing: "-0.03em",
+                textTransform: "capitalize",
                 color: "#5A2035",
-                lineHeight: 1.15,
-                letterSpacing: "-0.5px",
+                display: "inline-block",
               }}
             >
               {S("hero").subtitle || "Fashion Possibilities"}
@@ -432,13 +459,13 @@ export default function HomePage() {
             <p
               style={{
                 fontFamily: "var(--font-sans)",
-                fontSize: "13.5px",
-                fontWeight: 600,
+                fontSize: "14px",
+                fontWeight: 500,
                 color: "#5A2035",
-                maxWidth: "350px",
+                maxWidth: "380px",
                 margin: 0,
-                lineHeight: 1.4,
-                letterSpacing: "0.1px",
+                lineHeight: 1.45,
+                letterSpacing: "-0.2px",
               }}
             >
               {S("hero").description || "Elevate Your Wardrobe With Our Fashion Finds."}
@@ -2249,7 +2276,7 @@ export default function HomePage() {
           12. FOOTER
          ========================================================================= */}
       <footer
-        id="about"
+        id="footer"
         style={{
           width: "100%",
           maxWidth: "1535px",
@@ -2335,6 +2362,12 @@ export default function HomePage() {
 
       {/* Responsive Styles */}
       <style>{`
+        @media (min-width: 1400px) {
+          .hero-main-title,
+          .hero-second-title {
+            font-size: 86px !important;
+          }
+        }
         @media (min-width: 992px) {
           .desktop-nav {
             display: flex !important;

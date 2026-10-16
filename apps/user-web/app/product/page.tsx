@@ -314,7 +314,7 @@ function MockProductDetailPage() {
           style={{ display: "none", alignItems: "center", gap: "36px" }}
         >
           <NavLink href="/">Home</NavLink>
-          <NavLink href="/#about">About</NavLink>
+          <NavLink href="/about">About</NavLink>
           <NavLink href="/categories">Categories</NavLink>
           <a
             href="/contact"
@@ -468,7 +468,7 @@ function MockProductDetailPage() {
                 Home
               </a>
               <a
-                href="/#about"
+                href="/about"
                 onClick={() => setMobileMenuOpen(false)}
                 style={{
                   fontSize: "17px",

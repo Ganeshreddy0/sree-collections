@@ -1,4 +1,4 @@
-﻿import dns from 'dns';
+import dns from 'dns';
 // Fallback to public DNS so MongoDB Atlas SRV records resolve on restrictive local networks
 dns.setServers(['8.8.8.8', '1.1.1.1']);
 
@@ -19,6 +19,7 @@ import orderRoutes from './routes/orderRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
 import homepageRoutes from './routes/homepageRoutes.js';
+import contactRoutes from './routes/contactRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -59,6 +60,7 @@ app.use('/api/homepage', (req, res, next) => {
   next();
 });
 app.use('/api/homepage', homepageRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Error Handler
 app.use(errorHandler);
