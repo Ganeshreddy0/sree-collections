@@ -101,6 +101,12 @@ function buildProductFilterQuery(queryParams) {
     sizes,
     colour,
     color,
+    fabric,
+    material,
+    pattern,
+    occasion,
+    inStock,
+    availability,
     minPrice,
     maxPrice,
     priceRange,
@@ -225,6 +231,90 @@ function buildProductFilterQuery(queryParams) {
     }
   }
 
+  // 8b. Fabric / material / pattern / occasion (dynamic attribute filters)
+  if (fabric && String(fabric).trim() && fabric !== 'all') {
+    const fabrics = String(fabric)
+      .split(',')
+      .map((f) => f.trim())
+      .filter(Boolean);
+    if (fabrics.length > 0) {
+      const patterns = fabrics.map(
+        (f) => new RegExp(`^${f.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}$`, 'i')
+      );
+      andConditions.push({
+        $or: [{ fabric: { $in: patterns } }, { 'attributes.material': { $in: patterns } }],
+      });
+    }
+  }
+
+  if (material && String(material).trim() && material !== 'all') {
+    const materials = String(material)
+      .split(',')
+      .map((m) => m.trim())
+      .filter(Boolean);
+    if (materials.length > 0) {
+      const patterns = materials.map(
+        (m) => new RegExp(`^${m.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}$`, 'i')
+      );
+      andConditions.push({
+        $or: [{ 'attributes.material': { $in: patterns } }, { fabric: { $in: patterns } }],
+      });
+    }
+  }
+
+  if (pattern && String(pattern).trim() && pattern !== 'all') {
+    const patterns = String(pattern)
+      .split(',')
+      .map((p) => p.trim())
+      .filter(Boolean)
+      .map((p) => new RegExp(`^${p.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}$`, 'i'));
+    if (patterns.length > 0) {
+      andConditions.push({ 'attributes.pattern': { $in: patterns } });
+    }
+  }
+
+  if (occasion && String(occasion).trim() && occasion !== 'all') {
+    const occasions = String(occasion)
+      .split(',')
+      .map((o) => o.trim())
+      .filter(Boolean);
+    if (occasions.length > 0) {
+      const occasionOrs = [];
+      for (const o of occasions) {
+        const re = new RegExp(o.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i');
+        occasionOrs.push({ tags: re });
+        occasionOrs.push({ 'attributes.style': re });
+      }
+      andConditions.push({ $or: occasionOrs });
+    }
+  }
+
+  // 8c. Availability / in-stock
+  const stockFlag = inStock !== undefined && inStock !== '' ? inStock : availability;
+  if (stockFlag === 'true' || stockFlag === true || stockFlag === 'inStock') {
+    andConditions.push({
+      $or: [
+        { stock: { $gt: 0 } },
+        { quantity: { $gt: 0 } },
+        { 'variants.stock': { $gt: 0 } },
+      ],
+    });
+  } else if (stockFlag === 'false' || stockFlag === 'outOfStock') {
+    andConditions.push({
+      $and: [
+        { $or: [{ stock: { $lte: 0 } }, { stock: { $exists: false } }] },
+        { $or: [{ quantity: { $lte: 0 } }, { quantity: { $exists: false } }] },
+        {
+          $or: [
+            { variants: { $size: 0 } },
+            { variants: { $exists: false } },
+            { variants: { $not: { $elemMatch: { stock: { $gt: 0 } } } } },
+          ],
+        },
+      ],
+    });
+  }
+
   // 9. Price Range filter
   const priceRangesToParse = [];
   if (priceRange) {
@@ -336,11 +426,23 @@ export const getProducts = async (req, res, next) => {
 
 /* ═════════════════════════════════════════════════
    GET /api/products/filters
-   Returns available category, size, price range facets
+   Returns available category, size, colour, brand, fabric facets
 ═════════════════════════════════════════════════ */
 export const getProductFilterFacets = async (req, res, next) => {
   try {
-    // 1. Categories with product counts
+    // Active admin categories (missing status treated as Active for legacy docs)
+    const adminCategories = await Category.find({
+      $or: [
+        { status: 'Active' },
+        { status: { $exists: false } },
+        { status: null },
+        { status: '' },
+      ],
+    })
+      .sort({ featured: -1, name: 1 })
+      .lean();
+
+    // Product counts per category name
     const categoriesAggregation = await Product.aggregate([
       { $match: { isActive: true } },
       {
@@ -354,30 +456,68 @@ export const getProductFilterFacets = async (req, res, next) => {
       { $sort: { count: -1 } },
     ]);
 
-    const categories = categoriesAggregation.map((c) => ({
-      name: String(c._id),
-      count: c.count,
+    const countByName = new Map(
+      categoriesAggregation.map((c) => [String(c._id).toLowerCase(), c.count])
+    );
+
+    const categoriesFromAdmin = adminCategories.map((c) => ({
+      name: c.name,
+      slug: c.slug,
+      count: countByName.get(String(c.name).toLowerCase()) || 0,
+      featured: Boolean(c.featured),
     }));
 
-    // 2. Distinct sizes & price min/max
+    // Include product-only category names not yet in Category collection
+    const adminNameSet = new Set(categoriesFromAdmin.map((c) => c.name.toLowerCase()));
+    const orphanCategories = categoriesAggregation
+      .filter((c) => c._id && !adminNameSet.has(String(c._id).toLowerCase()))
+      .map((c) => ({
+        name: String(c._id),
+        slug: '',
+        count: c.count,
+        featured: false,
+      }));
+
+    const categories = [...categoriesFromAdmin, ...orphanCategories];
+
     const activeProducts = await Product.find({ isActive: true })
-      .select('selectedSizes variants.size attributes.size sellingPrice price')
+      .select(
+        'selectedSizes selectedColours variants attributes fabric brand subCategory sellingPrice price stock quantity'
+      )
       .lean();
 
-    const sizeSet = new Set(['S', 'M', 'L', 'XL', 'XXL']);
+    const sizeSet = new Set();
+    const colourSet = new Set();
+    const brandSet = new Set();
+    const fabricSet = new Set();
+    const patternSet = new Set();
+    const subCategorySet = new Set();
     let minPrice = Infinity;
     let maxPrice = 0;
+    let inStockCount = 0;
 
     activeProducts.forEach((p) => {
       if (Array.isArray(p.selectedSizes)) {
-        p.selectedSizes.forEach((s) => s && sizeSet.add(s.trim()));
+        p.selectedSizes.forEach((s) => s && sizeSet.add(String(s).trim()));
+      }
+      if (Array.isArray(p.selectedColours)) {
+        p.selectedColours.forEach((c) => c && colourSet.add(String(c).trim()));
       }
       if (Array.isArray(p.variants)) {
-        p.variants.forEach((v) => v.size && sizeSet.add(v.size.trim()));
+        p.variants.forEach((v) => {
+          if (v.size) sizeSet.add(String(v.size).trim());
+          if (v.colour) colourSet.add(String(v.colour).trim());
+        });
       }
-      if (p.attributes && p.attributes.size) {
-        sizeSet.add(p.attributes.size.trim());
+      if (p.attributes) {
+        if (p.attributes.size) sizeSet.add(String(p.attributes.size).trim());
+        if (p.attributes.colour) colourSet.add(String(p.attributes.colour).trim());
+        if (p.attributes.material) fabricSet.add(String(p.attributes.material).trim());
+        if (p.attributes.pattern) patternSet.add(String(p.attributes.pattern).trim());
       }
+      if (p.fabric) fabricSet.add(String(p.fabric).trim());
+      if (p.brand && p.brand !== '---') brandSet.add(String(p.brand).trim());
+      if (p.subCategory) subCategorySet.add(String(p.subCategory).trim());
 
       const pPrice = Number(p.sellingPrice) || Number(p.price) || 0;
       if (pPrice > 0) {
@@ -393,18 +533,59 @@ export const getProductFilterFacets = async (req, res, next) => {
           }
         });
       }
+
+      const stock =
+        Number(p.stock) ||
+        Number(p.quantity) ||
+        (Array.isArray(p.variants)
+          ? p.variants.reduce((sum, v) => sum + (Number(v.stock) || 0), 0)
+          : 0);
+      if (stock > 0) inStockCount += 1;
     });
 
     if (minPrice === Infinity) minPrice = 0;
 
+    // Sensible INR buckets from live price span
+    const priceBuckets =
+      maxPrice > 10000
+        ? [
+            { label: 'All Prices', min: null, max: null },
+            { label: 'Under ₹2,000', min: 0, max: 2000 },
+            { label: '₹2,000 - ₹5,000', min: 2000, max: 5000 },
+            { label: '₹5,000 - ₹10,000', min: 5000, max: 10000 },
+            { label: 'Above ₹10,000', min: 10000, max: null },
+          ]
+        : [
+            { label: 'All Prices', min: null, max: null },
+            { label: 'Under ₹2,000', min: 0, max: 2000 },
+            { label: '₹2,000 - ₹5,000', min: 2000, max: 5000 },
+            { label: 'Above ₹5,000', min: 5000, max: null },
+          ];
+
+    const payload = {
+      categories,
+      sizes: Array.from(sizeSet).sort((a, b) => a.localeCompare(b, undefined, { numeric: true })),
+      colours: Array.from(colourSet).sort((a, b) => a.localeCompare(b)),
+      brands: Array.from(brandSet).sort((a, b) => a.localeCompare(b)),
+      fabrics: Array.from(fabricSet).sort((a, b) => a.localeCompare(b)),
+      patterns: Array.from(patternSet).sort((a, b) => a.localeCompare(b)),
+      subCategories: Array.from(subCategorySet).sort((a, b) => a.localeCompare(b)),
+      priceRange: { min: minPrice, max: maxPrice },
+      priceBuckets,
+      availability: {
+        inStock: inStockCount,
+        total: activeProducts.length,
+      },
+      totalActiveProducts: activeProducts.length,
+    };
+
     res.json({
       success: true,
-      data: {
-        categories,
-        sizes: Array.from(sizeSet),
-        priceRange: { min: minPrice, max: maxPrice },
-        totalActiveProducts: activeProducts.length,
-      },
+      data: payload,
+      // Backward-compatible top-level aliases (older clients)
+      categories: payload.categories,
+      sizes: payload.sizes,
+      priceRange: payload.priceRange,
     });
   } catch (error) {
     next(error);

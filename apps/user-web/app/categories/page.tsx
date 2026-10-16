@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   FiSearch,
   FiShoppingCart,
@@ -12,34 +12,29 @@ import {
   FiMapPin,
   FiCheckCircle,
   FiShoppingBag,
+  FiPlus,
+  FiMinus,
 } from "react-icons/fi";
 import { FaFacebookF, FaYoutube, FaInstagram, FaWhatsapp } from "react-icons/fa";
+
+const API_BASE = "http://localhost:5000/api";
 
 interface Product {
   id: string;
   name: string;
   price: string;
+  rawPrice: number;
+  mrp: number;
   image: string;
   category: string;
   isTall: boolean;
+  colours: string[];
+  featured: boolean;
+  isNewArrival: boolean;
+  isBestSeller: boolean;
+  discountLabel: string;
+  productType: string;
 }
-
-const CATEGORIES = [
-  "All Products",
-  "Casual wear",
-  "Sarees",
-  "One Gram Jewellery",
-  "Decorative Items",
-];
-
-const PRICE_RANGES = [
-  { label: "All Prices" },
-  { label: "Under $2,000" },
-  { label: "$2,000 - $5,000" },
-  { label: "Above $5,000" },
-];
-
-const SIZES = ["S", "M", "L", "XL", "XXL"];
 
 const SORT_OPTIONS = [
   "Featured",
@@ -48,161 +43,109 @@ const SORT_OPTIONS = [
   "New Arrivals",
 ];
 
-/* Column 1 items: Short, Short, Tall, Short, Short, Tall */
-const COL1_PRODUCTS: Product[] = [
-  {
-    id: "c1_1",
-    name: "Formal Shirt For Woman",
-    price: "$14.55",
-    image: "/Categories/product_formal_shirt.jpg",
-    category: "Casual wear",
-    isTall: false,
-  },
-  {
-    id: "c1_2",
-    name: "Yellow Jacket For Winter",
-    price: "$14.55",
-    image: "/Categories/product_yellow_jacket.jpg",
-    category: "Casual wear",
-    isTall: false,
-  },
-  {
-    id: "c1_3",
-    name: "Black and gray Exercise outfit",
-    price: "$28.50",
-    image: "/Categories/product_exercise_outfit.jpg",
-    category: "Casual wear",
-    isTall: true,
-  },
-  {
-    id: "c1_4",
-    name: "Formal Shirt For Woman",
-    price: "$14.55",
-    image: "/Categories/product_formal_shirt.jpg",
-    category: "Casual wear",
-    isTall: false,
-  },
-  {
-    id: "c1_5",
-    name: "Yellow Jacket For Winter",
-    price: "$14.55",
-    image: "/Categories/product_yellow_jacket.jpg",
-    category: "Casual wear",
-    isTall: false,
-  },
-  {
-    id: "c1_6",
-    name: "Black and gray Exercise outfit",
-    price: "$28.50",
-    image: "/Categories/product_exercise_outfit.jpg",
-    category: "Casual wear",
-    isTall: true,
-  },
+const DEFAULT_PRICE_BUCKETS = [
+  { label: "All Prices" },
+  { label: "Under ₹2,000" },
+  { label: "₹2,000 - ₹5,000" },
+  { label: "Above ₹5,000" },
 ];
 
-/* Column 2 items: Tall, Short, Short, Tall, Short, Short */
-const COL2_PRODUCTS: Product[] = [
-  {
-    id: "c2_1",
-    name: "Black and gray Exercise outfit",
-    price: "$28.50",
-    image: "/Categories/product_exercise_outfit.jpg",
-    category: "Casual wear",
-    isTall: true,
-  },
-  {
-    id: "c2_2",
-    name: "Formal Shirt For Woman",
-    price: "$14.55",
-    image: "/Categories/product_formal_shirt.jpg",
-    category: "Casual wear",
-    isTall: false,
-  },
-  {
-    id: "c2_3",
-    name: "Yellow Jacket For Winter",
-    price: "$14.55",
-    image: "/Categories/product_yellow_jacket.jpg",
-    category: "Casual wear",
-    isTall: false,
-  },
-  {
-    id: "c2_4",
-    name: "Black and gray Exercise outfit",
-    price: "$28.50",
-    image: "/Categories/product_exercise_outfit.jpg",
-    category: "Casual wear",
-    isTall: true,
-  },
-  {
-    id: "c2_5",
-    name: "Formal Shirt For Woman",
-    price: "$14.55",
-    image: "/Categories/product_formal_shirt.jpg",
-    category: "Casual wear",
-    isTall: false,
-  },
-  {
-    id: "c2_6",
-    name: "Yellow Jacket For Winter",
-    price: "$14.55",
-    image: "/Categories/product_yellow_jacket.jpg",
-    category: "Casual wear",
-    isTall: false,
-  },
-];
+const COLOUR_HEX: Record<string, string> = {
+  maroon: "#800000",
+  red: "#C0392B",
+  green: "#1E7B34",
+  blue: "#1F4E79",
+  navy: "#1B2A4A",
+  black: "#1A1A1A",
+  white: "#F5F5F5",
+  cream: "#F5E6C8",
+  gold: "#C9A227",
+  yellow: "#E1B12C",
+  pink: "#D46A8C",
+  purple: "#6C3483",
+  orange: "#E67E22",
+  brown: "#6B3E26",
+  grey: "#7F8C8D",
+  gray: "#7F8C8D",
+  beige: "#D4C4A8",
+};
 
-/* Column 3 items: Short, Tall, Short, Short, Tall, Short */
-const COL3_PRODUCTS: Product[] = [
-  {
-    id: "c3_1",
-    name: "Yellow Jacket For Winter",
-    price: "$14.55",
-    image: "/Categories/product_yellow_jacket.jpg",
-    category: "Casual wear",
-    isTall: false,
-  },
-  {
-    id: "c3_2",
-    name: "Black and gray Exercise outfit",
-    price: "$28.50",
-    image: "/Categories/product_exercise_outfit.jpg",
-    category: "Casual wear",
-    isTall: true,
-  },
-  {
-    id: "c3_3",
-    name: "Formal Shirt For Woman",
-    price: "$14.55",
-    image: "/Categories/product_formal_shirt.jpg",
-    category: "Casual wear",
-    isTall: false,
-  },
-  {
-    id: "c3_4",
-    name: "Yellow Jacket For Winter",
-    price: "$14.55",
-    image: "/Categories/product_yellow_jacket.jpg",
-    category: "Casual wear",
-    isTall: false,
-  },
-  {
-    id: "c3_5",
-    name: "Black and gray Exercise outfit",
-    price: "$28.50",
-    image: "/Categories/product_exercise_outfit.jpg",
-    category: "Casual wear",
-    isTall: true,
-  },
-  {
-    id: "c3_6",
-    name: "Formal Shirt For Woman",
-    price: "$14.55",
-    image: "/Categories/product_formal_shirt.jpg",
-    category: "Casual wear",
-    isTall: false,
-  },
-];
+function colourToHex(name: string): string {
+  const key = name.toLowerCase().trim();
+  if (COLOUR_HEX[key]) return COLOUR_HEX[key];
+  for (const [k, hex] of Object.entries(COLOUR_HEX)) {
+    if (key.includes(k)) return hex;
+  }
+  return "#BB8E43";
+}
+
+function formatInr(amount: number): string {
+  return `₹${Number(amount || 0).toLocaleString("en-IN")}`;
+}
+
+function readUrlFilters() {
+  if (typeof window === "undefined") {
+    return {
+      category: "All Products",
+      size: "",
+      colour: "",
+      brand: "",
+      fabric: "",
+      subCategory: "",
+      prices: ["All Prices"] as string[],
+      sort: "Featured",
+      search: "",
+      inStock: false,
+    };
+  }
+  const sp = new URLSearchParams(window.location.search);
+  const prices = sp.get("price");
+  return {
+    category: sp.get("category") || "All Products",
+    size: sp.get("size") || "",
+    colour: sp.get("colour") || "",
+    brand: sp.get("brand") || "",
+    fabric: sp.get("fabric") || "",
+    subCategory: sp.get("subCategory") || "",
+    prices: prices ? prices.split(";").filter(Boolean) : ["All Prices"],
+    sort: sp.get("sort") || "Featured",
+    search: sp.get("search") || "",
+    inStock: sp.get("inStock") === "true",
+  };
+}
+
+function writeUrlFilters(state: {
+  category: string;
+  size: string;
+  colour: string;
+  brand: string;
+  fabric: string;
+  subCategory: string;
+  prices: string[];
+  sort: string;
+  search: string;
+  inStock: boolean;
+}) {
+  if (typeof window === "undefined") return;
+  const sp = new URLSearchParams();
+  if (state.category && state.category !== "All Products") {
+    sp.set("category", state.category);
+  }
+  if (state.subCategory) sp.set("subCategory", state.subCategory);
+  if (state.size) sp.set("size", state.size);
+  if (state.colour) sp.set("colour", state.colour);
+  if (state.brand) sp.set("brand", state.brand);
+  if (state.fabric) sp.set("fabric", state.fabric);
+  if (state.prices.length && !state.prices.includes("All Prices")) {
+    sp.set("price", state.prices.join(";"));
+  }
+  if (state.sort && state.sort !== "Featured") sp.set("sort", state.sort);
+  if (state.search.trim()) sp.set("search", state.search.trim());
+  if (state.inStock) sp.set("inStock", "true");
+  const qs = sp.toString();
+  const next = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
+  window.history.replaceState(null, "", next);
+}
 
 function NavLink({
   href,
@@ -236,18 +179,16 @@ function NavLink({
 
 function ProductCard({
   product,
-  onAddToCart,
-  inCart,
+  qty,
+  onQtyChange,
 }: {
   product: Product;
-  onAddToCart: (p: Product) => void;
-  inCart: boolean;
+  qty: number;
+  onQtyChange: (delta: number) => void;
 }) {
   const imgHeight = product.isTall ? 572 : 230;
-  const productUrl =
-    product.id && product.id.length === 24
-      ? `/products/${product.id}`
-      : `/product?id=${encodeURIComponent(product.id)}&name=${encodeURIComponent(product.name)}&price=${encodeURIComponent(product.price)}&img=${encodeURIComponent(product.image)}`;
+  const productUrl = `/products/${product.id}`;
+  const showMrp = product.mrp > 0 && product.mrp > product.rawPrice;
 
   return (
     <div
@@ -261,7 +202,7 @@ function ProductCard({
       style={{
         backgroundColor: "#FFFFFF",
         borderRadius: "16px",
-        border: inCart ? "2px solid #BB8E43" : "1.5px solid #E3D7C5",
+        border: qty > 0 ? "1.5px solid #BB8E43" : "1.5px solid #E3D7C5",
         padding: "12px",
         boxSizing: "border-box",
         position: "relative",
@@ -269,25 +210,63 @@ function ProductCard({
         transition: "border-color 0.2s ease",
       }}
     >
-      {/* In-cart indicator */}
-      {inCart && (
+      {(product.featured || product.isNewArrival || product.discountLabel) && (
         <div
           style={{
             position: "absolute",
-            top: "10px",
-            left: "10px",
-            backgroundColor: "#BB8E43",
-            color: "#FFFFFF",
-            fontSize: "10px",
-            fontFamily: "'Playfair Display', Georgia, serif",
-            fontWeight: 700,
-            padding: "2px 8px",
-            borderRadius: "999px",
+            top: 20,
+            left: 20,
             zIndex: 2,
-            letterSpacing: "0.5px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 6,
           }}
         >
-          In Cart
+          {product.discountLabel && (
+            <span
+              style={{
+                backgroundColor: "#5D2030",
+                color: "#FFFFFF",
+                fontSize: 11,
+                fontWeight: 700,
+                padding: "4px 8px",
+                borderRadius: 999,
+                fontFamily: "'Playfair Display', Georgia, serif",
+              }}
+            >
+              {product.discountLabel}
+            </span>
+          )}
+          {product.isNewArrival && (
+            <span
+              style={{
+                backgroundColor: "#BB8E43",
+                color: "#FFFFFF",
+                fontSize: 11,
+                fontWeight: 700,
+                padding: "4px 8px",
+                borderRadius: 999,
+                fontFamily: "'Playfair Display', Georgia, serif",
+              }}
+            >
+              New
+            </span>
+          )}
+          {product.featured && !product.isNewArrival && (
+            <span
+              style={{
+                backgroundColor: "#BB8E43",
+                color: "#FFFFFF",
+                fontSize: 11,
+                fontWeight: 700,
+                padding: "4px 8px",
+                borderRadius: 999,
+                fontFamily: "'Playfair Display', Georgia, serif",
+              }}
+            >
+              Featured
+            </span>
+          )}
         </div>
       )}
 
@@ -338,6 +317,45 @@ function ProductCard({
             {product.name}
           </a>
         </h3>
+
+        {product.colours.length > 0 && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              marginBottom: 8,
+              flexWrap: "wrap",
+            }}
+          >
+            {product.colours.slice(0, 5).map((c) => (
+              <span
+                key={c}
+                title={c}
+                style={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: "50%",
+                  backgroundColor: colourToHex(c),
+                  border: "1px solid #E3D7C5",
+                  display: "inline-block",
+                }}
+              />
+            ))}
+            {product.colours.length > 5 && (
+              <span
+                style={{
+                  fontSize: 11,
+                  color: "#8A7B6F",
+                  fontFamily: "'Playfair Display', Georgia, serif",
+                }}
+              >
+                +{product.colours.length - 5}
+              </span>
+            )}
+          </div>
+        )}
+
         <div
           style={{
             display: "flex",
@@ -345,7 +363,7 @@ function ProductCard({
             justifyContent: "space-between",
           }}
         >
-          <div style={{ display: "flex", alignItems: "baseline", gap: "4px" }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: "6px", flexWrap: "wrap" }}>
             <span
               style={{
                 fontFamily: "'Playfair Display', Georgia, serif",
@@ -366,36 +384,149 @@ function ProductCard({
             >
               {product.price}
             </span>
+            {showMrp && (
+              <span
+                style={{
+                  fontFamily: "'Playfair Display', Georgia, serif",
+                  fontSize: "12px",
+                  color: "#8A7B6F",
+                  textDecoration: "line-through",
+                }}
+              >
+                {formatInr(product.mrp)}
+              </span>
+            )}
           </div>
 
-          {/* Unified cart button for ALL products */}
-          <button
-            aria-label={inCart ? "Already in cart" : "Add to cart"}
-            className="cat-cart-btn"
-            onClick={(e) => {
-              e.stopPropagation();
-              onAddToCart(product);
-            }}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "5px",
-              backgroundColor: inCart ? "#BB8E43" : "transparent",
-              border: inCart ? "none" : "1.5px solid #BB8E43",
-              borderRadius: "999px",
-              padding: inCart ? "5px 12px" : "5px 12px",
-              cursor: "pointer",
-              transition: "all 0.2s ease",
-              color: inCart ? "#FFFFFF" : "#BB8E43",
-              fontFamily: "'Playfair Display', Georgia, serif",
-              fontSize: "12px",
-              fontWeight: 600,
-              whiteSpace: "nowrap",
-            }}
-          >
-            <FiShoppingCart size={13} />
-            <span>{inCart ? "Added" : "Add to Cart"}</span>
-          </button>
+          {/* Cart action: only cart icon when qty === 0; stepper (- count +) when qty > 0 */}
+          {qty === 0 ? (
+            <button
+              type="button"
+              aria-label={`Add ${product.name} to cart`}
+              className="cat-cart-icon-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                onQtyChange(1);
+              }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "36px",
+                height: "36px",
+                borderRadius: "50%",
+                backgroundColor: "transparent",
+                border: "1.5px solid #BB8E43",
+                color: "#BB8E43",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                padding: 0,
+                flexShrink: 0,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#BB8E43";
+                e.currentTarget.style.color = "#FFFFFF";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "transparent";
+                e.currentTarget.style.color = "#BB8E43";
+              }}
+            >
+              <FiShoppingCart size={17} />
+            </button>
+          ) : (
+            <div
+              className="cat-qty-stepper"
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                backgroundColor: "#BB8E43",
+                borderRadius: "999px",
+                padding: "4px 8px",
+                boxShadow: "0 2px 8px rgba(187, 142, 67, 0.25)",
+                flexShrink: 0,
+              }}
+            >
+              <button
+                type="button"
+                aria-label="Decrease quantity"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onQtyChange(-1);
+                }}
+                style={{
+                  width: "22px",
+                  height: "22px",
+                  borderRadius: "50%",
+                  backgroundColor: "rgba(255, 255, 255, 0.2)",
+                  border: "none",
+                  color: "#FFFFFF",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 0,
+                  transition: "background-color 0.15s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.35)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
+                }}
+              >
+                <FiMinus size={13} strokeWidth={2.5} />
+              </button>
+
+              <span
+                style={{
+                  fontFamily: "'Playfair Display', Georgia, serif",
+                  fontWeight: 700,
+                  fontSize: "14px",
+                  color: "#FFFFFF",
+                  minWidth: "18px",
+                  textAlign: "center",
+                  userSelect: "none",
+                  lineHeight: 1,
+                }}
+              >
+                {qty}
+              </span>
+
+              <button
+                type="button"
+                aria-label="Increase quantity"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onQtyChange(1);
+                }}
+                style={{
+                  width: "22px",
+                  height: "22px",
+                  borderRadius: "50%",
+                  backgroundColor: "rgba(255, 255, 255, 0.2)",
+                  border: "none",
+                  color: "#FFFFFF",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 0,
+                  transition: "background-color 0.15s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.35)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
+                }}
+              >
+                <FiPlus size={13} strokeWidth={2.5} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -480,57 +611,130 @@ function SidebarHeading({ children }: { children: React.ReactNode }) {
 }
 
 export default function CategoriesPage() {
+  const initial = readUrlFilters();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("All Products");
-  const [selectedSize, setSelectedSize] = useState("");
-  const [checkedPrices, setCheckedPrices] = useState<string[]>(["All Prices"]);
+  const [selectedCategory, setSelectedCategory] = useState(initial.category);
+  const [selectedSubCategory, setSelectedSubCategory] = useState(initial.subCategory);
+  const [selectedSize, setSelectedSize] = useState(initial.size);
+  const [selectedColour, setSelectedColour] = useState(initial.colour);
+  const [selectedBrand, setSelectedBrand] = useState(initial.brand);
+  const [selectedFabric, setSelectedFabric] = useState(initial.fabric);
+  const [inStockOnly, setInStockOnly] = useState(initial.inStock);
+  const [checkedPrices, setCheckedPrices] = useState<string[]>(initial.prices);
   const [sortOpen, setSortOpen] = useState(false);
-  const [sortBy, setSortBy] = useState("Featured");
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchInput, setSearchInput] = useState("");
+  const [sortBy, setSortBy] = useState(initial.sort);
+  const [searchOpen, setSearchOpen] = useState(Boolean(initial.search));
+  const [searchQuery, setSearchQuery] = useState(initial.search);
+  const [searchInput, setSearchInput] = useState(initial.search);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [cartItems, setCartItems] = useState<Record<string, Product & { qty: number }>>({});
+  const [cartMap, setCartMap] = useState<Record<string, { product: Product; quantity: number }>>({});
   const [cartCount, setCartCount] = useState(0);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
-  // Backend product state
-  const [products, setProducts] = useState<Product[]>([
-    ...COL1_PRODUCTS,
-    ...COL2_PRODUCTS,
-    ...COL3_PRODUCTS,
+  const [products, setProducts] = useState<Product[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [categoriesList, setCategoriesList] = useState<string[]>(["All Products"]);
+  const [subCategoriesList, setSubCategoriesList] = useState<string[]>([]);
+  const [sizesList, setSizesList] = useState<string[]>([]);
+  const [coloursList, setColoursList] = useState<string[]>([]);
+  const [brandsList, setBrandsList] = useState<string[]>([]);
+  const [fabricsList, setFabricsList] = useState<string[]>([]);
+  const [priceBuckets, setPriceBuckets] = useState(DEFAULT_PRICE_BUCKETS);
+
+  const syncUrl = useCallback(() => {
+    writeUrlFilters({
+      category: selectedCategory,
+      size: selectedSize,
+      colour: selectedColour,
+      brand: selectedBrand,
+      fabric: selectedFabric,
+      subCategory: selectedSubCategory,
+      prices: checkedPrices,
+      sort: sortBy,
+      search: searchQuery,
+      inStock: inStockOnly,
+    });
+  }, [
+    selectedCategory,
+    selectedSize,
+    selectedColour,
+    selectedBrand,
+    selectedFabric,
+    selectedSubCategory,
+    checkedPrices,
+    sortBy,
+    searchQuery,
+    inStockOnly,
   ]);
-  const [totalCount, setTotalCount] = useState<number>(
-    COL1_PRODUCTS.length + COL2_PRODUCTS.length + COL3_PRODUCTS.length
-  );
-  const [loading, setLoading] = useState<boolean>(true);
-  const [categoriesList, setCategoriesList] = useState<string[]>(CATEGORIES);
-  const [sizesList, setSizesList] = useState<string[]>(SIZES);
 
-  // 1. Fetch available filter facets on mount
+  useEffect(() => {
+    syncUrl();
+  }, [syncUrl]);
+
+  // 1. Fetch filter facets + active categories
   useEffect(() => {
     let isMounted = true;
     async function fetchFilters() {
       try {
-        const res = await fetch("http://localhost:5000/api/products/filters");
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data.success && isMounted) {
-          if (Array.isArray(data.categories) && data.categories.length > 0) {
-            const dynamicCatNames = data.categories
-              .map((c: any) => c.name)
-              .filter(Boolean);
-            const merged = Array.from(
-              new Set(["All Products", ...CATEGORIES.slice(1), ...dynamicCatNames])
-            );
-            setCategoriesList(merged);
-          }
-          if (Array.isArray(data.sizes) && data.sizes.length > 0) {
-            const mergedSizes = Array.from(new Set([...SIZES, ...data.sizes]));
-            setSizesList(mergedSizes);
-          }
+        const [filtersRes, catsRes, subRes] = await Promise.all([
+          fetch(`${API_BASE}/products/filters`),
+          fetch(`${API_BASE}/categories?status=Active`),
+          fetch(`${API_BASE}/sub-categories?status=Active`),
+        ]);
+
+        const filtersJson = filtersRes.ok ? await filtersRes.json() : null;
+        const catsJson = catsRes.ok ? await catsRes.json() : null;
+        const subJson = subRes.ok ? await subRes.json() : null;
+
+        if (!isMounted) return;
+
+        const facetData = filtersJson?.data || filtersJson || {};
+        const facetCategories: { name: string }[] = Array.isArray(facetData.categories)
+          ? facetData.categories
+          : Array.isArray(filtersJson?.categories)
+            ? filtersJson.categories
+            : [];
+
+        const adminCats: string[] = Array.isArray(catsJson?.data)
+          ? catsJson.data.map((c: any) => c.name).filter(Boolean)
+          : [];
+
+        const mergedCats = Array.from(
+          new Set([
+            "All Products",
+            ...adminCats,
+            ...facetCategories.map((c) => c.name).filter(Boolean),
+          ])
+        );
+        setCategoriesList(mergedCats);
+
+        if (Array.isArray(facetData.sizes) && facetData.sizes.length > 0) {
+          setSizesList(facetData.sizes);
+        } else if (Array.isArray(filtersJson?.sizes)) {
+          setSizesList(filtersJson.sizes);
         }
-      } catch (err) {
-        // Keep default categories and sizes if filters endpoint fails
+
+        if (Array.isArray(facetData.colours)) setColoursList(facetData.colours);
+        if (Array.isArray(facetData.brands)) setBrandsList(facetData.brands);
+        if (Array.isArray(facetData.fabrics)) setFabricsList(facetData.fabrics);
+
+        if (Array.isArray(facetData.priceBuckets) && facetData.priceBuckets.length > 0) {
+          setPriceBuckets(
+            facetData.priceBuckets.map((b: { label: string }) => ({ label: b.label }))
+          );
+        }
+
+        if (Array.isArray(subJson?.data)) {
+          setSubCategoriesList(
+            subJson.data.map((s: any) => s.name).filter(Boolean)
+          );
+        } else if (Array.isArray(facetData.subCategories)) {
+          setSubCategoriesList(facetData.subCategories);
+        }
+      } catch {
+        // Keep empty dynamic lists; products fetch still works
       }
     }
     fetchFilters();
@@ -539,57 +743,97 @@ export default function CategoriesPage() {
     };
   }, []);
 
+  // Filter subcategories for the selected category
+  useEffect(() => {
+    let isMounted = true;
+    async function loadSubs() {
+      if (!selectedCategory || selectedCategory === "All Products") {
+        try {
+          const res = await fetch(`${API_BASE}/sub-categories?status=Active`);
+          const json = await res.json();
+          if (isMounted && json.success) {
+            setSubCategoriesList(
+              (json.data || []).map((s: any) => s.name).filter(Boolean)
+            );
+          }
+        } catch {
+          /* ignore */
+        }
+        return;
+      }
+      try {
+        const res = await fetch(
+          `${API_BASE}/sub-categories?status=Active&category=${encodeURIComponent(selectedCategory)}`
+        );
+        const json = await res.json();
+        if (isMounted && json.success) {
+          setSubCategoriesList(
+            (json.data || []).map((s: any) => s.name).filter(Boolean)
+          );
+        }
+      } catch {
+        /* ignore */
+      }
+    }
+    loadSubs();
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedCategory]);
+
   // 2. Fetch products whenever filters or search change
   useEffect(() => {
     let isMounted = true;
     async function loadProducts() {
       setLoading(true);
+      setFetchError(null);
       try {
         const params = new URLSearchParams();
+        params.append("status", "Active");
+        params.append("limit", "100");
         if (selectedCategory && selectedCategory !== "All Products") {
           params.append("category", selectedCategory);
         }
-        if (selectedSize) {
-          params.append("size", selectedSize);
-        }
+        if (selectedSubCategory) params.append("subCategory", selectedSubCategory);
+        if (selectedSize) params.append("size", selectedSize);
+        if (selectedColour) params.append("colour", selectedColour);
+        if (selectedBrand) params.append("brand", selectedBrand);
+        if (selectedFabric) params.append("fabric", selectedFabric);
+        if (inStockOnly) params.append("inStock", "true");
         if (checkedPrices.length > 0 && !checkedPrices.includes("All Prices")) {
           params.append("priceRange", checkedPrices.join(";"));
         }
-        if (sortBy) {
-          params.append("sort", sortBy);
-        }
-        if (searchQuery.trim()) {
-          params.append("search", searchQuery.trim());
-        }
+        if (sortBy) params.append("sort", sortBy);
+        if (searchQuery.trim()) params.append("search", searchQuery.trim());
 
-        const res = await fetch(
-          `http://localhost:5000/api/products?${params.toString()}`
-        );
+        const res = await fetch(`${API_BASE}/products?${params.toString()}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
 
         if (isMounted) {
           const rawItems = json.data || json.products || [];
           const mapped: Product[] = rawItems.map((p: any, idx: number) => {
-            let formattedPrice = "$14.55";
-            if (
-              typeof p.price === "string" &&
-              (p.price.startsWith("₹") || p.price.startsWith("$"))
-            ) {
-              formattedPrice = p.price;
-            } else if (
-              p.sellingPrice !== undefined &&
-              p.sellingPrice !== null &&
-              p.sellingPrice !== ""
-            ) {
-              formattedPrice = `₹${Number(p.sellingPrice).toLocaleString("en-IN")}`;
-            } else if (
-              p.price !== undefined &&
-              p.price !== null &&
-              p.price !== ""
-            ) {
-              formattedPrice = `₹${Number(p.price).toLocaleString("en-IN")}`;
+            const selling =
+              Number(p.sellingPrice) ||
+              Number(p.rawPrice) ||
+              (typeof p.price === "number" ? p.price : 0) ||
+              0;
+            const mrp = Number(p.mrp) || 0;
+            let discountLabel = "";
+            if (mrp > selling && selling > 0) {
+              const pct = Math.round(((mrp - selling) / mrp) * 100);
+              if (pct > 0) discountLabel = `${pct}% OFF`;
+            } else if (p.discountType === "Percentage" && Number(p.discountValue) > 0) {
+              discountLabel = `${Number(p.discountValue)}% OFF`;
             }
+
+            const colours: string[] = Array.isArray(p.selectedColours)
+              ? p.selectedColours.filter(Boolean)
+              : Array.isArray(p.colourImages)
+                ? p.colourImages.map((c: any) => c.colour).filter(Boolean)
+                : p.attributes?.colour
+                  ? [p.attributes.colour]
+                  : [];
 
             const img =
               p.featuredImage ||
@@ -599,22 +843,33 @@ export default function CategoriesPage() {
               "/Categories/product_formal_shirt.jpg";
 
             return {
-              id: p.id || p._id || `item_${idx}`,
+              id: String(p.id || p._id || `item_${idx}`),
               name: p.productName || p.name || p.title || "Product",
-              price: formattedPrice,
+              price: formatInr(selling),
+              rawPrice: selling,
+              mrp,
               image: img,
               category: p.categoryName || p.category || "General",
               isTall: false,
+              colours,
+              featured: Boolean(p.featured),
+              isNewArrival: p.isNewArrival !== false && Boolean(p.isNewArrival),
+              isBestSeller: Boolean(p.isBestSeller),
+              discountLabel,
+              productType: p.productType || "Single Product",
             };
           });
 
           setProducts(mapped);
-          setTotalCount(
-            json.total !== undefined ? json.total : mapped.length
-          );
+          setTotalCount(json.total !== undefined ? json.total : mapped.length);
         }
       } catch (err) {
         console.error("Error loading products from backend:", err);
+        if (isMounted) {
+          setFetchError("Unable to load products. Please check your connection and try again.");
+          setProducts([]);
+          setTotalCount(0);
+        }
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -624,41 +879,154 @@ export default function CategoriesPage() {
     return () => {
       isMounted = false;
     };
-  }, [selectedCategory, selectedSize, checkedPrices, sortBy, searchQuery]);
+  }, [
+    selectedCategory,
+    selectedSubCategory,
+    selectedSize,
+    selectedColour,
+    selectedBrand,
+    selectedFabric,
+    inStockOnly,
+    checkedPrices,
+    sortBy,
+    searchQuery,
+    reloadKey,
+  ]);
 
-  // Load cart from localStorage on mount
+  // Load cart from localStorage on mount (supports both Array and Object format)
   useEffect(() => {
     try {
       const stored = localStorage.getItem("sree_cart");
       if (stored) {
-        const parsed = JSON.parse(stored) as Record<string, Product & { qty: number }>;
-        setCartItems(parsed);
-        const total = Object.values(parsed).reduce((sum, i) => sum + i.qty, 0);
+        const parsed = JSON.parse(stored);
+        const map: Record<string, { product: Product; quantity: number }> = {};
+        if (Array.isArray(parsed)) {
+          parsed.forEach((item: any) => {
+            const pid = item.productId || item.id || item._id;
+            if (pid) {
+              const qty = item.quantity || item.qty || 1;
+              const numericPrice =
+                typeof item.price === "number"
+                  ? item.price
+                  : parseFloat(String(item.price || "0").replace(/[^0-9.]/g, "")) || 0;
+              map[pid] = {
+                product: {
+                  id: pid,
+                  name: item.name || item.title || "Product",
+                  price: formatInr(numericPrice),
+                  rawPrice: numericPrice,
+                  mrp: Number(item.mrp) || 0,
+                  image: item.image || "/Categories/product_formal_shirt.jpg",
+                  category: item.category || "General",
+                  isTall: false,
+                  colours: item.colour ? [item.colour] : [],
+                  featured: false,
+                  isNewArrival: false,
+                  isBestSeller: false,
+                  discountLabel: "",
+                  productType: "Single Product",
+                },
+                quantity: qty,
+              };
+            }
+          });
+        } else if (typeof parsed === "object" && parsed !== null) {
+          Object.entries(parsed).forEach(([key, val]: [string, any]) => {
+            const qty = val.quantity || val.qty || 1;
+            map[key] = { product: val, quantity: qty };
+          });
+        }
+        setCartMap(map);
+        const total = Object.values(map).reduce((sum, i) => sum + i.quantity, 0);
         setCartCount(total);
       }
-    } catch {}
+    } catch (e) {
+      console.error("Failed to parse cart on mount:", e);
+    }
   }, []);
 
-  const handleAddToCart = (product: Product) => {
-    setCartItems((prev) => {
-      const existing = prev[product.id];
-      const updated = {
-        ...prev,
-        [product.id]: {
-          ...product,
-          qty: existing ? existing.qty + 1 : 1,
-        },
-      };
+  const handleQtyChange = (product: Product, delta: number) => {
+    // Variable products need colour/size selection on the PDP
+    if (
+      product.productType === "Variable Product" &&
+      delta > 0 &&
+      !(cartMap[product.id]?.quantity)
+    ) {
+      setToastMessage("Select colour & size on the product page");
+      setTimeout(() => setToastMessage(null), 2200);
+      window.setTimeout(() => {
+        window.location.href = `/products/${product.id}`;
+      }, 400);
+      return;
+    }
+
+    setCartMap((prev) => {
+      const current = prev[product.id];
+      const currentQty = current ? current.quantity : 0;
+      const newQty = currentQty + delta;
+      const updated = { ...prev };
+
+      if (newQty <= 0) {
+        delete updated[product.id];
+      } else {
+        updated[product.id] = { product, quantity: newQty };
+      }
+
+      const cartArray = Object.values(updated).map((entry) => ({
+        productId: entry.product.id,
+        id: entry.product.id,
+        name: entry.product.name,
+        price: entry.product.rawPrice || 0,
+        quantity: entry.quantity,
+        image: entry.product.image,
+        category: entry.product.category,
+        variantId: null,
+        colour: "",
+        size: "",
+      }));
+
       try {
-        localStorage.setItem("sree_cart", JSON.stringify(updated));
-      } catch {}
-      const total = Object.values(updated).reduce((sum, i) => sum + i.qty, 0);
+        localStorage.setItem("sree_cart", JSON.stringify(cartArray));
+      } catch {
+        /* ignore */
+      }
+
+      const total = Object.values(updated).reduce((s, i) => s + i.quantity, 0);
       setCartCount(total);
+
+      if (currentQty === 0 && delta > 0) {
+        setToastMessage(`"${product.name}" added to cart!`);
+        setTimeout(() => setToastMessage(null), 2500);
+      }
+
       return updated;
     });
-    setToastMessage(`"${product.name}" added to cart!`);
-    setTimeout(() => setToastMessage(null), 2800);
   };
+
+  const clearAllFilters = () => {
+    setSelectedCategory("All Products");
+    setSelectedSubCategory("");
+    setSelectedSize("");
+    setSelectedColour("");
+    setSelectedBrand("");
+    setSelectedFabric("");
+    setInStockOnly(false);
+    setCheckedPrices(["All Prices"]);
+    setSearchQuery("");
+    setSearchInput("");
+    setSortBy("Featured");
+  };
+
+  const hasActiveFilters =
+    selectedCategory !== "All Products" ||
+    Boolean(selectedSubCategory) ||
+    Boolean(selectedSize) ||
+    Boolean(selectedColour) ||
+    Boolean(selectedBrand) ||
+    Boolean(selectedFabric) ||
+    inStockOnly ||
+    !checkedPrices.includes("All Prices") ||
+    Boolean(searchQuery.trim());
 
   const togglePrice = (label: string) => {
     if (label === "All Prices") {
@@ -1138,6 +1506,28 @@ export default function CategoriesPage() {
             top: "24px",
           }}
         >
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={clearAllFilters}
+              style={{
+                alignSelf: "flex-start",
+                background: "none",
+                border: "none",
+                color: "#BB8E43",
+                fontSize: 14,
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontWeight: 700,
+                cursor: "pointer",
+                textDecoration: "underline",
+                padding: 0,
+                marginTop: -8,
+              }}
+            >
+              Clear all filters
+            </button>
+          )}
+
           {/* Categories */}
           <div>
             <SidebarHeading>Categories</SidebarHeading>
@@ -1156,7 +1546,10 @@ export default function CategoriesPage() {
                 return active ? (
                   <button
                     key={cat}
-                    onClick={() => setSelectedCategory(cat)}
+                    onClick={() => {
+                      setSelectedCategory(cat);
+                      setSelectedSubCategory("");
+                    }}
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
@@ -1180,7 +1573,10 @@ export default function CategoriesPage() {
                 ) : (
                   <button
                     key={cat}
-                    onClick={() => setSelectedCategory(cat)}
+                    onClick={() => {
+                      setSelectedCategory(cat);
+                      setSelectedSubCategory("");
+                    }}
                     className="cat-sidebar-link"
                     style={{
                       background: "none",
@@ -1204,6 +1600,94 @@ export default function CategoriesPage() {
             </div>
           </div>
 
+          {/* Subcategories */}
+          {subCategoriesList.length > 0 && (
+            <div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <SidebarHeading>Subcategory</SidebarHeading>
+                {selectedSubCategory && (
+                  <button
+                    type="button"
+                    onClick={() => setSelectedSubCategory("")}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#BB8E43",
+                      fontSize: 13,
+                      fontFamily: "'Playfair Display', Georgia, serif",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      textDecoration: "underline",
+                      padding: 0,
+                      marginBottom: 18,
+                    }}
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  gap: 12,
+                }}
+              >
+                {subCategoriesList.map((sub) => {
+                  const active =
+                    selectedSubCategory.toLowerCase() === sub.toLowerCase();
+                  return (
+                    <button
+                      key={sub}
+                      type="button"
+                      onClick={() =>
+                        setSelectedSubCategory((prev) =>
+                          prev.toLowerCase() === sub.toLowerCase() ? "" : sub
+                        )
+                      }
+                      className={active ? undefined : "cat-sidebar-link"}
+                      style={
+                        active
+                          ? {
+                              display: "inline-flex",
+                              padding: "6px 18px",
+                              borderRadius: 999,
+                              backgroundColor: "#BB8E43",
+                              color: "#FFFFFF",
+                              fontFamily: "'Playfair Display', Georgia, serif",
+                              fontWeight: 600,
+                              fontSize: 14,
+                              border: "none",
+                              cursor: "pointer",
+                            }
+                          : {
+                              background: "none",
+                              border: "none",
+                              cursor: "pointer",
+                              padding: "2px 0",
+                              fontFamily: "'Playfair Display', Georgia, serif",
+                              fontWeight: 500,
+                              fontSize: 15,
+                              color: "#5D2030",
+                              textAlign: "left",
+                            }
+                      }
+                    >
+                      {sub}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Price Range */}
           <div>
             <SidebarHeading>Price Range</SidebarHeading>
@@ -1214,7 +1698,7 @@ export default function CategoriesPage() {
                 gap: "15px",
               }}
             >
-              {PRICE_RANGES.map(({ label }) => (
+              {priceBuckets.map(({ label }) => (
                 <CheckboxRow
                   key={label}
                   label={label}
@@ -1226,85 +1710,224 @@ export default function CategoriesPage() {
           </div>
 
           {/* Size */}
-          <div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: "16px",
-              }}
-            >
-              <SidebarHeading>Size</SidebarHeading>
-              {selectedSize && (
-                <button
-                  onClick={() => setSelectedSize("")}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "#BB8E43",
-                    fontSize: "13px",
-                    fontFamily: "'Playfair Display', Georgia, serif",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    textDecoration: "underline",
-                    padding: 0,
-                    marginBottom: "18px",
-                  }}
-                >
-                  Clear
-                </button>
-              )}
-            </div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-                gap: "14px",
-              }}
-            >
-              {sizesList.map((s) => {
-                const active = selectedSize.toLowerCase() === s.toLowerCase();
-                return (
+          {sizesList.length > 0 && (
+            <div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: "16px",
+                }}
+              >
+                <SidebarHeading>Size</SidebarHeading>
+                {selectedSize && (
                   <button
-                    key={s}
-                    onClick={() =>
-                      setSelectedSize((prev) =>
-                        prev.toLowerCase() === s.toLowerCase() ? "" : s
+                    onClick={() => setSelectedSize("")}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#BB8E43",
+                      fontSize: "13px",
+                      fontFamily: "'Playfair Display', Georgia, serif",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      textDecoration: "underline",
+                      padding: 0,
+                      marginBottom: "18px",
+                    }}
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  gap: "14px",
+                }}
+              >
+                {sizesList.map((s) => {
+                  const active = selectedSize.toLowerCase() === s.toLowerCase();
+                  return (
+                    <button
+                      key={s}
+                      onClick={() =>
+                        setSelectedSize((prev) =>
+                          prev.toLowerCase() === s.toLowerCase() ? "" : s
+                        )
+                      }
+                      style={{
+                        minWidth: "36px",
+                        height: "36px",
+                        padding: "0 10px",
+                        borderRadius: s.length > 3 ? "999px" : "50%",
+                        backgroundColor: active ? "#BB8E43" : "transparent",
+                        color: active ? "#FFFFFF" : "#5D2030",
+                        fontFamily: "'Playfair Display', Georgia, serif",
+                        fontWeight: active ? 700 : 600,
+                        fontSize: s.length > 4 ? "12px" : "16px",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        transition: "all 0.2s ease",
+                        boxShadow: active
+                          ? "0 4px 12px rgba(187,142,67,0.3)"
+                          : "none",
+                        border: "none",
+                      }}
+                      title={
+                        active
+                          ? `Click to clear size ${s}`
+                          : `Filter by size ${s}`
+                      }
+                    >
+                      {s}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Colour */}
+          {coloursList.length > 0 && (
+            <div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <SidebarHeading>Colour</SidebarHeading>
+                {selectedColour && (
+                  <button
+                    type="button"
+                    onClick={() => setSelectedColour("")}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#BB8E43",
+                      fontSize: 13,
+                      fontFamily: "'Playfair Display', Georgia, serif",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      textDecoration: "underline",
+                      padding: 0,
+                      marginBottom: 18,
+                    }}
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 10,
+                }}
+              >
+                {coloursList.map((c) => {
+                  const active =
+                    selectedColour.toLowerCase() === c.toLowerCase();
+                  return (
+                    <button
+                      key={c}
+                      type="button"
+                      title={c}
+                      onClick={() =>
+                        setSelectedColour((prev) =>
+                          prev.toLowerCase() === c.toLowerCase() ? "" : c
+                        )
+                      }
+                      style={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: "50%",
+                        backgroundColor: colourToHex(c),
+                        border: active
+                          ? "2.5px solid #5D2030"
+                          : "1.5px solid #E3D7C5",
+                        boxShadow: active
+                          ? "0 0 0 2px #BB8E43"
+                          : "none",
+                        cursor: "pointer",
+                        padding: 0,
+                      }}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Brand */}
+          {brandsList.length > 0 && (
+            <div>
+              <SidebarHeading>Brand</SidebarHeading>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 12,
+                }}
+              >
+                {brandsList.map((b) => (
+                  <CheckboxRow
+                    key={b}
+                    label={b}
+                    checked={selectedBrand.toLowerCase() === b.toLowerCase()}
+                    onChange={() =>
+                      setSelectedBrand((prev) =>
+                        prev.toLowerCase() === b.toLowerCase() ? "" : b
                       )
                     }
-                    style={{
-                      minWidth: "36px",
-                      height: "36px",
-                      padding: "0 10px",
-                      borderRadius: s.length > 3 ? "999px" : "50%",
-                      backgroundColor: active ? "#BB8E43" : "transparent",
-                      color: active ? "#FFFFFF" : "#5D2030",
-                      fontFamily: "'Playfair Display', Georgia, serif",
-                      fontWeight: active ? 700 : 600,
-                      fontSize: s.length > 4 ? "12px" : "16px",
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      transition: "all 0.2s ease",
-                      boxShadow: active
-                        ? "0 4px 12px rgba(187,142,67,0.3)"
-                        : "none",
-                      border: "none",
-                    }}
-                    title={
-                      active
-                        ? `Click to clear size ${s}`
-                        : `Filter by size ${s}`
-                    }
-                  >
-                    {s}
-                  </button>
-                );
-              })}
+                  />
+                ))}
+              </div>
             </div>
+          )}
+
+          {/* Fabric */}
+          {fabricsList.length > 0 && (
+            <div>
+              <SidebarHeading>Fabric</SidebarHeading>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 12,
+                }}
+              >
+                {fabricsList.map((f) => (
+                  <CheckboxRow
+                    key={f}
+                    label={f}
+                    checked={selectedFabric.toLowerCase() === f.toLowerCase()}
+                    onChange={() =>
+                      setSelectedFabric((prev) =>
+                        prev.toLowerCase() === f.toLowerCase() ? "" : f
+                      )
+                    }
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Availability */}
+          <div>
+            <SidebarHeading>Availability</SidebarHeading>
+            <CheckboxRow
+              label="In stock only"
+              checked={inStockOnly}
+              onChange={() => setInStockOnly((v) => !v)}
+            />
           </div>
         </aside>
 
@@ -1319,7 +1942,69 @@ export default function CategoriesPage() {
             alignItems: "start",
           }}
         >
-          {totalCount === 0 && !loading ? (
+          {loading ? (
+            <div
+              style={{
+                gridColumn: "1 / -1",
+                textAlign: "center",
+                padding: "80px 24px",
+                fontFamily: "'Playfair Display', Georgia, serif",
+                color: "#5D2030",
+                fontSize: 18,
+              }}
+            >
+              Loading products…
+            </div>
+          ) : fetchError ? (
+            <div
+              style={{
+                gridColumn: "1 / -1",
+                textAlign: "center",
+                padding: "80px 24px",
+                backgroundColor: "#FFFFFF",
+                borderRadius: "16px",
+                border: "1.5px solid #BB8E43",
+              }}
+            >
+              <h3
+                style={{
+                  fontFamily: "'Playfair Display', Georgia, serif",
+                  fontSize: 24,
+                  color: "#5D2030",
+                  marginBottom: 12,
+                }}
+              >
+                Something went wrong
+              </h3>
+              <p
+                style={{
+                  fontFamily: "'Playfair Display', Georgia, serif",
+                  fontSize: 15,
+                  color: "#7D5D4E",
+                  marginBottom: 20,
+                }}
+              >
+                {fetchError}
+              </p>
+              <button
+                type="button"
+                onClick={() => setReloadKey((k) => k + 1)}
+                style={{
+                  backgroundColor: "#BB8E43",
+                  color: "#FFFFFF",
+                  fontFamily: "'Playfair Display', Georgia, serif",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  padding: "10px 24px",
+                  borderRadius: 999,
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Try Again
+              </button>
+            </div>
+          ) : totalCount === 0 ? (
             <div
               style={{
                 gridColumn: "1 / -1",
@@ -1354,13 +2039,7 @@ export default function CategoriesPage() {
                 category, size, or price range.
               </p>
               <button
-                onClick={() => {
-                  setSelectedCategory("All Products");
-                  setSelectedSize("");
-                  setCheckedPrices(["All Prices"]);
-                  setSearchQuery("");
-                  setSearchInput("");
-                }}
+                onClick={clearAllFilters}
                 style={{
                   backgroundColor: "#BB8E43",
                   color: "#FFFFFF",
@@ -1390,8 +2069,8 @@ export default function CategoriesPage() {
                   <ProductCard
                     key={p.id}
                     product={p}
-                    onAddToCart={handleAddToCart}
-                    inCart={!!cartItems[p.id]}
+                    qty={cartMap[p.id]?.quantity || 0}
+                    onQtyChange={(delta) => handleQtyChange(p, delta)}
                   />
                 ))}
               </div>
@@ -1408,8 +2087,8 @@ export default function CategoriesPage() {
                   <ProductCard
                     key={p.id}
                     product={p}
-                    onAddToCart={handleAddToCart}
-                    inCart={!!cartItems[p.id]}
+                    qty={cartMap[p.id]?.quantity || 0}
+                    onQtyChange={(delta) => handleQtyChange(p, delta)}
                   />
                 ))}
               </div>
@@ -1426,8 +2105,8 @@ export default function CategoriesPage() {
                   <ProductCard
                     key={p.id}
                     product={p}
-                    onAddToCart={handleAddToCart}
-                    inCart={!!cartItems[p.id]}
+                    qty={cartMap[p.id]?.quantity || 0}
+                    onQtyChange={(delta) => handleQtyChange(p, delta)}
                   />
                 ))}
               </div>
