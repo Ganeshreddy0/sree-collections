@@ -115,7 +115,7 @@ export default function HomePage() {
               Home
             </a>
             <a
-              href="#about"
+              href="/about"
               style={{
                 fontFamily: "var(--font-serif)",
                 fontSize: "17px",
@@ -253,7 +253,7 @@ export default function HomePage() {
             </div>
             <nav style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "20px" }}>
               <a href="#home" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 600 }}>Home</a>
-              <a href="#about" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500 }}>About</a>
+              <a href="/about" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500 }}>About</a>
               <a href="/categories" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500 }}>Categories</a>
               <a href="/contact" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500 }}>Contact Us</a>
             </nav>
@@ -2205,7 +2205,7 @@ export default function HomePage() {
           12. FOOTER
          ========================================================================= */}
       <footer
-        id="about"
+        id="footer"
         style={{
           width: "100%",
           maxWidth: "1535px",

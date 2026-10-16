@@ -1121,12 +1121,12 @@ export default function CategoriesPage() {
           style={{ display: "none", alignItems: "center", gap: "28px" }}
         >
           <NavLink href="/">Home</NavLink>
-          <NavLink href="/#about">About</NavLink>
+          <NavLink href="/about">About</NavLink>
           <NavLink href="/categories" active>
             Categories
           </NavLink>
           <a
-            href="/#contact"
+            href="/contact"
             className="cat-contact-btn"
             style={{
               backgroundColor: "#BB8E43",
@@ -1314,7 +1314,7 @@ export default function CategoriesPage() {
                 Home
               </a>
               <a
-                href="/#about"
+                href="/about"
                 onClick={() => setMobileMenuOpen(false)}
                 style={{
                   fontSize: "17px",
