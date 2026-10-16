@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FiSearch,
   FiShoppingCart,
@@ -10,11 +10,10 @@ import {
   FiPhone,
   FiMail,
   FiMapPin,
-  FiArrowUpRight,
+  FiCheckCircle,
+  FiShoppingBag,
 } from "react-icons/fi";
 import { FaFacebookF, FaYoutube, FaInstagram, FaWhatsapp } from "react-icons/fa";
-
-type ActionType = "bag" | "stepper" | "view";
 
 interface Product {
   id: string;
@@ -23,7 +22,6 @@ interface Product {
   image: string;
   category: string;
   isTall: boolean;
-  actionType: ActionType;
 }
 
 const CATEGORIES = [
@@ -59,7 +57,6 @@ const COL1_PRODUCTS: Product[] = [
     image: "/Categories/product_formal_shirt.jpg",
     category: "Casual wear",
     isTall: false,
-    actionType: "bag",
   },
   {
     id: "c1_2",
@@ -68,7 +65,6 @@ const COL1_PRODUCTS: Product[] = [
     image: "/Categories/product_yellow_jacket.jpg",
     category: "Casual wear",
     isTall: false,
-    actionType: "stepper",
   },
   {
     id: "c1_3",
@@ -77,7 +73,6 @@ const COL1_PRODUCTS: Product[] = [
     image: "/Categories/product_exercise_outfit.jpg",
     category: "Casual wear",
     isTall: true,
-    actionType: "view",
   },
   {
     id: "c1_4",
@@ -86,7 +81,6 @@ const COL1_PRODUCTS: Product[] = [
     image: "/Categories/product_formal_shirt.jpg",
     category: "Casual wear",
     isTall: false,
-    actionType: "bag",
   },
   {
     id: "c1_5",
@@ -95,7 +89,6 @@ const COL1_PRODUCTS: Product[] = [
     image: "/Categories/product_yellow_jacket.jpg",
     category: "Casual wear",
     isTall: false,
-    actionType: "stepper",
   },
   {
     id: "c1_6",
@@ -104,7 +97,6 @@ const COL1_PRODUCTS: Product[] = [
     image: "/Categories/product_exercise_outfit.jpg",
     category: "Casual wear",
     isTall: true,
-    actionType: "view",
   },
 ];
 
@@ -117,7 +109,6 @@ const COL2_PRODUCTS: Product[] = [
     image: "/Categories/product_exercise_outfit.jpg",
     category: "Casual wear",
     isTall: true,
-    actionType: "bag",
   },
   {
     id: "c2_2",
@@ -126,7 +117,6 @@ const COL2_PRODUCTS: Product[] = [
     image: "/Categories/product_formal_shirt.jpg",
     category: "Casual wear",
     isTall: false,
-    actionType: "view",
   },
   {
     id: "c2_3",
@@ -135,7 +125,6 @@ const COL2_PRODUCTS: Product[] = [
     image: "/Categories/product_yellow_jacket.jpg",
     category: "Casual wear",
     isTall: false,
-    actionType: "stepper",
   },
   {
     id: "c2_4",
@@ -144,7 +133,6 @@ const COL2_PRODUCTS: Product[] = [
     image: "/Categories/product_exercise_outfit.jpg",
     category: "Casual wear",
     isTall: true,
-    actionType: "bag",
   },
   {
     id: "c2_5",
@@ -153,7 +141,6 @@ const COL2_PRODUCTS: Product[] = [
     image: "/Categories/product_formal_shirt.jpg",
     category: "Casual wear",
     isTall: false,
-    actionType: "view",
   },
   {
     id: "c2_6",
@@ -162,7 +149,6 @@ const COL2_PRODUCTS: Product[] = [
     image: "/Categories/product_yellow_jacket.jpg",
     category: "Casual wear",
     isTall: false,
-    actionType: "stepper",
   },
 ];
 
@@ -175,7 +161,6 @@ const COL3_PRODUCTS: Product[] = [
     image: "/Categories/product_yellow_jacket.jpg",
     category: "Casual wear",
     isTall: false,
-    actionType: "stepper",
   },
   {
     id: "c3_2",
@@ -184,7 +169,6 @@ const COL3_PRODUCTS: Product[] = [
     image: "/Categories/product_exercise_outfit.jpg",
     category: "Casual wear",
     isTall: true,
-    actionType: "view",
   },
   {
     id: "c3_3",
@@ -193,7 +177,6 @@ const COL3_PRODUCTS: Product[] = [
     image: "/Categories/product_formal_shirt.jpg",
     category: "Casual wear",
     isTall: false,
-    actionType: "bag",
   },
   {
     id: "c3_4",
@@ -202,7 +185,6 @@ const COL3_PRODUCTS: Product[] = [
     image: "/Categories/product_yellow_jacket.jpg",
     category: "Casual wear",
     isTall: false,
-    actionType: "stepper",
   },
   {
     id: "c3_5",
@@ -211,7 +193,6 @@ const COL3_PRODUCTS: Product[] = [
     image: "/Categories/product_exercise_outfit.jpg",
     category: "Casual wear",
     isTall: true,
-    actionType: "view",
   },
   {
     id: "c3_6",
@@ -220,7 +201,6 @@ const COL3_PRODUCTS: Product[] = [
     image: "/Categories/product_formal_shirt.jpg",
     category: "Casual wear",
     isTall: false,
-    actionType: "bag",
   },
 ];
 
@@ -256,16 +236,18 @@ function NavLink({
 
 function ProductCard({
   product,
-  qty,
-  onQtyChange,
+  onAddToCart,
+  inCart,
 }: {
   product: Product;
-  qty: number;
-  onQtyChange: (delta: number) => void;
+  onAddToCart: (p: Product) => void;
+  inCart: boolean;
 }) {
-  /* Short image: 230px, Tall image: 572px (exactly 2 * (230 + 88) + 24 - 88 = 572px) */
   const imgHeight = product.isTall ? 572 : 230;
-  const productUrl = `/product?id=${encodeURIComponent(product.id)}&name=${encodeURIComponent(product.name)}&price=${encodeURIComponent(product.price)}&img=${encodeURIComponent(product.image)}`;
+  const productUrl =
+    product.id && product.id.length === 24
+      ? `/products/${product.id}`
+      : `/product?id=${encodeURIComponent(product.id)}&name=${encodeURIComponent(product.name)}&price=${encodeURIComponent(product.price)}&img=${encodeURIComponent(product.image)}`;
 
   return (
     <div
@@ -279,13 +261,36 @@ function ProductCard({
       style={{
         backgroundColor: "#FFFFFF",
         borderRadius: "16px",
-        border: "1.5px solid #BB8E43",
+        border: inCart ? "2px solid #BB8E43" : "1.5px solid #E3D7C5",
         padding: "12px",
         boxSizing: "border-box",
         position: "relative",
         cursor: "pointer",
+        transition: "border-color 0.2s ease",
       }}
     >
+      {/* In-cart indicator */}
+      {inCart && (
+        <div
+          style={{
+            position: "absolute",
+            top: "10px",
+            left: "10px",
+            backgroundColor: "#BB8E43",
+            color: "#FFFFFF",
+            fontSize: "10px",
+            fontFamily: "'Playfair Display', Georgia, serif",
+            fontWeight: 700,
+            padding: "2px 8px",
+            borderRadius: "999px",
+            zIndex: 2,
+            letterSpacing: "0.5px",
+          }}
+        >
+          In Cart
+        </div>
+      )}
+
       <a
         href={productUrl}
         style={{
@@ -301,6 +306,9 @@ function ProductCard({
         <img
           src={product.image}
           alt={product.name}
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = "/Categories/product_formal_shirt.jpg";
+          }}
           style={{
             width: "100%",
             height: "100%",
@@ -310,6 +318,7 @@ function ProductCard({
           }}
         />
       </a>
+
       <div style={{ padding: "10px 2px 2px 2px" }}>
         <h3
           style={{
@@ -334,7 +343,6 @@ function ProductCard({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            height: "24px",
           }}
         >
           <div style={{ display: "flex", alignItems: "baseline", gap: "4px" }}>
@@ -360,103 +368,34 @@ function ProductCard({
             </span>
           </div>
 
-          {product.actionType === "bag" && (
-            <button
-              aria-label="Add to cart"
-              className="cat-bag-btn"
-              style={{
-                background: "none",
-                border: "none",
-                padding: "2px",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transition: "transform 0.2s ease",
-              }}
-              onClick={() => alert("Added to cart!")}
-            >
-              <img
-                src="/Categories/bag.png"
-                alt="Add to cart"
-                style={{ width: "20px", height: "20px", objectFit: "contain" }}
-              />
-            </button>
-          )}
-
-          {product.actionType === "stepper" && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                backgroundColor: "#BB8E43",
-                borderRadius: "999px",
-                padding: "3px 10px",
-                color: "#FFFFFF",
-              }}
-            >
-              <button
-                onClick={() => onQtyChange(-1)}
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: "#FFFFFF",
-                  fontSize: "14px",
-                  lineHeight: 1,
-                  cursor: "pointer",
-                  padding: "0 2px",
-                }}
-              >
-                -
-              </button>
-              <span
-                style={{
-                  fontFamily: "'Playfair Display', Georgia, serif",
-                  fontWeight: 700,
-                  fontSize: "13px",
-                  minWidth: "14px",
-                  textAlign: "center",
-                }}
-              >
-                {qty}
-              </span>
-              <button
-                onClick={() => onQtyChange(1)}
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: "#FFFFFF",
-                  fontSize: "14px",
-                  lineHeight: 1,
-                  cursor: "pointer",
-                  padding: "0 2px",
-                }}
-              >
-                +
-              </button>
-            </div>
-          )}
-
-          {product.actionType === "view" && (
-            <a
-              href={productUrl}
-              style={{
-                width: "22px",
-                height: "22px",
-                borderRadius: "4px",
-                border: "1.2px solid #BB8E43",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#BB8E43",
-                cursor: "pointer",
-                textDecoration: "none",
-              }}
-            >
-              <FiArrowUpRight size={14} />
-            </a>
-          )}
+          {/* Unified cart button for ALL products */}
+          <button
+            aria-label={inCart ? "Already in cart" : "Add to cart"}
+            className="cat-cart-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddToCart(product);
+            }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "5px",
+              backgroundColor: inCart ? "#BB8E43" : "transparent",
+              border: inCart ? "none" : "1.5px solid #BB8E43",
+              borderRadius: "999px",
+              padding: inCart ? "5px 12px" : "5px 12px",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              color: inCart ? "#FFFFFF" : "#BB8E43",
+              fontFamily: "'Playfair Display', Georgia, serif",
+              fontSize: "12px",
+              fontWeight: 600,
+              whiteSpace: "nowrap",
+            }}
+          >
+            <FiShoppingCart size={13} />
+            <span>{inCart ? "Added" : "Add to Cart"}</span>
+          </button>
         </div>
       </div>
     </div>
@@ -543,17 +482,183 @@ function SidebarHeading({ children }: { children: React.ReactNode }) {
 export default function CategoriesPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All Products");
-  const [selectedSize, setSelectedSize] = useState("S");
+  const [selectedSize, setSelectedSize] = useState("");
   const [checkedPrices, setCheckedPrices] = useState<string[]>(["All Prices"]);
   const [sortOpen, setSortOpen] = useState(false);
   const [sortBy, setSortBy] = useState("Featured");
-  const [quantities, setQuantities] = useState<Record<string, number>>({});
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [cartItems, setCartItems] = useState<Record<string, Product & { qty: number }>>({});
+  const [cartCount, setCartCount] = useState(0);
 
-  const updateQty = (id: string, delta: number) =>
-    setQuantities((prev) => ({
-      ...prev,
-      [id]: Math.max(1, (prev[id] ?? 1) + delta),
-    }));
+  // Backend product state
+  const [products, setProducts] = useState<Product[]>([
+    ...COL1_PRODUCTS,
+    ...COL2_PRODUCTS,
+    ...COL3_PRODUCTS,
+  ]);
+  const [totalCount, setTotalCount] = useState<number>(
+    COL1_PRODUCTS.length + COL2_PRODUCTS.length + COL3_PRODUCTS.length
+  );
+  const [loading, setLoading] = useState<boolean>(true);
+  const [categoriesList, setCategoriesList] = useState<string[]>(CATEGORIES);
+  const [sizesList, setSizesList] = useState<string[]>(SIZES);
+
+  // 1. Fetch available filter facets on mount
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchFilters() {
+      try {
+        const res = await fetch("http://localhost:5000/api/products/filters");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.success && isMounted) {
+          if (Array.isArray(data.categories) && data.categories.length > 0) {
+            const dynamicCatNames = data.categories
+              .map((c: any) => c.name)
+              .filter(Boolean);
+            const merged = Array.from(
+              new Set(["All Products", ...CATEGORIES.slice(1), ...dynamicCatNames])
+            );
+            setCategoriesList(merged);
+          }
+          if (Array.isArray(data.sizes) && data.sizes.length > 0) {
+            const mergedSizes = Array.from(new Set([...SIZES, ...data.sizes]));
+            setSizesList(mergedSizes);
+          }
+        }
+      } catch (err) {
+        // Keep default categories and sizes if filters endpoint fails
+      }
+    }
+    fetchFilters();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // 2. Fetch products whenever filters or search change
+  useEffect(() => {
+    let isMounted = true;
+    async function loadProducts() {
+      setLoading(true);
+      try {
+        const params = new URLSearchParams();
+        if (selectedCategory && selectedCategory !== "All Products") {
+          params.append("category", selectedCategory);
+        }
+        if (selectedSize) {
+          params.append("size", selectedSize);
+        }
+        if (checkedPrices.length > 0 && !checkedPrices.includes("All Prices")) {
+          params.append("priceRange", checkedPrices.join(";"));
+        }
+        if (sortBy) {
+          params.append("sort", sortBy);
+        }
+        if (searchQuery.trim()) {
+          params.append("search", searchQuery.trim());
+        }
+
+        const res = await fetch(
+          `http://localhost:5000/api/products?${params.toString()}`
+        );
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+
+        if (isMounted) {
+          const rawItems = json.data || json.products || [];
+          const mapped: Product[] = rawItems.map((p: any, idx: number) => {
+            let formattedPrice = "$14.55";
+            if (
+              typeof p.price === "string" &&
+              (p.price.startsWith("₹") || p.price.startsWith("$"))
+            ) {
+              formattedPrice = p.price;
+            } else if (
+              p.sellingPrice !== undefined &&
+              p.sellingPrice !== null &&
+              p.sellingPrice !== ""
+            ) {
+              formattedPrice = `₹${Number(p.sellingPrice).toLocaleString("en-IN")}`;
+            } else if (
+              p.price !== undefined &&
+              p.price !== null &&
+              p.price !== ""
+            ) {
+              formattedPrice = `₹${Number(p.price).toLocaleString("en-IN")}`;
+            }
+
+            const img =
+              p.featuredImage ||
+              p.image ||
+              p.img ||
+              (Array.isArray(p.images) && p.images[0]) ||
+              "/Categories/product_formal_shirt.jpg";
+
+            return {
+              id: p.id || p._id || `item_${idx}`,
+              name: p.productName || p.name || p.title || "Product",
+              price: formattedPrice,
+              image: img,
+              category: p.categoryName || p.category || "General",
+              isTall: false,
+            };
+          });
+
+          setProducts(mapped);
+          setTotalCount(
+            json.total !== undefined ? json.total : mapped.length
+          );
+        }
+      } catch (err) {
+        console.error("Error loading products from backend:", err);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+
+    loadProducts();
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedCategory, selectedSize, checkedPrices, sortBy, searchQuery]);
+
+  // Load cart from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("sree_cart");
+      if (stored) {
+        const parsed = JSON.parse(stored) as Record<string, Product & { qty: number }>;
+        setCartItems(parsed);
+        const total = Object.values(parsed).reduce((sum, i) => sum + i.qty, 0);
+        setCartCount(total);
+      }
+    } catch {}
+  }, []);
+
+  const handleAddToCart = (product: Product) => {
+    setCartItems((prev) => {
+      const existing = prev[product.id];
+      const updated = {
+        ...prev,
+        [product.id]: {
+          ...product,
+          qty: existing ? existing.qty + 1 : 1,
+        },
+      };
+      try {
+        localStorage.setItem("sree_cart", JSON.stringify(updated));
+      } catch {}
+      const total = Object.values(updated).reduce((sum, i) => sum + i.qty, 0);
+      setCartCount(total);
+      return updated;
+    });
+    setToastMessage(`"${product.name}" added to cart!`);
+    setTimeout(() => setToastMessage(null), 2800);
+  };
 
   const togglePrice = (label: string) => {
     if (label === "All Prices") {
@@ -567,6 +672,25 @@ export default function CategoriesPage() {
     setCheckedPrices(next.length === 0 ? ["All Prices"] : next);
   };
 
+  // Distribute products into 3 columns following the alternating tall/short masonry rhythm
+  const col1: Product[] = [];
+  const col2: Product[] = [];
+  const col3: Product[] = [];
+
+  products.forEach((p, idx) => {
+    const col = idx % 3;
+    if (col === 0) {
+      const i = col1.length;
+      col1.push({ ...p, isTall: i % 3 === 2 });
+    } else if (col === 1) {
+      const i = col2.length;
+      col2.push({ ...p, isTall: i % 3 === 0 });
+    } else {
+      const i = col3.length;
+      col3.push({ ...p, isTall: i % 3 === 1 });
+    }
+  });
+
   return (
     <div
       style={{
@@ -575,6 +699,33 @@ export default function CategoriesPage() {
         overflowX: "hidden",
       }}
     >
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: "28px",
+            right: "28px",
+            backgroundColor: "#5D2030",
+            color: "#FFFFFF",
+            padding: "14px 22px",
+            borderRadius: "12px",
+            border: "1.5px solid #BB8E43",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+            fontFamily: "'Playfair Display', Georgia, serif",
+            fontSize: "15px",
+            fontWeight: 600,
+            zIndex: 999,
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+          }}
+        >
+          <FiCheckCircle size={18} color="#BB8E43" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
       {/* HEADER */}
       <header
         style={{
@@ -599,7 +750,7 @@ export default function CategoriesPage() {
         </a>
         <nav
           className="cat-desktop-nav"
-          style={{ display: "none", alignItems: "center", gap: "36px" }}
+          style={{ display: "none", alignItems: "center", gap: "28px" }}
         >
           <NavLink href="/">Home</NavLink>
           <NavLink href="/#about">About</NavLink>
@@ -624,28 +775,94 @@ export default function CategoriesPage() {
           >
             Contact Us
           </a>
-          <button
-            aria-label="Search"
-            style={{
-              color: "#5A2035",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            <FiSearch size={22} />
-          </button>
-          <button
+
+          {/* Search Toggle */}
+          <div style={{ display: "flex", alignItems: "center" }}>
+            {searchOpen && (
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    setSearchQuery(searchInput);
+                  }
+                }}
+                autoFocus
+                style={{
+                  width: "200px",
+                  height: "36px",
+                  padding: "0 14px",
+                  borderRadius: "999px",
+                  border: "1.5px solid #BB8E43",
+                  backgroundColor: "#FFFFFF",
+                  fontFamily: "'Playfair Display', Georgia, serif",
+                  fontSize: "13px",
+                  color: "#5D2030",
+                  outline: "none",
+                  marginRight: "8px",
+                }}
+              />
+            )}
+            <button
+              aria-label="Search"
+              onClick={() => {
+                if (searchOpen && searchInput.trim()) {
+                  setSearchQuery(searchInput);
+                } else {
+                  setSearchOpen(!searchOpen);
+                }
+              }}
+              style={{
+                color: "#5A2035",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              <FiSearch size={22} />
+            </button>
+          </div>
+
+          <a
+            href="/cart"
             aria-label="Cart"
             style={{
               color: "#5A2035",
               background: "none",
               border: "none",
               cursor: "pointer",
+              textDecoration: "none",
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
             }}
           >
             <FiShoppingCart size={22} />
-          </button>
+            {cartCount > 0 && (
+              <span
+                style={{
+                  position: "absolute",
+                  top: "-7px",
+                  right: "-7px",
+                  backgroundColor: "#BB8E43",
+                  color: "#FFFFFF",
+                  fontSize: "10px",
+                  fontWeight: 700,
+                  width: "17px",
+                  height: "17px",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontFamily: "'Playfair Display', Georgia, serif",
+                }}
+              >
+                {cartCount > 9 ? "9+" : cartCount}
+              </span>
+            )}
+          </a>
         </nav>
         <button
           className="cat-hamburger"
@@ -796,7 +1013,7 @@ export default function CategoriesPage() {
               margin: 0,
             }}
           >
-            All Products
+            {selectedCategory}
           </h1>
           <span
             style={{
@@ -806,7 +1023,7 @@ export default function CategoriesPage() {
               fontWeight: 500,
             }}
           >
-            Showing 321 results
+            Showing {totalCount} results
           </span>
         </div>
 
@@ -931,8 +1148,10 @@ export default function CategoriesPage() {
                 gap: "16px",
               }}
             >
-              {CATEGORIES.map((cat) => {
-                const active = selectedCategory === cat;
+              {categoriesList.map((cat) => {
+                const active =
+                  selectedCategory.toLowerCase() === cat.toLowerCase() ||
+                  (selectedCategory === "All Products" && cat === "All Products");
                 return active ? (
                   <button
                     key={cat}
@@ -1007,7 +1226,35 @@ export default function CategoriesPage() {
 
           {/* Size */}
           <div>
-            <SidebarHeading>Size</SidebarHeading>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: "16px",
+              }}
+            >
+              <SidebarHeading>Size</SidebarHeading>
+              {selectedSize && (
+                <button
+                  onClick={() => setSelectedSize("")}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#BB8E43",
+                    fontSize: "13px",
+                    fontFamily: "'Playfair Display', Georgia, serif",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    textDecoration: "underline",
+                    padding: 0,
+                    marginBottom: "18px",
+                  }}
+                >
+                  Clear
+                </button>
+              )}
+            </div>
             <div
               style={{
                 display: "flex",
@@ -1016,21 +1263,26 @@ export default function CategoriesPage() {
                 gap: "14px",
               }}
             >
-              {SIZES.map((s) => {
-                const active = selectedSize === s;
+              {sizesList.map((s) => {
+                const active = selectedSize.toLowerCase() === s.toLowerCase();
                 return (
                   <button
                     key={s}
-                    onClick={() => setSelectedSize(s)}
+                    onClick={() =>
+                      setSelectedSize((prev) =>
+                        prev.toLowerCase() === s.toLowerCase() ? "" : s
+                      )
+                    }
                     style={{
-                      width: "36px",
+                      minWidth: "36px",
                       height: "36px",
-                      borderRadius: "50%",
+                      padding: "0 10px",
+                      borderRadius: s.length > 3 ? "999px" : "50%",
                       backgroundColor: active ? "#BB8E43" : "transparent",
                       color: active ? "#FFFFFF" : "#5D2030",
                       fontFamily: "'Playfair Display', Georgia, serif",
                       fontWeight: active ? 700 : 600,
-                      fontSize: "16px",
+                      fontSize: s.length > 4 ? "12px" : "16px",
                       cursor: "pointer",
                       display: "flex",
                       alignItems: "center",
@@ -1040,8 +1292,12 @@ export default function CategoriesPage() {
                         ? "0 4px 12px rgba(187,142,67,0.3)"
                         : "none",
                       border: "none",
-                      padding: 0,
                     }}
+                    title={
+                      active
+                        ? `Click to clear size ${s}`
+                        : `Filter by size ${s}`
+                    }
                   >
                     {s}
                   </button>
@@ -1062,43 +1318,199 @@ export default function CategoriesPage() {
             alignItems: "start",
           }}
         >
-          {/* Column 1: Short, Short, Tall, Short, Short, Tall */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-            {COL1_PRODUCTS.map((p) => (
-              <ProductCard
-                key={p.id}
-                product={p}
-                qty={quantities[p.id] ?? 1}
-                onQtyChange={(d) => updateQty(p.id, d)}
-              />
-            ))}
-          </div>
+          {totalCount === 0 && !loading ? (
+            <div
+              style={{
+                gridColumn: "1 / -1",
+                textAlign: "center",
+                padding: "80px 24px",
+                backgroundColor: "#FFFFFF",
+                borderRadius: "16px",
+                border: "1.5px solid #BB8E43",
+              }}
+            >
+              <h3
+                style={{
+                  fontFamily:
+                    "'Playfair Display', 'Blacker Display', Georgia, serif",
+                  fontSize: "24px",
+                  color: "#5D2030",
+                  marginBottom: "12px",
+                }}
+              >
+                No Products Found
+              </h3>
+              <p
+                style={{
+                  fontFamily: "'Playfair Display', Georgia, serif",
+                  fontSize: "15px",
+                  color: "#7D5D4E",
+                  maxWidth: "460px",
+                  margin: "0 auto 20px",
+                }}
+              >
+                No products match the selected filters. Try choosing a different
+                category, size, or price range.
+              </p>
+              <button
+                onClick={() => {
+                  setSelectedCategory("All Products");
+                  setSelectedSize("");
+                  setCheckedPrices(["All Prices"]);
+                  setSearchQuery("");
+                  setSearchInput("");
+                }}
+                style={{
+                  backgroundColor: "#BB8E43",
+                  color: "#FFFFFF",
+                  fontFamily: "'Playfair Display', Georgia, serif",
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  padding: "10px 24px",
+                  borderRadius: "999px",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Reset Filters
+              </button>
+            </div>
+          ) : (
+            <>
+              {/* Column 1: Short, Short, Tall, Short, Short, Tall */}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "24px",
+                }}
+              >
+                {col1.map((p) => (
+                  <ProductCard
+                    key={p.id}
+                    product={p}
+                    onAddToCart={handleAddToCart}
+                    inCart={!!cartItems[p.id]}
+                  />
+                ))}
+              </div>
 
-          {/* Column 2: Tall, Short, Short, Tall, Short, Short */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-            {COL2_PRODUCTS.map((p) => (
-              <ProductCard
-                key={p.id}
-                product={p}
-                qty={quantities[p.id] ?? 1}
-                onQtyChange={(d) => updateQty(p.id, d)}
-              />
-            ))}
-          </div>
+              {/* Column 2: Tall, Short, Short, Tall, Short, Short */}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "24px",
+                }}
+              >
+                {col2.map((p) => (
+                  <ProductCard
+                    key={p.id}
+                    product={p}
+                    onAddToCart={handleAddToCart}
+                    inCart={!!cartItems[p.id]}
+                  />
+                ))}
+              </div>
 
-          {/* Column 3: Short, Tall, Short, Short, Tall, Short */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-            {COL3_PRODUCTS.map((p) => (
-              <ProductCard
-                key={p.id}
-                product={p}
-                qty={quantities[p.id] ?? 1}
-                onQtyChange={(d) => updateQty(p.id, d)}
-              />
-            ))}
-          </div>
+              {/* Column 3: Short, Tall, Short, Short, Tall, Short */}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "24px",
+                }}
+              >
+                {col3.map((p) => (
+                  <ProductCard
+                    key={p.id}
+                    product={p}
+                    onAddToCart={handleAddToCart}
+                    inCart={!!cartItems[p.id]}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </main>
       </div>
+
+      {/* FLOATING CART BAR */}
+      {cartCount > 0 && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: "28px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            backgroundColor: "#5D2030",
+            borderRadius: "999px",
+            boxShadow: "0 8px 32px rgba(93,32,48,0.35)",
+            padding: "14px 28px",
+            display: "flex",
+            alignItems: "center",
+            gap: "20px",
+            zIndex: 998,
+            border: "1.5px solid #BB8E43",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              color: "#FFFFFF",
+              fontFamily: "'Playfair Display', Georgia, serif",
+              fontSize: "15px",
+              fontWeight: 600,
+            }}
+          >
+            <FiShoppingBag size={18} color="#BB8E43" />
+            <span>
+              {cartCount} item{cartCount !== 1 ? "s" : ""} in cart
+            </span>
+          </div>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <a
+              href="/cart"
+              style={{
+                backgroundColor: "transparent",
+                border: "1.5px solid #BB8E43",
+                color: "#BB8E43",
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: "13px",
+                fontWeight: 700,
+                padding: "8px 20px",
+                borderRadius: "999px",
+                textDecoration: "none",
+                whiteSpace: "nowrap",
+                transition: "all 0.2s ease",
+              }}
+            >
+              View Cart
+            </a>
+            <a
+              href="/checkout"
+              style={{
+                backgroundColor: "#BB8E43",
+                border: "none",
+                color: "#FFFFFF",
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: "13px",
+                fontWeight: 700,
+                padding: "8px 20px",
+                borderRadius: "999px",
+                textDecoration: "none",
+                whiteSpace: "nowrap",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}
+            >
+              Place Order
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* FOOTER */}
       <div style={{ borderTop: "1.5px solid #5D2030" }} />
@@ -1267,7 +1679,7 @@ export default function CategoriesPage() {
         .cat-sidebar-link:hover { color: #BB8E43 !important; transform: translateX(4px); }
         .cat-card-wrap { transition: box-shadow 0.25s ease, transform 0.25s ease; }
         .cat-card-wrap:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(187,142,67,0.18); }
-        .cat-bag-btn:hover { transform: scale(1.15); }
+        .cat-cart-btn:hover { background-color: #BB8E43 !important; color: #FFFFFF !important; border-color: #BB8E43 !important; transform: scale(1.04); }
         .cat-social-btn:hover { background-color: #5D2030 !important; color: #FFFFFF !important; }
         .cat-footer-link { color: #8A7B6F; text-decoration: none; }
         .cat-footer-link:hover { color: #5D2030; text-decoration: underline; }

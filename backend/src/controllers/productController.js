@@ -26,6 +26,11 @@ function resolveTaxRate(taxType) {
 ───────────────────────────────────────────────── */
 function formatProduct(p) {
   const mainPrice = p.sellingPrice || p.price || 0;
+  const mainImg =
+    p.featuredImage ||
+    (p.images && p.images.length > 0 ? p.images[0] : '') ||
+    '/Categories/product_formal_shirt.jpg';
+
   return {
     _id: p._id,
     id: p._id.toString(),
@@ -34,6 +39,7 @@ function formatProduct(p) {
     name: p.productName || p.title || 'Untitled',
     productName: p.productName || p.title,
     category: p.categoryName || (typeof p.category === 'string' ? p.category : 'General'),
+    categoryName: p.categoryName || (typeof p.category === 'string' ? p.category : 'General'),
     subCategory: p.subCategory || '',
     brand: p.brand || '---',
     mrp: p.mrp || 0,
@@ -47,7 +53,8 @@ function formatProduct(p) {
     unit: p.unit || 'Pc',
     qty: p.quantity !== undefined ? p.quantity : p.stock,
     quantity: p.quantity !== undefined ? p.quantity : p.stock,
-    img: p.featuredImage || (p.images && p.images.length > 0 ? p.images[0] : ''),
+    img: mainImg,
+    image: mainImg,
     images: p.images || [],
     colourImages: p.colourImages || [],
     featuredImage: p.featuredImage || '',
@@ -78,86 +85,356 @@ function formatProduct(p) {
   };
 }
 
+/* ─────────────────────────────────────────────────
+   Query builder for category, size, price range, etc.
+───────────────────────────────────────────────── */
+function buildProductFilterQuery(queryParams) {
+  const {
+    search,
+    category,
+    categories,
+    subCategory,
+    brand,
+    status,
+    isActive,
+    size,
+    sizes,
+    colour,
+    color,
+    minPrice,
+    maxPrice,
+    priceRange,
+    featured,
+    bestSeller,
+    newArrival,
+  } = queryParams;
+
+  const andConditions = [];
+
+  // 1. Status filter
+  if (status && status !== 'Status' && status !== 'all') {
+    andConditions.push({ isActive: status === 'Active' });
+  } else if (isActive !== undefined && isActive !== '') {
+    andConditions.push({ isActive: isActive === 'true' || isActive === true });
+  }
+
+  // 2. Display flags
+  if (featured === 'true' || featured === true) andConditions.push({ featured: true });
+  if (bestSeller === 'true' || bestSeller === true) andConditions.push({ isBestSeller: true });
+  if (newArrival === 'true' || newArrival === true) andConditions.push({ isNewArrival: true });
+
+  // 3. Search query
+  if (search && search.trim()) {
+    const term = search.trim();
+    andConditions.push({
+      $or: [
+        { productName: { $regex: term, $options: 'i' } },
+        { title: { $regex: term, $options: 'i' } },
+        { productCode: { $regex: term, $options: 'i' } },
+        { sku: { $regex: term, $options: 'i' } },
+        { brand: { $regex: term, $options: 'i' } },
+        { description: { $regex: term, $options: 'i' } },
+        { categoryName: { $regex: term, $options: 'i' } },
+        { subCategory: { $regex: term, $options: 'i' } },
+        { tags: { $regex: term, $options: 'i' } },
+      ],
+    });
+  }
+
+  // 4. Category filter (supports singular/plural e.g. Saree & Sarees, Casual wear, etc.)
+  const catInput = category || categories;
+  if (catInput && catInput !== 'All Products' && catInput !== 'all' && catInput !== 'Category') {
+    const catList = Array.isArray(catInput)
+      ? catInput
+      : catInput.split(',').map((c) => c.trim()).filter(Boolean);
+
+    const catOrs = [];
+    for (const c of catList) {
+      if (c === 'All Products' || c === 'all' || c === 'Category') continue;
+
+      if (typeof c === 'string' && c.match(/^[0-9a-fA-F]{24}$/)) {
+        catOrs.push({ category: c });
+      } else {
+        const clean = c.trim();
+        const base = clean.replace(/s$/i, '').trim();
+        const escapedClean = clean.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+        const escapedBase = base.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+        const catRegex = new RegExp(`(^${escapedClean}$|^${escapedBase}s?$)`, 'i');
+
+        catOrs.push({ categoryName: { $regex: catRegex } });
+        catOrs.push({ category: clean });
+        catOrs.push({ category: { $regex: catRegex } });
+
+        if (/jewell?ery/i.test(clean)) {
+          catOrs.push({ categoryName: { $regex: /jewell?ery/i } });
+          catOrs.push({ category: { $regex: /jewell?ery/i } });
+        }
+      }
+    }
+    if (catOrs.length > 0) {
+      andConditions.push({ $or: catOrs });
+    }
+  }
+
+  // 5. Subcategory filter
+  if (subCategory && subCategory.trim()) {
+    andConditions.push({ subCategory: { $regex: `^${subCategory.trim()}$`, $options: 'i' } });
+  }
+
+  // 6. Brand filter
+  if (brand && brand !== 'Brand' && brand !== 'all') {
+    andConditions.push({ brand: { $regex: `^${brand.trim()}$`, $options: 'i' } });
+  }
+
+  // 7. Size filter (matches selectedSizes, variants.size, attributes.size)
+  const sizeInput = size || sizes;
+  if (sizeInput && sizeInput !== 'all') {
+    const rawSizes = Array.isArray(sizeInput)
+      ? sizeInput
+      : sizeInput.split(',').map((s) => s.trim()).filter(Boolean);
+
+    if (rawSizes.length > 0) {
+      const sizePatterns = rawSizes.map((s) => new RegExp(`^${s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}$`, 'i'));
+      andConditions.push({
+        $or: [
+          { selectedSizes: { $in: sizePatterns } },
+          { 'variants.size': { $in: sizePatterns } },
+          { 'attributes.size': { $in: sizePatterns } },
+        ],
+      });
+    }
+  }
+
+  // 8. Colour filter
+  const colInput = colour || color;
+  if (colInput && colInput !== 'all') {
+    const rawCols = Array.isArray(colInput)
+      ? colInput
+      : colInput.split(',').map((c) => c.trim()).filter(Boolean);
+
+    if (rawCols.length > 0) {
+      const colPatterns = rawCols.map((c) => new RegExp(`^${c.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}$`, 'i'));
+      andConditions.push({
+        $or: [
+          { selectedColours: { $in: colPatterns } },
+          { 'variants.colour': { $in: colPatterns } },
+          { 'attributes.colour': { $in: colPatterns } },
+          { 'colourImages.colour': { $in: colPatterns } },
+        ],
+      });
+    }
+  }
+
+  // 9. Price Range filter
+  const priceRangesToParse = [];
+  if (priceRange) {
+    const prArray = Array.isArray(priceRange) ? priceRange : priceRange.split(';');
+    for (const pr of prArray) {
+      if (pr && pr !== 'All Prices') priceRangesToParse.push(pr);
+    }
+  }
+
+  if (priceRangesToParse.length > 0) {
+    const priceRangeOrs = [];
+    for (const pr of priceRangesToParse) {
+      const clean = pr.replace(/[$,₹]/g, '').replace(/,/g, '').trim();
+      let rMin = undefined;
+      let rMax = undefined;
+
+      if (/under\s+(\d+(?:\.\d+)?)/i.test(clean)) {
+        const m = clean.match(/under\s+(\d+(?:\.\d+)?)/i);
+        rMax = Number(m[1]);
+      } else if (/above\s+(\d+(?:\.\d+)?)/i.test(clean)) {
+        const m = clean.match(/above\s+(\d+(?:\.\d+)?)/i);
+        rMin = Number(m[1]);
+      } else if (/(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)/.test(clean)) {
+        const m = clean.match(/(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)/);
+        rMin = Number(m[1]);
+        rMax = Number(m[2]);
+      }
+
+      if (rMin !== undefined || rMax !== undefined) {
+        const cond = {};
+        if (rMin !== undefined && !isNaN(rMin)) cond.$gte = rMin;
+        if (rMax !== undefined && !isNaN(rMax)) cond.$lte = rMax;
+        priceRangeOrs.push({ sellingPrice: cond });
+        priceRangeOrs.push({ price: cond });
+        priceRangeOrs.push({ 'variants.sellingPrice': cond });
+      }
+    }
+    if (priceRangeOrs.length > 0) {
+      andConditions.push({ $or: priceRangeOrs });
+    }
+  } else if (minPrice !== undefined || maxPrice !== undefined) {
+    const cond = {};
+    if (minPrice !== undefined && minPrice !== '' && !isNaN(Number(minPrice))) {
+      cond.$gte = Number(minPrice);
+    }
+    if (maxPrice !== undefined && maxPrice !== '' && !isNaN(Number(maxPrice))) {
+      cond.$lte = Number(maxPrice);
+    }
+    if (Object.keys(cond).length > 0) {
+      andConditions.push({
+        $or: [
+          { sellingPrice: cond },
+          { price: cond },
+          { 'variants.sellingPrice': cond },
+        ],
+      });
+    }
+  }
+
+  return andConditions.length > 0 ? { $and: andConditions } : {};
+}
+
+function resolveSortOptions(sort) {
+  if (!sort) return { displayOrder: 1, createdAt: -1 };
+  const s = String(sort).toLowerCase().trim();
+  if (s.includes('low to high') || s === 'price-low' || s === 'price_asc') {
+    return { sellingPrice: 1, price: 1 };
+  }
+  if (s.includes('high to low') || s === 'price-high' || s === 'price_desc') {
+    return { sellingPrice: -1, price: -1 };
+  }
+  if (s.includes('new') || s === 'newest') {
+    return { isNewArrival: -1, createdAt: -1 };
+  }
+  if (s.includes('featured')) {
+    return { featured: -1, displayOrder: 1, createdAt: -1 };
+  }
+  return { displayOrder: 1, createdAt: -1 };
+}
+
 /* ═════════════════════════════════════════════════
    GET /api/products
+   Full-featured filtering by category, size, price range, search, sort
 ═════════════════════════════════════════════════ */
 export const getProducts = async (req, res, next) => {
   try {
-    const {
-      search, category, brand, status, minPrice, maxPrice,
-      featured, bestSeller, newArrival,
-      sort, page = 1, limit = 50,
-    } = req.query;
-
-    const query = {};
-
-    // Status filter
-    if (status && status !== 'Status') {
-      query.isActive = status === 'Active';
-    } else if (req.query.isActive !== undefined) {
-      query.isActive = req.query.isActive === 'true';
-    }
-
-    // Display filters
-    if (featured === 'true') query.featured = true;
-    if (bestSeller === 'true') query.isBestSeller = true;
-    if (newArrival === 'true') query.isNewArrival = true;
-
-    // Search
-    if (search) {
-      query.$or = [
-        { productName: { $regex: search, $options: 'i' } },
-        { title: { $regex: search, $options: 'i' } },
-        { productCode: { $regex: search, $options: 'i' } },
-        { sku: { $regex: search, $options: 'i' } },
-        { brand: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-        { tags: { $regex: search, $options: 'i' } },
-      ];
-    }
-
-    // Category filter
-    if (category && category !== 'Category') {
-      if (typeof category === 'string' && category.match(/^[0-9a-fA-F]{24}$/)) {
-        query.category = category;
-      } else {
-        query.$or = [
-          { categoryName: { $regex: `^${category}$`, $options: 'i' } },
-          { category: category },
-        ];
-      }
-    }
-
-    // Brand filter
-    if (brand && brand !== 'Brand') {
-      query.brand = { $regex: `^${brand}$`, $options: 'i' };
-    }
-
-    // Price range
-    if (minPrice || maxPrice) {
-      query.sellingPrice = {};
-      if (minPrice) query.sellingPrice.$gte = Number(minPrice);
-      if (maxPrice) query.sellingPrice.$lte = Number(maxPrice);
-    }
-
-    // Sort
-    let sortOptions = { displayOrder: 1, createdAt: -1 };
-    if (sort === 'price-low') sortOptions = { sellingPrice: 1 };
-    if (sort === 'price-high') sortOptions = { sellingPrice: -1 };
-    if (sort === 'newest') sortOptions = { createdAt: -1 };
-    if (sort === 'featured') sortOptions = { featured: -1, displayOrder: 1 };
+    const { page = 1, limit = 50, sort } = req.query;
+    const query = buildProductFilterQuery(req.query);
+    const sortOptions = resolveSortOptions(sort);
 
     const skip = (Number(page) - 1) * Number(limit);
     const total = await Product.countDocuments(query);
     const products = await Product.find(query).sort(sortOptions).skip(skip).limit(Number(limit));
 
+    const formatted = products.map(formatProduct);
     res.json({
       success: true,
       count: products.length,
       total,
       totalPages: Math.ceil(total / Number(limit)) || 1,
       currentPage: Number(page),
-      data: products.map(formatProduct),
+      data: formatted,
+      products: formatted,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/* ═════════════════════════════════════════════════
+   GET /api/products/filters
+   Returns available category, size, price range facets
+═════════════════════════════════════════════════ */
+export const getProductFilterFacets = async (req, res, next) => {
+  try {
+    // 1. Categories with product counts
+    const categoriesAggregation = await Product.aggregate([
+      { $match: { isActive: true } },
+      {
+        $group: {
+          _id: {
+            $ifNull: ['$categoryName', { $ifNull: ['$category', 'General'] }],
+          },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { count: -1 } },
+    ]);
+
+    const categories = categoriesAggregation.map((c) => ({
+      name: String(c._id),
+      count: c.count,
+    }));
+
+    // 2. Distinct sizes & price min/max
+    const activeProducts = await Product.find({ isActive: true })
+      .select('selectedSizes variants.size attributes.size sellingPrice price')
+      .lean();
+
+    const sizeSet = new Set(['S', 'M', 'L', 'XL', 'XXL']);
+    let minPrice = Infinity;
+    let maxPrice = 0;
+
+    activeProducts.forEach((p) => {
+      if (Array.isArray(p.selectedSizes)) {
+        p.selectedSizes.forEach((s) => s && sizeSet.add(s.trim()));
+      }
+      if (Array.isArray(p.variants)) {
+        p.variants.forEach((v) => v.size && sizeSet.add(v.size.trim()));
+      }
+      if (p.attributes && p.attributes.size) {
+        sizeSet.add(p.attributes.size.trim());
+      }
+
+      const pPrice = Number(p.sellingPrice) || Number(p.price) || 0;
+      if (pPrice > 0) {
+        if (pPrice < minPrice) minPrice = pPrice;
+        if (pPrice > maxPrice) maxPrice = pPrice;
+      }
+      if (Array.isArray(p.variants)) {
+        p.variants.forEach((v) => {
+          const vPrice = Number(v.sellingPrice) || Number(v.mrp) || 0;
+          if (vPrice > 0) {
+            if (vPrice < minPrice) minPrice = vPrice;
+            if (vPrice > maxPrice) maxPrice = vPrice;
+          }
+        });
+      }
+    });
+
+    if (minPrice === Infinity) minPrice = 0;
+
+    res.json({
+      success: true,
+      data: {
+        categories,
+        sizes: Array.from(sizeSet),
+        priceRange: { min: minPrice, max: maxPrice },
+        totalActiveProducts: activeProducts.length,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/* ═════════════════════════════════════════════════
+   GET /api/products/by-category
+   Returns products organized by category
+═════════════════════════════════════════════════ */
+export const getProductsByCategory = async (req, res, next) => {
+  try {
+    const filterQuery = buildProductFilterQuery({ ...req.query, isActive: true });
+    const sortOptions = resolveSortOptions(req.query.sort);
+
+    const products = await Product.find(filterQuery).sort(sortOptions);
+    const formatted = products.map(formatProduct);
+
+    const grouped = {};
+    formatted.forEach((p) => {
+      const cat = p.category || 'Other';
+      if (!grouped[cat]) grouped[cat] = [];
+      grouped[cat].push(p);
+    });
+
+    res.json({
+      success: true,
+      count: formatted.length,
+      categoriesCount: Object.keys(grouped).length,
+      data: grouped,
     });
   } catch (error) {
     next(error);
