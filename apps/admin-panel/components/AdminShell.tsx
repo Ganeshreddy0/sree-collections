@@ -11,6 +11,7 @@ import {
   FiChevronDown,
   FiBox,
   FiPlusSquare,
+  FiShoppingBag,
   FiMenu,
   FiX,
 } from "react-icons/fi";
@@ -54,6 +55,7 @@ export default function AdminShell({ children }: Props) {
   }, [pathname]);
 
   const navItems = [
+    { href: "/orders",            label: "Orders",            icon: <FiShoppingBag size={16} /> },
     { href: "/",                  label: "Products",          icon: <FiBox size={16} /> },
     { href: "/products/new",      label: "Create Product",    icon: <FiPlusSquare size={16} /> },
     { href: "/categories",        label: "Category",          icon: <LuLayoutGrid size={16} /> },

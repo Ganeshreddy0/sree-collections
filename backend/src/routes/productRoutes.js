@@ -1,6 +1,8 @@
 import express from 'express';
 import {
   getProducts,
+  getProductFilterFacets,
+  getProductsByCategory,
   getProductByIdOrSlug,
   createProduct,
   updateProduct,
@@ -12,6 +14,8 @@ import { protect, requireAdmin } from '../middleware/auth.js';
 const router = express.Router();
 
 router.get('/', getProducts);
+router.get('/filters', getProductFilterFacets);
+router.get('/by-category', getProductsByCategory);
 router.get('/:idOrSlug', getProductByIdOrSlug);
 
 // Admin protected routes

@@ -16,6 +16,7 @@ import {
   FiAlertCircle,
   FiCheckCircle,
 } from "react-icons/fi";
+import { FaWhatsapp } from "react-icons/fa";
 
 const API_BASE = "http://localhost:5000/api";
 
@@ -260,6 +261,30 @@ export default function ProductDetailPage() {
 
     setCartSuccess(`Added ${quantity} item(s) (${selectedSize} / ${selectedColour}) to Cart!`);
     setTimeout(() => setCartSuccess(null), 3500);
+  };
+
+  // Instant Buy Now with WhatsApp Checkout
+  const handleBuyNow = () => {
+    if (isOutOfStock) return;
+    const cartItem = {
+      productId: product?._id,
+      name: product?.productName || product?.title,
+      variantId: matchedVariant?._id || null,
+      sku: currentSku,
+      size: selectedSize,
+      colour: selectedColour,
+      price: currentPrice,
+      quantity,
+      image: activeImage,
+    };
+
+    try {
+      localStorage.setItem("sree_cart", JSON.stringify([cartItem]));
+    } catch {
+      // LocalStorage fallback
+    }
+
+    router.push("/checkout");
   };
 
   if (loading) {
@@ -814,34 +839,60 @@ export default function ProductDetailPage() {
               </button>
             </div>
 
-            {/* Add to Cart Button */}
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                disabled={isOutOfStock}
+                style={{
+                  flex: 1,
+                  height: "46px",
+                  borderRadius: "9999px",
+                  border: "none",
+                  backgroundColor: isOutOfStock ? "#D1D5DB" : "#BA8E43",
+                  color: "#FFFFFF",
+                  fontSize: "14px",
+                  fontWeight: 700,
+                  letterSpacing: "0.5px",
+                  cursor: isOutOfStock ? "not-allowed" : "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                  boxShadow: isOutOfStock ? "none" : "0 4px 14px rgba(186, 142, 67, 0.35)",
+                  transition: "all 0.2s",
+                }}
+              >
+                <FiShoppingBag size={18} />
+                <span>{isOutOfStock ? "Out of Stock" : "Add to Cart"}</span>
+              </button>
+            </div>
+
+            {/* Instant Buy Now Button */}
             <button
               type="button"
-              onClick={handleAddToCart}
+              onClick={handleBuyNow}
               disabled={isOutOfStock}
               style={{
-                flex: 1,
-                height: "46px",
+                width: "100%",
+                height: "48px",
                 borderRadius: "9999px",
                 border: "none",
-                backgroundColor: isOutOfStock ? "#D1D5DB" : "#BA8E43",
+                backgroundColor: isOutOfStock ? "#E5E7EB" : "#5D2030",
                 color: "#FFFFFF",
-                fontSize: "14px",
+                fontSize: "14.5px",
                 fontWeight: 700,
-                letterSpacing: "0.5px",
                 cursor: isOutOfStock ? "not-allowed" : "pointer",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: "8px",
-                boxShadow: isOutOfStock ? "none" : "0 4px 14px rgba(186, 142, 67, 0.35)",
+                gap: "10px",
+                boxShadow: isOutOfStock ? "none" : "0 4px 16px rgba(93, 32, 48, 0.25)",
                 transition: "all 0.2s",
               }}
             >
-              <FiShoppingBag size={18} />
-              <span>{isOutOfStock ? "Out of Stock" : "Add to Cart"}</span>
+              <FaWhatsapp size={20} color="#25D366" />
+              <span>Buy Now with WhatsApp Confirmation</span>
             </button>
-          </div>
 
           {/* Assurances */}
           <div

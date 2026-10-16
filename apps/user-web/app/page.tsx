@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import {
   FiSearch,
   FiShoppingCart,
@@ -183,7 +184,8 @@ export default function HomePage() {
             </a>
 
             {/* Cart Icon */}
-            <button
+            <Link
+              href="/cart"
               aria-label="Shopping Cart"
               style={{
                 display: "flex",
@@ -195,7 +197,7 @@ export default function HomePage() {
               }}
             >
               <FiShoppingCart size={22} strokeWidth={2} />
-            </button>
+            </Link>
           </nav>
 
           {/* Mobile Hamburger */}

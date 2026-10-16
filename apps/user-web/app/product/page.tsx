@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   FiSearch,
   FiShoppingCart,
@@ -115,6 +116,7 @@ function NavLink({
 }
 
 export default function ProductDetailPage() {
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState("M");
@@ -2038,7 +2040,22 @@ export default function ProductDetailPage() {
               <button
                 onClick={() => {
                   setCartOpen(false);
-                  setCheckoutModalOpen(true);
+                  try {
+                    const formatted = cartItems.map((it) => ({
+                      productId: it.id,
+                      name: it.name,
+                      title: it.name,
+                      colour: it.colorName || "",
+                      size: it.size || "Free Size",
+                      price: it.price,
+                      quantity: it.quantity,
+                      image: it.image,
+                    }));
+                    localStorage.setItem("sree_cart", JSON.stringify(formatted));
+                  } catch (e) {
+                    console.error("Cart save error:", e);
+                  }
+                  router.push("/checkout");
                 }}
                 style={{
                   width: "100%",
