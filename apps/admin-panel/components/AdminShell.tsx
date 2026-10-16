@@ -22,6 +22,7 @@ import {
   LuSlidersHorizontal,
   LuChevronsLeft,
   LuChevronsRight,
+  LuLayoutDashboard,
 } from "react-icons/lu";
 
 type Props = { children: React.ReactNode };
@@ -62,6 +63,7 @@ export default function AdminShell({ children }: Props) {
     { href: "/sub-categories",    label: "Sub Category",      icon: <LuFolderTree size={16} /> },
     { href: "/brands",            label: "Brands",            icon: <LuTag size={16} /> },
     { href: "/variants",          label: "Variant Attributes",icon: <LuSlidersHorizontal size={16} /> },
+    { href: "/homepage",          label: "Homepage CMS",      icon: <LuLayoutDashboard size={16} /> },
   ];
 
   const sidebarWidth = isMobile ? 240 : (collapsed ? 64 : 240);
