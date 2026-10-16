@@ -1,12 +1,60 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import AdminShell from "@/components/AdminShell";
 import {
   FiSave, FiRefreshCw, FiPlus, FiTrash2, FiEdit2, FiCheck, FiX,
   FiUpload, FiEye, FiEyeOff, FiChevronDown, FiChevronUp, FiAlertCircle,
-  FiImage, FiExternalLink,
+  FiImage, FiExternalLink, FiInstagram, FiFacebook,
 } from "react-icons/fi";
+import { FaWhatsapp, FaPinterest } from "react-icons/fa";
+
+function isLikelyImageUrl(url?: string): boolean {
+  if (!url || typeof url !== "string") return false;
+  const trimmed = url.trim();
+  if (
+    trimmed.startsWith("http://") ||
+    trimmed.startsWith("https://") ||
+    trimmed.startsWith("/") ||
+    trimmed.startsWith("data:image/") ||
+    trimmed.startsWith("blob:")
+  ) {
+    return true;
+  }
+  return /\.(jpeg|jpg|png|webp|gif|svg|avif)($|\?)/i.test(trimmed);
+}
+
+function normalizeImageSrc(src: string): string {
+  if (!src) return "";
+  const trimmed = src.trim();
+  if (trimmed.startsWith("http") || trimmed.startsWith("blob:") || trimmed.startsWith("data:")) return trimmed;
+  if (trimmed.startsWith("/")) return trimmed;
+  return `/${trimmed}`;
+}
+
+function renderSocialOrCustomIcon(iconName: string, size = 18) {
+  const lower = iconName.toLowerCase().trim();
+  if (lower.includes("instagram")) return <FiInstagram size={size} color="#E1306C" />;
+  if (lower.includes("facebook")) return <FiFacebook size={size} color="#1877F2" />;
+  if (lower.includes("whatsapp")) return <FaWhatsapp size={size} color="#25D366" />;
+  if (lower.includes("pinterest")) return <FaPinterest size={size} color="#BD081C" />;
+  return (
+    <span
+      style={{
+        display: "inline-block",
+        padding: "2px 6px",
+        background: "#F0E7D8",
+        color: "#5A2035",
+        borderRadius: 4,
+        fontSize: 10,
+        fontWeight: 700,
+        textTransform: "uppercase",
+      }}
+    >
+      {iconName}
+    </span>
+  );
+}
 
 const API = "http://localhost:5000/api";
 const AUTH = "Bearer super_admin_authenticated";
@@ -107,9 +155,23 @@ function ImageUploader({
         {label}
       </label>
       {value && (
-        <div style={{ position: "relative", marginBottom: 8, borderRadius: 8, overflow: "hidden", border: "1px solid #E5D7C5", background: "#FDFAF5" }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={value} alt={label} style={{ maxHeight: 120, maxWidth: "100%", objectFit: "contain", display: "block", margin: "0 auto", padding: 8 }} />
+        <div style={{ position: "relative", marginBottom: 8, borderRadius: 8, overflow: "hidden", border: "1px solid #E5D7C5", background: "#FDFAF5", minHeight: 60, display: "flex", alignItems: "center", justifyContent: "center", padding: 8 }}>
+          {isLikelyImageUrl(value) ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={normalizeImageSrc(value)}
+              alt={label}
+              style={{ maxHeight: 120, maxWidth: "100%", objectFit: "contain", display: "block", margin: "0 auto" }}
+              onError={(e) => {
+                (e.target as HTMLElement).style.display = "none";
+              }}
+            />
+          ) : (
+            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", background: "#F5EFE6", borderRadius: 6 }}>
+              {renderSocialOrCustomIcon(value, 20)}
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#5A2035" }}>Icon: {value}</span>
+            </div>
+          )}
           <button
             onClick={() => onChange("")}
             title="Remove image"
@@ -347,8 +409,19 @@ function ItemsManager({ section, onRefresh }: { section: HomepageSection; onRefr
                     {item.title || item.description?.substring(0, 40) || <span style={{ color: "#A8926B" }}>—</span>}
                   </td>
                   <td style={{ padding: "9px 12px" }}>
-                    {item.imageUrl ? (
-                      <img src={item.imageUrl} alt={item.imageAlt || item.title} style={{ width: 40, height: 30, objectFit: "cover", borderRadius: 4 }} />
+                    {isLikelyImageUrl(item.imageUrl) ? (
+                      <img
+                        src={normalizeImageSrc(item.imageUrl)}
+                        alt={item.imageAlt || item.title}
+                        style={{ width: 40, height: 30, objectFit: "cover", borderRadius: 4, display: "block" }}
+                        onError={(e) => {
+                          (e.target as HTMLElement).style.display = "none";
+                        }}
+                      />
+                    ) : item.imageUrl ? (
+                      <div style={{ width: 40, height: 30, display: "flex", alignItems: "center", justifyContent: "center", background: "#FDF8F0", borderRadius: 4, border: "1px solid #E5D7C5" }}>
+                        {renderSocialOrCustomIcon(item.imageUrl, 16)}
+                      </div>
                     ) : (
                       <FiImage size={16} color="#C4B49A" />
                     )}

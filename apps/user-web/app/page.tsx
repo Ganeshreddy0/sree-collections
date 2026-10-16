@@ -518,8 +518,8 @@ export default function HomePage() {
               className="float-hover"
             >
               <img
-                src="/homepage/hero_col1.png"
-                alt="Fashion Model in Coat"
+                src={S("hero").mediaUrl || "/homepage/hero_col1.png"}
+                alt={S("hero").mediaAlt || "Fashion Model in Coat"}
                 style={{
                   width: "100%",
                   height: "100%",
