@@ -11,6 +11,7 @@ import {
   FiPhone,
   FiMapPin,
   FiCheckCircle,
+  FiAlertCircle,
 } from "react-icons/fi";
 import {
   FaFacebookF,
@@ -53,6 +54,8 @@ function NavLink({
 export default function ContactPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -60,13 +63,35 @@ export default function ContactPage() {
     message: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email) {
-      alert("Please fill in your name and email.");
+    setErrorMessage(null);
+
+    if (!formData.name.trim() || !formData.email.trim() || !formData.topic.trim() || !formData.message.trim()) {
+      setErrorMessage("Please fill in all required fields.");
       return;
     }
-    setFormSubmitted(true);
+
+    setLoading(true);
+    try {
+      const res = await fetch("http://localhost:5000/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || `Submission failed with status ${res.status}`);
+      }
+
+      setFormSubmitted(true);
+    } catch (err: any) {
+      console.error("Failed to submit contact message:", err);
+      setErrorMessage(err.message || "Failed to send message. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -583,13 +608,13 @@ export default function ContactPage() {
                     margin: "0 0 20px 0",
                   }}
                 >
-                  Your message has been received. Our team will review your inquiry and reach out
-                  promptly.
+                  Your message has been received. Our team will review your inquiry and reach out to <strong>{formData.email}</strong> promptly.
                 </p>
                 <button
                   onClick={() => {
                     setFormSubmitted(false);
                     setFormData({ name: "", email: "", topic: "", message: "" });
+                    setErrorMessage(null);
                   }}
                   style={{
                     backgroundColor: "#BB8E43",
@@ -608,6 +633,25 @@ export default function ContactPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+                {errorMessage && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      backgroundColor: "#FEE2E2",
+                      border: "1px solid #F87171",
+                      borderRadius: "8px",
+                      padding: "12px 16px",
+                      color: "#991B1B",
+                      fontSize: "13px",
+                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    }}
+                  >
+                    <FiAlertCircle size={18} style={{ flexShrink: 0 }} />
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
                 <div>
                   <label
                     style={{
@@ -748,9 +792,10 @@ export default function ContactPage() {
                 <div>
                   <button
                     type="submit"
+                    disabled={loading}
                     className="contact-submit-btn"
                     style={{
-                      backgroundColor: "#BB8E43",
+                      backgroundColor: loading ? "#9CA3AF" : "#BB8E43",
                       color: "#FFFFFF",
                       fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
                       fontWeight: 700,
@@ -760,13 +805,18 @@ export default function ContactPage() {
                       padding: "13px 38px",
                       borderRadius: "999px",
                       border: "none",
-                      cursor: "pointer",
+                      cursor: loading ? "not-allowed" : "pointer",
                       boxShadow: "0 6px 18px rgba(187,142,67,0.3)",
-                      transition: "transform 0.2s ease, filter 0.2s ease",
+                      transition: "transform 0.2s ease, filter 0.2s ease, background-color 0.2s ease",
                       marginTop: "6px",
+                      opacity: loading ? 0.75 : 1,
                     }}
                   >
+<<<<<<< HEAD
                     CONTACT US
+=======
+                    {loading ? "Sending Message..." : "Contact Us"}
+>>>>>>> a47bb2da36575df2bf4addd51abf78e37bf235f2
                   </button>
                 </div>
               </form>
