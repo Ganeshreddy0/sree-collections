@@ -31,6 +31,16 @@ const categorySchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    tag: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    startingPrice: {
+      type: String,
+      default: '',
+      trim: true,
+    },
     status: {
       type: String,
       enum: ['Active', 'Inactive'],
