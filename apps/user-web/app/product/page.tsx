@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   FiSearch,
   FiShoppingCart,
@@ -17,6 +17,39 @@ import {
   FiChevronDown,
 } from "react-icons/fi";
 import { FaFacebookF, FaYoutube, FaInstagram, FaWhatsapp } from "react-icons/fa";
+
+/** Redirect legacy ?id= Mongo product links to the real API PDP */
+function LegacyQueryRedirect({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const id = searchParams?.get("id") || "";
+
+  useEffect(() => {
+    if (id && /^[0-9a-fA-F]{24}$/.test(id)) {
+      router.replace(`/products/${id}`);
+    }
+  }, [id, router]);
+
+  if (id && /^[0-9a-fA-F]{24}$/.test(id)) {
+    return (
+      <div
+        style={{
+          minHeight: "50vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#FAF6EE",
+          color: "#5D2030",
+          fontFamily: "'Playfair Display', Georgia, serif",
+        }}
+      >
+        Loading product…
+      </div>
+    );
+  }
+
+  return <>{children}</>;
+}
 
 interface RelatedProduct {
   id: string;
@@ -115,7 +148,7 @@ function NavLink({
   );
 }
 
-export default function ProductDetailPage() {
+function MockProductDetailPage() {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
@@ -130,6 +163,11 @@ export default function ProductDetailPage() {
   React.useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
+      const id = params.get("id");
+      if (id && /^[0-9a-fA-F]{24}$/.test(id)) {
+        router.replace(`/products/${id}`);
+        return;
+      }
       const name = params.get("name");
       const price = params.get("price");
       const img = params.get("img");
@@ -137,7 +175,7 @@ export default function ProductDetailPage() {
       if (price) setProductPrice(price);
       if (img) setActiveImage(img);
     }
-  }, []);
+  }, [router]);
 
   // Accordion states
   const [fittingOpen, setFittingOpen] = useState(false);
@@ -296,17 +334,20 @@ export default function ProductDetailPage() {
           >
             Contact Us
           </a>
-          <button
+          <a
+            href="/search"
             aria-label="Search"
             style={{
               color: "#5A2035",
               background: "none",
               border: "none",
               cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
             }}
           >
             <FiSearch size={22} />
-          </button>
+          </a>
           <button
             onClick={() => setCartOpen(!cartOpen)}
             aria-label="Cart"
@@ -2322,5 +2363,31 @@ export default function ProductDetailPage() {
         .prod-footer-link:hover { color: #5D2030; text-decoration: underline; }
       `}</style>
     </div>
+  );
+}
+
+export default function ProductDetailPage() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          style={{
+            minHeight: "50vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#FAF6EE",
+            color: "#5D2030",
+            fontFamily: "'Playfair Display', Georgia, serif",
+          }}
+        >
+          Loading…
+        </div>
+      }
+    >
+      <LegacyQueryRedirect>
+        <MockProductDetailPage />
+      </LegacyQueryRedirect>
+    </Suspense>
   );
 }
