@@ -6,12 +6,24 @@ import AdminShell from "@/components/AdminShell";
 import { FiSearch, FiChevronDown, FiChevronLeft, FiChevronRight, FiEdit, FiTrash2 } from "react-icons/fi";
 import { FaFilePdf, FaFileExcel } from "react-icons/fa";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
+import EditCategoryModal, { CategoryData } from "@/components/EditCategoryModal";
 
 const API = "http://localhost:5000/api";
 const AUTH = "Bearer super_admin_authenticated";
 
 interface CategoryItem {
-  _id: string; id: string; name: string; slug: string; date: string; status: "Active" | "Inactive";
+  _id: string;
+  id: string;
+  name: string;
+  slug: string;
+  date: string;
+  status: "Active" | "Inactive";
+  description?: string;
+  image?: string;
+  featured?: boolean;
+  tag?: string;
+  badge?: string;
+  startingPrice?: string;
 }
 
 function StatusBadge({ status, onClick }: { status: string; onClick: () => void }) {
@@ -42,6 +54,7 @@ export default function CategoriesPage() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [deletingCategory, setDeletingCategory] = useState<{ id: string; name: string } | null>(null);
+  const [editingCategory, setEditingCategory] = useState<CategoryData | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -70,6 +83,27 @@ export default function CategoriesPage() {
     if (!deletingCategory) return;
     const res = await fetch(`${API}/categories/${deletingCategory.id}`, { method: "DELETE", headers: { Authorization: AUTH } });
     if (res.ok) setRows((prev) => prev.filter((r) => r.id !== deletingCategory.id));
+  };
+
+  const handleSaveCategory = (updated: CategoryData) => {
+    setRows((prev) =>
+      prev.map((r) =>
+        r.id === updated.id
+          ? {
+              ...r,
+              name: updated.name,
+              slug: updated.slug,
+              status: updated.status,
+              description: updated.description,
+              image: updated.image,
+              featured: updated.featured,
+              tag: updated.tag,
+              badge: updated.badge,
+              startingPrice: updated.startingPrice,
+            }
+          : r
+      )
+    );
   };
 
   const toggleAll = (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -133,7 +167,13 @@ export default function CategoriesPage() {
                 <td><StatusBadge status={c.status} onClick={() => toggleStatus(c.id)} /></td>
                 <td>
                   <div className="sc-action-2">
-                    <button className="sc-row-btn" title="Edit"><FiEdit size={12} /></button>
+                    <button
+                      className="sc-row-btn"
+                      title="Edit"
+                      onClick={() => setEditingCategory(c)}
+                    >
+                      <FiEdit size={12} />
+                    </button>
                     <button className="sc-row-btn delete" title="Delete" onClick={() => setDeletingCategory({ id: c.id, name: c.name })}><FiTrash2 size={12} /></button>
                   </div>
                 </td>
@@ -164,6 +204,13 @@ export default function CategoriesPage() {
         itemType="category"
         onConfirm={confirmDeleteCategory}
         onClose={() => setDeletingCategory(null)}
+      />
+
+      <EditCategoryModal
+        isOpen={!!editingCategory}
+        category={editingCategory}
+        onClose={() => setEditingCategory(null)}
+        onSaveSuccess={handleSaveCategory}
       />
     </AdminShell>
   );

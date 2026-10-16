@@ -10,6 +10,9 @@ function formatCategory(c) {
     image: c.image || '',
     itemCount: c.itemCount || 0,
     featured: Boolean(c.featured),
+    tag: c.tag || '',
+    badge: c.tag || '',
+    startingPrice: c.startingPrice || '',
     status: c.status || 'Active',
     date: c.createdAt
       ? new Date(c.createdAt).toLocaleDateString('en-GB', {
@@ -96,6 +99,9 @@ export const createCategory = async (req, res, next) => {
 export const updateCategory = async (req, res, next) => {
   try {
     const updates = { ...req.body };
+    if (updates.badge !== undefined && updates.tag === undefined) {
+      updates.tag = updates.badge;
+    }
     if (updates.name && !updates.slug) {
       updates.slug = String(updates.name)
         .toLowerCase()

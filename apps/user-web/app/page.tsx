@@ -17,6 +17,7 @@ import {
   FiCheckCircle,
 } from "react-icons/fi";
 import { FaWhatsapp, FaPinterest } from "react-icons/fa";
+import FeaturedCardsShowcase from "@/components/FeaturedCardsShowcase";
 
 // ─── CMS API types & defaults ────────────────────────────────────────────────
 const API_BASE = "http://localhost:5000/api";
@@ -805,68 +806,8 @@ export default function HomePage() {
           </h2>
         </div>
 
-        {/* Category Pill Filters */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "12px",
-            marginBottom: "36px",
-            flexWrap: "wrap",
-          }}
-        >
-          {["All", "Silk Sarees", "Bridal Lehengas", "Temple Jewellery", "Ethnic Casuals"].map(
-            (tab) => {
-              const isActive = activeTab.toLowerCase() === tab.toLowerCase() || (activeTab === "all" && tab === "All");
-              return (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab.toLowerCase())}
-                  style={{
-                    padding: "9px 24px",
-                    borderRadius: "24px",
-                    fontSize: "14px",
-                    fontWeight: 600,
-                    letterSpacing: "0.3px",
-                    transition: "all 0.25s ease",
-                    backgroundColor: isActive ? "#5D2030" : "#FFFDF9",
-                    color: isActive ? "#FFFFFF" : "#554D42",
-                    border: isActive ? "1px solid #5D2030" : "1px solid #E5D7C5",
-                    boxShadow: isActive ? "0 4px 14px rgba(93, 32, 48, 0.25)" : "none",
-                  }}
-                >
-                  {tab}
-                </button>
-              );
-            }
-          )}
-        </div>
-
-        {/* Featured Showcase: img3.png */}
-        <div
-          style={{
-            width: "100%",
-            maxWidth: "1440px",
-            margin: "0 auto",
-            position: "relative",
-            borderRadius: "32px",
-            overflow: "hidden",
-            boxShadow: "0 18px 45px rgba(93, 32, 48, 0.08)",
-            transition: "transform 0.35s ease",
-          }}
-          className="float-hover"
-        >
-          <img
-            src="/homepage/img3.png"
-            alt="Sree Collections Featured Fan Showcase"
-            style={{
-              width: "100%",
-              height: "auto",
-              display: "block",
-              borderRadius: "32px",
-            }}
-          />
-        </div>
+        {/* Dynamic Featured Collection Showcase (7-Card Curved Diamond Layout) */}
+        <FeaturedCardsShowcase />
       </section>
 
       {/* =========================================================================
