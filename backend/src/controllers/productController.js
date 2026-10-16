@@ -1,5 +1,6 @@
 import Product from '../models/Product.js';
 import Category from '../models/Category.js';
+import SubCategory from '../models/SubCategory.js';
 
 /* ─────────────────────────────────────────────────
    Helper: compute discount price
@@ -430,6 +431,8 @@ export const getProducts = async (req, res, next) => {
 ═════════════════════════════════════════════════ */
 export const getProductFilterFacets = async (req, res, next) => {
   try {
+    const { category } = req.query;
+
     // Active admin categories (missing status treated as Active for legacy docs)
     const adminCategories = await Category.find({
       $or: [
@@ -480,7 +483,28 @@ export const getProductFilterFacets = async (req, res, next) => {
 
     const categories = [...categoriesFromAdmin, ...orphanCategories];
 
-    const activeProducts = await Product.find({ isActive: true })
+    // Filter active products by category if specified
+    const productQuery = { isActive: true };
+    if (category && category !== 'All Products' && category !== 'all' && category !== 'Category') {
+      const clean = category.trim();
+      const base = clean.replace(/s$/i, '').trim();
+      const escapedClean = clean.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+      const escapedBase = base.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+      const catRegex = new RegExp(`(^${escapedClean}$|^${escapedBase}s?$)`, 'i');
+
+      const catOrs = [
+        { categoryName: { $regex: catRegex } },
+        { category: clean },
+        { category: { $regex: catRegex } },
+      ];
+      if (/jewell?ery/i.test(clean)) {
+        catOrs.push({ categoryName: { $regex: /jewell?ery/i } });
+        catOrs.push({ category: { $regex: /jewell?ery/i } });
+      }
+      productQuery.$or = catOrs;
+    }
+
+    const activeProducts = await Product.find(productQuery)
       .select(
         'selectedSizes selectedColours variants attributes fabric brand subCategory sellingPrice price stock quantity'
       )
@@ -492,6 +516,15 @@ export const getProductFilterFacets = async (req, res, next) => {
     const fabricSet = new Set();
     const patternSet = new Set();
     const subCategorySet = new Set();
+
+    // If category specified, also load subcategories configured under that category
+    if (category && category !== 'All Products' && category !== 'all' && category !== 'Category') {
+      const activeSubs = await SubCategory.find({
+        category: { $regex: new RegExp(`^${category.trim()}$`, 'i') },
+        status: 'Active',
+      }).lean();
+      activeSubs.forEach((s) => s.name && subCategorySet.add(s.name.trim()));
+    }
     let minPrice = Infinity;
     let maxPrice = 0;
     let inStockCount = 0;
