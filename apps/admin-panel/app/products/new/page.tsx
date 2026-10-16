@@ -92,8 +92,8 @@ interface FormState {
   tags: string;
 }
 
-const PRESET_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "Free Size"];
-const PRESET_COLOURS = [
+const DEFAULT_PRESET_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "Free Size"];
+const DEFAULT_PRESET_COLOURS = [
   { name: "Black", hex: "#111827" },
   { name: "White", hex: "#FFFFFF", border: true },
   { name: "Red", hex: "#DC2626" },
@@ -107,6 +107,35 @@ const PRESET_COLOURS = [
   { name: "Gold", hex: "#C5A059" },
   { name: "Beige", hex: "#D8C4AA" },
 ];
+
+const COLOUR_HEX_FALLBACK: Record<string, string> = {
+  black: "#111827",
+  white: "#FFFFFF",
+  red: "#DC2626",
+  blue: "#2563EB",
+  green: "#16A34A",
+  grey: "#6B7280",
+  gray: "#6B7280",
+  yellow: "#CA8A04",
+  pink: "#DB2777",
+  navy: "#1E3A8A",
+  maroon: "#541A28",
+  gold: "#C5A059",
+  beige: "#D8C4AA",
+  cream: "#F5E6C8",
+  purple: "#6C3483",
+  orange: "#E67E22",
+  brown: "#6B3E26",
+};
+
+function resolveColourHex(name: string): string {
+  const key = name.toLowerCase().trim();
+  if (COLOUR_HEX_FALLBACK[key]) return COLOUR_HEX_FALLBACK[key];
+  for (const [k, hex] of Object.entries(COLOUR_HEX_FALLBACK)) {
+    if (key.includes(k)) return hex;
+  }
+  return "#541A28";
+}
 
 const INITIAL_FORM: FormState = {
   productName: "",
@@ -334,6 +363,10 @@ export default function CreateProductPage() {
     "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=400&q=80"
   );
 
+  // Size / colour presets (loaded from Variant Attributes admin when available)
+  const [PRESET_SIZES, setPresetSizes] = useState<string[]>(DEFAULT_PRESET_SIZES);
+  const [PRESET_COLOURS, setPresetColours] = useState(DEFAULT_PRESET_COLOURS);
+
   // Variable product attributes
   const [selectedSizes, setSelectedSizes] = useState<string[]>(["S", "M", "L"]);
   const [customSizeInput, setCustomSizeInput] = useState<string>("");
@@ -367,7 +400,7 @@ export default function CreateProductPage() {
 
   /* ── Load dynamic backend options ── */
   useEffect(() => {
-    fetch(`${API_BASE}/categories`)
+    fetch(`${API_BASE}/categories?status=Active`)
       .then((r) => r.json())
       .then((d) => {
         if (d.data && Array.isArray(d.data) && d.data.length > 0) {
@@ -379,7 +412,7 @@ export default function CreateProductPage() {
       })
       .catch(() => {});
 
-    fetch(`${API_BASE}/sub-categories`)
+    fetch(`${API_BASE}/sub-categories?status=Active`)
       .then((r) => r.json())
       .then((d) => {
         if (d.data && Array.isArray(d.data) && d.data.length > 0) {
@@ -398,6 +431,34 @@ export default function CreateProductPage() {
           const list = d.data.map((b: { name: string }) => b.name);
           if (!list.includes("---")) list.push("---");
           setBrands(list);
+        }
+      })
+      .catch(() => {});
+
+    fetch(`${API_BASE}/variants?status=Active`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (!d.data || !Array.isArray(d.data)) return;
+        const sizeAttr = d.data.find((v: { name: string }) =>
+          /size/i.test(v.name || "")
+        );
+        const colourAttr = d.data.find((v: { name: string }) =>
+          /colou?r/i.test(v.name || "")
+        );
+        if (sizeAttr?.values?.length) {
+          setPresetSizes(sizeAttr.values.map((s: string) => String(s).trim()).filter(Boolean));
+        }
+        if (colourAttr?.values?.length) {
+          setPresetColours(
+            colourAttr.values
+              .map((name: string) => String(name).trim())
+              .filter(Boolean)
+              .map((name: string) => ({
+                name,
+                hex: resolveColourHex(name),
+                border: name.toLowerCase() === "white",
+              }))
+          );
         }
       })
       .catch(() => {});
