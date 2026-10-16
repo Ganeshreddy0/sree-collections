@@ -15,11 +15,6 @@ const categorySchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
-    status: {
-      type: String,
-      enum: ['Active', 'Inactive'],
-      default: 'Active',
-    },
     description: {
       type: String,
       default: '',
@@ -41,13 +36,6 @@ const categorySchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
-categorySchema.pre('validate', function (next) {
-  if (!this.slug && this.name) {
-    this.slug = this.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-  }
-  next();
-});
 
 const Category = mongoose.model('Category', categorySchema);
 export default Category;
