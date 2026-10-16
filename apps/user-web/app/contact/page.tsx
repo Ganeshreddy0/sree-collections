@@ -812,11 +812,7 @@ export default function ContactPage() {
                       opacity: loading ? 0.75 : 1,
                     }}
                   >
-<<<<<<< HEAD
                     CONTACT US
-=======
-                    {loading ? "Sending Message..." : "Contact Us"}
->>>>>>> a47bb2da36575df2bf4addd51abf78e37bf235f2
                   </button>
                 </div>
               </form>
