@@ -160,7 +160,7 @@ function NavLink({
     <a
       href={href}
       style={{
-        fontFamily: "'Playfair Display', Georgia, serif",
+        fontFamily: "var(--font-serif)",
         fontSize: "17px",
         fontWeight: 700,
         color: "#5A2035",
@@ -1094,167 +1094,200 @@ export default function CategoriesPage() {
         </div>
       )}
 
-      {/* HEADER */}
-      <header
-        style={{
-          width: "100%",
-          maxWidth: "1440px",
-          margin: "0 auto",
-          padding: "16px 40px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          boxSizing: "border-box",
-          position: "relative",
-          zIndex: 50,
-        }}
-      >
-        <a href="/" style={{ display: "inline-block", flexShrink: 0 }}>
-          <img
-            src="/homepage/logo2_trans.png"
-            alt="Sree Collections"
-            style={{ height: "68px", width: "auto", objectFit: "contain" }}
-          />
-        </a>
-        <nav
-          className="cat-desktop-nav"
-          style={{ display: "none", alignItems: "center", gap: "28px" }}
+      {/* HEADER — Identical to Home Page */}
+      <div style={{ width: "100%", display: "flex", justifyContent: "center", position: "sticky", top: 0, zIndex: 100, backgroundColor: "#FCF8F2" }}>
+        <header
+          style={{
+            width: "100%",
+            maxWidth: "1360px",
+            minHeight: "95px",
+            margin: "0 auto",
+            padding: "0 20px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            boxSizing: "border-box",
+            position: "relative",
+            zIndex: 50,
+          }}
         >
-          <NavLink href="/">Home</NavLink>
-          <NavLink href="/about">About</NavLink>
-          <NavLink href="/categories" active>
-            Categories
-          </NavLink>
-          <a
-            href="/contact"
-            className="cat-contact-btn"
-            style={{
-              backgroundColor: "#BB8E43",
-              color: "#FFFFFF",
-              fontFamily: "'Playfair Display', Georgia, serif",
-              fontSize: "12px",
-              fontWeight: 700,
-              letterSpacing: "1px",
-              textTransform: "uppercase",
-              padding: "12px 28px",
-              borderRadius: "999px",
-              textDecoration: "none",
-            }}
-          >
-            Contact Us
-          </a>
-
-          {/* Search Toggle */}
+          {/* Brand Logo */}
           <div style={{ display: "flex", alignItems: "center" }}>
-            {searchOpen && (
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    setSearchQuery(searchInput);
-                  }
-                }}
-                autoFocus
+            <a href="/" style={{ display: "inline-block" }}>
+              <img
+                src="/homepage/logo2_trans.png"
+                alt="Sree Collections"
                 style={{
-                  width: "200px",
-                  height: "36px",
-                  padding: "0 14px",
-                  borderRadius: "999px",
-                  border: "1.5px solid #BB8E43",
-                  backgroundColor: "#FFFFFF",
-                  fontFamily: "'Playfair Display', Georgia, serif",
-                  fontSize: "13px",
-                  color: "#5D2030",
-                  outline: "none",
-                  marginRight: "8px",
+                  height: "72px",
+                  width: "auto",
+                  objectFit: "contain",
+                  maxWidth: "340px",
+                  display: "block",
                 }}
               />
-            )}
-            <button
-              aria-label="Search"
-              onClick={() => {
-                if (searchOpen && searchInput.trim()) {
-                  setSearchQuery(searchInput);
-                } else {
-                  setSearchOpen(!searchOpen);
-                }
+            </a>
+          </div>
+
+          {/* Desktop Navigation */}
+          <nav
+            className="cat-desktop-nav"
+            style={{ display: "none", alignItems: "center", gap: "36px" }}
+          >
+            <NavLink href="/">Home</NavLink>
+            <NavLink href="/about">About</NavLink>
+            <NavLink href="/categories" active>Categories</NavLink>
+
+            {/* CONTACT US Pill Button */}
+            <a
+              href="/contact"
+              className="cat-contact-btn primary-btn"
+              style={{
+                background: "#BA8E43",
+                color: "#FFFFFF",
+                fontFamily: "var(--font-serif)",
+                fontSize: "12.5px",
+                fontWeight: 700,
+                letterSpacing: "0.8px",
+                textTransform: "uppercase",
+                padding: "11px 28px",
+                borderRadius: "9999px",
+                boxShadow: "0 2px 10px rgba(186, 142, 67, 0.25)",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.25s ease",
+                textDecoration: "none",
               }}
+            >
+              CONTACT US
+            </a>
+
+            {/* Search Toggle */}
+            <div style={{ display: "flex", alignItems: "center" }}>
+              {searchOpen && (
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      setSearchQuery(searchInput);
+                    }
+                  }}
+                  autoFocus
+                  style={{
+                    width: "200px",
+                    height: "36px",
+                    padding: "0 14px",
+                    borderRadius: "999px",
+                    border: "1.5px solid #BB8E43",
+                    backgroundColor: "#FFFFFF",
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "13px",
+                    color: "#5D2030",
+                    outline: "none",
+                    marginRight: "8px",
+                  }}
+                />
+              )}
+              <button
+                aria-label="Search"
+                onClick={() => {
+                  if (searchOpen && searchInput.trim()) {
+                    setSearchQuery(searchInput);
+                  } else {
+                    setSearchOpen(!searchOpen);
+                  }
+                }}
+                style={{
+                  color: "#5A2035",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "4px",
+                  transition: "transform 0.2s ease",
+                }}
+              >
+                <FiSearch size={22} strokeWidth={2} />
+              </button>
+            </div>
+
+            {/* Cart Icon */}
+            <a
+              href="/cart"
+              aria-label="Cart"
               style={{
                 color: "#5A2035",
                 background: "none",
                 border: "none",
                 cursor: "pointer",
+                textDecoration: "none",
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "4px",
+                transition: "transform 0.2s ease",
               }}
             >
-              <FiSearch size={22} />
-            </button>
-          </div>
+              <FiShoppingCart size={22} strokeWidth={2} />
+              {cartCount > 0 && (
+                <span
+                  style={{
+                    position: "absolute",
+                    top: "-7px",
+                    right: "-7px",
+                    backgroundColor: "#BB8E43",
+                    color: "#FFFFFF",
+                    fontSize: "10px",
+                    fontWeight: 700,
+                    width: "17px",
+                    height: "17px",
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontFamily: "var(--font-serif)",
+                  }}
+                >
+                  {cartCount > 9 ? "9+" : cartCount}
+                </span>
+              )}
+            </a>
+          </nav>
 
-          <a
-            href="/cart"
-
-            aria-label="Cart"
+          {/* Mobile Hamburger */}
+          <button
+            className="cat-hamburger mobile-hamburger"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             style={{
-              color: "#5A2035",
+              display: "none",
+              padding: "8px",
+              color: "#2F2C24",
               background: "none",
               border: "none",
               cursor: "pointer",
-              textDecoration: "none",
-              position: "relative",
-              display: "flex",
-              alignItems: "center",
             }}
           >
-            <FiShoppingCart size={22} />
-            {cartCount > 0 && (
-              <span
-                style={{
-                  position: "absolute",
-                  top: "-7px",
-                  right: "-7px",
-                  backgroundColor: "#BB8E43",
-                  color: "#FFFFFF",
-                  fontSize: "10px",
-                  fontWeight: 700,
-                  width: "17px",
-                  height: "17px",
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontFamily: "'Playfair Display', Georgia, serif",
-                }}
-              >
-                {cartCount > 9 ? "9+" : cartCount}
-              </span>
-            )}
-          </a>
-        </nav>
-        <button
-          className="cat-hamburger"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          style={{
-            display: "none",
-            color: "#5A2035",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          {mobileMenuOpen ? <FiX size={26} /> : <FiMenu size={26} />}
-        </button>
-      </header>
+            {mobileMenuOpen ? <FiX size={26} /> : <FiMenu size={26} />}
+          </button>
+        </header>
+      </div>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Drawer — same as home page */}
       {mobileMenuOpen && (
         <div
           style={{
             position: "fixed",
-            inset: 0,
-            backgroundColor: "rgba(0,0,0,0.45)",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100vh",
+            backgroundColor: "rgba(0,0,0,0.5)",
             zIndex: 200,
             display: "flex",
             justifyContent: "flex-end",
@@ -1263,10 +1296,10 @@ export default function CategoriesPage() {
         >
           <div
             style={{
-              width: "280px",
+              width: "290px",
               height: "100%",
               backgroundColor: "#FCF8F2",
-              padding: "28px 24px",
+              padding: "30px 24px",
               display: "flex",
               flexDirection: "column",
               gap: "20px",
@@ -1274,76 +1307,17 @@ export default function CategoriesPage() {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <img
-                src="/homepage/logo2_trans.png"
-                alt="Logo"
-                style={{ height: "48px" }}
-              />
-              <button
-                onClick={() => setMobileMenuOpen(false)}
-                style={{ background: "none", border: "none", cursor: "pointer" }}
-              >
-                <FiX size={22} />
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <img src="/homepage/logo2_trans.png" alt="Logo" style={{ height: "48px" }} />
+              <button onClick={() => setMobileMenuOpen(false)} style={{ background: "none", border: "none", cursor: "pointer" }}>
+                <FiX size={24} />
               </button>
             </div>
-            <nav
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "16px",
-                marginTop: "10px",
-              }}
-            >
-              <a
-                href="/"
-                onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  fontSize: "17px",
-                  fontFamily: "'Playfair Display', Georgia, serif",
-                  fontWeight: 500,
-                  color: "#3D3028",
-                }}
-              >
-                Home
-              </a>
-              <a
-                href="/about"
-                onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  fontSize: "17px",
-                  fontFamily: "'Playfair Display', Georgia, serif",
-                  fontWeight: 500,
-                  color: "#3D3028",
-                }}
-              >
-                About
-              </a>
-              <a
-                href="/categories"
-                onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  fontSize: "17px",
-                  fontFamily: "'Playfair Display', Georgia, serif",
-                  fontWeight: 700,
-                  color: "#5A2035",
-                }}
-              >
-                Categories
-              </a>
-              <a
-                href="/#contact"
-                onClick={() => setMobileMenuOpen(false)}
-                style={{ fontSize: "16px", fontWeight: 500 }}
-              >
-                Contact Us
-              </a>
+            <nav style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "20px" }}>
+              <a href="/" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 600, color: "#5A2035", fontFamily: "var(--font-serif)", textDecoration: "none" }}>Home</a>
+              <a href="/about" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500, color: "#5A2035", fontFamily: "var(--font-serif)", textDecoration: "none" }}>About</a>
+              <a href="/categories" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 700, color: "#BA8E43", fontFamily: "var(--font-serif)", textDecoration: "none" }}>Categories</a>
+              <a href="/contact" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500, color: "#5A2035", fontFamily: "var(--font-serif)", textDecoration: "none" }}>Contact Us</a>
             </nav>
           </div>
         </div>
