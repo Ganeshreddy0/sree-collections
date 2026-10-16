@@ -1,3 +1,7 @@
+import dns from 'dns';
+// Fallback to public DNS so MongoDB Atlas SRV records resolve on restrictive local networks
+dns.setServers(['8.8.8.8', '1.1.1.1']);
+
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -14,6 +18,7 @@ import uploadRoutes from './routes/uploadRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
+import homepageRoutes from './routes/homepageRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
@@ -47,6 +52,14 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/analytics', analyticsRoutes);
+// Prevent browser caching of the public homepage CMS endpoint
+app.use('/api/homepage', (req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
+});
+app.use('/api/homepage', homepageRoutes);
 app.use('/api/contact', contactRoutes);
 
 // Error Handler

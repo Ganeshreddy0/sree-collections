@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
   FiSearch,
@@ -18,37 +18,107 @@ import {
 } from "react-icons/fi";
 import { FaWhatsapp, FaPinterest } from "react-icons/fa";
 
+// ─── CMS API types & defaults ────────────────────────────────────────────────
+const API_BASE = "http://localhost:5000/api";
+
+type CMSItem = { itemId: string; title: string; subtitle: string; description: string; badge: string; imageUrl: string; imageAlt: string; linkUrl: string; ctaText: string; bgColor: string; displayOrder: number; isActive: boolean; metadata: Record<string, unknown> };
+type CMSSection = { sectionId: string; title: string; subtitle: string; description: string; badgeText: string; mediaUrl: string; mediaAlt: string; secondaryMediaUrl: string; secondaryMediaAlt: string; tertiaryMediaUrl: string; tertiaryMediaAlt: string; ctaText: string; ctaLink: string; secondaryCtaText: string; secondaryCtaLink: string; isActive: boolean; settings: Record<string, unknown>; items: CMSItem[] };
+type CMSData = Record<string, CMSSection>;
+
+// Graceful fallbacks — identical to original hardcoded data — used when API is offline
+const FALLBACK_CMS: CMSData = {
+  header: { sectionId: "header", title: "Sree Collections", subtitle: "", description: "Celebrating timeless Indian royalty with handpicked silk sarees, designer ethnic sets, and authentic temple jewellery crafted for extraordinary celebrations.", badgeText: "", mediaUrl: "/homepage/logo2_trans.png", mediaAlt: "Sree Collections", secondaryMediaUrl: "/homepage/logo2.png", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "CONTACT US", ctaLink: "/contact", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{itemId:"nav-home",title:"Home",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#home",ctaText:"",bgColor:"",displayOrder:1,isActive:true,metadata:{}},{itemId:"nav-about",title:"About",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#about",ctaText:"",bgColor:"",displayOrder:2,isActive:true,metadata:{}},{itemId:"nav-categories",title:"Categories",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"/categories",ctaText:"",bgColor:"",displayOrder:3,isActive:true,metadata:{}}] },
+  hero: { sectionId: "hero", title: "Dive Into A World Of Endless", subtitle: "Fashion Possibilities", description: "Elevate Your Wardrobe With Our Fashion Finds. Discover Your Signature Style At Fashion Avenue.", badgeText: "", mediaUrl: "/homepage/hero_col1.png", mediaAlt: "Fashion Model in Coat", secondaryMediaUrl: "/homepage/hero_bangles.png", secondaryMediaAlt: "Awesome Gold Jewelry Collection", tertiaryMediaUrl: "/homepage/hero_col3.png", tertiaryMediaAlt: "Bridal Jewelry and Sets", ctaText: "SHOP NOW", ctaLink: "#featured", secondaryCtaText: "EXPLORE MORE PRODUCTS", secondaryCtaLink: "#categories", isActive: true, settings: { watermarkUrl: "/homepage/sc_crest_watermark_trans.png", bangle_badge_label: "TRENDING", bangle_badge_title: "Awesome", bangle_badge_subtitle: "Collection" }, items: [] },
+  "free-delivery": { sectionId: "free-delivery", title: "Free Delivery", subtitle: "🛍️ Order above $99/-", description: "", badgeText: "No Code Required • Worldwide Express Delivery", mediaUrl: "/homepage/img4.png", mediaAlt: "Free Express Delivery Truck", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "", ctaLink: "#", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [] },
+  "categories-mosaic": { sectionId: "categories-mosaic", title: "Explore Our World of Styles", subtitle: "Discover By Category", description: "", badgeText: "", mediaUrl: "", mediaAlt: "", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "", ctaLink: "#", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{itemId:"mosaic-denim",title:"Effortless Casuals",subtitle:"",description:"",badge:"DENIM WEAR",imageUrl:"/homepage/mosaic_denim.jpg",imageAlt:"Denim Jeans",linkUrl:"#featured",ctaText:"Shop Denims",bgColor:"#DDEBEA",displayOrder:1,isActive:true,metadata:{type:"left-top",textColor:"#4A6261"}},{itemId:"mosaic-ethnic",title:"Heritage Elegance",subtitle:"",description:"",badge:"ETHNIC WEAR",imageUrl:"/homepage/mosaic_ethnic.jpg",imageAlt:"Ethnic Wear",linkUrl:"#sarees",ctaText:"Explore Kurtas",bgColor:"#EFE4E0",displayOrder:2,isActive:true,metadata:{type:"left-bottom",textColor:"#7D534A"}},{itemId:"mosaic-necklace",title:"Royal Gold Jewellery Collection",subtitle:"",description:"",badge:"22K PURE TEMPLE CRAFT",imageUrl:"/homepage/mosaic_necklace.jpg",imageAlt:"Royal Gold Jewellery",linkUrl:"#featured",ctaText:"Explore Jewellery",bgColor:"",displayOrder:3,isActive:true,metadata:{type:"right-tall"}},{itemId:"mosaic-shirt",title:"Everyday Linens",subtitle:"",description:"",badge:"Minimalist",imageUrl:"/homepage/mosaic_shirt.jpg",imageAlt:"Summer Casuals",linkUrl:"#",ctaText:"",bgColor:"#F2EFE9",displayOrder:4,isActive:true,metadata:{type:"bottom-small-left"}},{itemId:"mosaic-street",title:"Active Wear & Street Style",subtitle:"",description:"Vibrant hues, modern cuts, and ultimate comfort for every journey.",badge:"URBAN ATELIER",imageUrl:"/homepage/mosaic_street.jpg",imageAlt:"Activewear & Street Style",linkUrl:"#featured",ctaText:"Shop Street Edit",bgColor:"#D8F0EC",displayOrder:5,isActive:true,metadata:{type:"bottom-wide",badgeColor:"#2F5F58"}},{itemId:"mosaic-decor",title:"Festive Home Decor",subtitle:"",description:"",badge:"Celebrations",imageUrl:"/homepage/mosaic_decor.jpg",imageAlt:"Festive Party Decor",linkUrl:"#",ctaText:"",bgColor:"#F7F2FA",displayOrder:6,isActive:true,metadata:{type:"bottom-small-right"}}] },
+  "editorial-banner": { sectionId: "editorial-banner", title: "Your Style", subtitle: "Your Rules", description: "Empower Your Fashion", badgeText: "", mediaUrl: "/homepage/your_style_pill1_hd.jpg", mediaAlt: "Luxury saree and pearls", secondaryMediaUrl: "/homepage/your_style_pill2_hd.jpg", secondaryMediaAlt: "Jewelry display", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "SHOP NOW", ctaLink: "#featured", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [] },
+  "spotlight-casual": { sectionId: "spotlight-casual", title: "Casual Wear", subtitle: "Collections", description: "You offer your kids wardrobe to your journey wardrobe.", badgeText: "", mediaUrl: "/homepage/casual_model1.jpg", mediaAlt: "Casual Wear Model", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "Explore", ctaLink: "#featured", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{itemId:"casual-card-1",title:"",subtitle:"",description:"",badge:"",imageUrl:"/homepage/casual_model2.jpg",imageAlt:"Casual fashion",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:1,isActive:true,metadata:{width:200,height:280}},{itemId:"casual-card-2",title:"",subtitle:"",description:"",badge:"",imageUrl:"/homepage/casual_model3.jpg",imageAlt:"Casual styling",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:2,isActive:true,metadata:{width:180,height:260,marginTop:28}}] },
+  "spotlight-saree": { sectionId: "spotlight-saree", title: "Saree", subtitle: "Collections", description: "You drape your traditions and beauty with our saree collections.", badgeText: "", mediaUrl: "", mediaAlt: "", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "Explore", ctaLink: "#featured", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{itemId:"saree-card-1",title:"",subtitle:"",description:"",badge:"",imageUrl:"/homepage/saree_green.jpg",imageAlt:"Silk Saree",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:1,isActive:true,metadata:{width:220,height:340}},{itemId:"saree-card-2",title:"",subtitle:"",description:"",badge:"",imageUrl:"/homepage/saree_models.jpg",imageAlt:"Royal Silk Sarees",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:2,isActive:true,metadata:{width:200,height:310,marginTop:36}}] },
+  "spotlight-decor": { sectionId: "spotlight-decor", title: "Decorative Item", subtitle: "Collections", description: "You collect your craft and art décor here with our collections.", badgeText: "", mediaUrl: "", mediaAlt: "", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "Explore", ctaLink: "#featured", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{itemId:"decor-card-1",title:"",subtitle:"",description:"",badge:"",imageUrl:"/homepage/decor_lights.jpg",imageAlt:"Festive Decor Diyas",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:1,isActive:true,metadata:{width:220,height:300}},{itemId:"decor-card-2",title:"",subtitle:"",description:"",badge:"",imageUrl:"/homepage/decor_handicraft.jpg",imageAlt:"Artisanal Handicrafts",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:2,isActive:true,metadata:{width:200,height:280,marginTop:32}}] },
+  "whatsapp-banner": { sectionId: "whatsapp-banner", title: "Curate your cart.", subtitle: "Complete on WhatsApp.", description: "", badgeText: "🛍 Shopping Made Personal", mediaUrl: "/homepage/img5.png", mediaAlt: "Sree Collections WhatsApp Shopping Bag", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "Chat on WhatsApp", ctaLink: "https://wa.me/?text=Hello%20Sree%20Collections%2C%20I%20want%20to%20shop!", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{itemId:"wa-step-1",title:"Added Cart",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:1,isActive:true,metadata:{}},{itemId:"wa-step-2",title:"WhatsApp",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:2,isActive:true,metadata:{}},{itemId:"wa-step-3",title:"Order Confirmed",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:3,isActive:true,metadata:{}}] },
+  testimonials: { sectionId: "testimonials", title: "Why our Customer says", subtitle: "", description: "", badgeText: "", mediaUrl: "", mediaAlt: "", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "", ctaLink: "#", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{itemId:"t1",title:"Priya Sundaram",subtitle:"Verified Bride",description:"The silk saree and the temple necklace set I ordered for my sister's wedding completely surpassed my expectations.",badge:"Chennai, India",imageUrl:"",imageAlt:"",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:1,isActive:true,metadata:{rating:5}},{itemId:"t2",title:"Ananya Deshmukh",subtitle:"Verified Buyer",description:"Shopping via WhatsApp concierge was the smoothest experience ever. They shared detailed 4K close-up videos of the Banarasi weaves.",badge:"Mumbai, India",imageUrl:"",imageAlt:"",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:2,isActive:true,metadata:{rating:5}},{itemId:"t3",title:"Radhika Patel",subtitle:"International Client",description:"Ordered from the US and my parcel arrived in just 4 days with pristine packing. The fabric is so soft, breathable, and authentic.",badge:"San Jose, USA",imageUrl:"",imageAlt:"",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:3,isActive:true,metadata:{rating:5}}] },
+  footer: { sectionId: "footer", title: "", subtitle: "", description: "Celebrating timeless Indian royalty with handpicked silk sarees, designer ethnic sets, and authentic temple jewellery crafted for extraordinary celebrations.", badgeText: "", mediaUrl: "/homepage/logo2.png", mediaAlt: "Sree Collections", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "", ctaLink: "#", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: { phone: "+91 98765 43210", email: "support@sreecollections.com", copyright: "Sree Collections. All Rights Reserved." }, items: [{itemId:"footer-col-1",title:"Kanjeevaram Pure Silk",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#featured",ctaText:"",bgColor:"",displayOrder:1,isActive:true,metadata:{group:"collections"}},{itemId:"footer-col-2",title:"Banarasi Heritage Weaves",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#featured",ctaText:"",bgColor:"",displayOrder:2,isActive:true,metadata:{group:"collections"}},{itemId:"footer-col-3",title:"Bridal Lehengas & Kurtas",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#featured",ctaText:"",bgColor:"",displayOrder:3,isActive:true,metadata:{group:"collections"}},{itemId:"footer-col-4",title:"Temple Jewellery Sets",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#featured",ctaText:"",bgColor:"",displayOrder:4,isActive:true,metadata:{group:"collections"}},{itemId:"footer-col-5",title:"Everyday Casuals & Denims",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#featured",ctaText:"",bgColor:"",displayOrder:5,isActive:true,metadata:{group:"collections"}},{itemId:"footer-col-6",title:"Festive Home Decor",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#featured",ctaText:"",bgColor:"",displayOrder:6,isActive:true,metadata:{group:"collections"}},{itemId:"footer-care-1",title:"Track Your Order",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#home",ctaText:"",bgColor:"",displayOrder:1,isActive:true,metadata:{group:"customer-care"}},{itemId:"footer-care-2",title:"Shipping & Global Delivery",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#home",ctaText:"",bgColor:"",displayOrder:2,isActive:true,metadata:{group:"customer-care"}},{itemId:"footer-care-3",title:"Custom Blouse Stitching",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#home",ctaText:"",bgColor:"",displayOrder:3,isActive:true,metadata:{group:"customer-care"}},{itemId:"footer-care-4",title:"WhatsApp Live Video Call",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#home",ctaText:"",bgColor:"",displayOrder:4,isActive:true,metadata:{group:"customer-care"}},{itemId:"footer-care-5",title:"Returns & Exchanges",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#home",ctaText:"",bgColor:"",displayOrder:5,isActive:true,metadata:{group:"customer-care"}},{itemId:"footer-care-6",title:"Authenticity Certificate",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#home",ctaText:"",bgColor:"",displayOrder:6,isActive:true,metadata:{group:"customer-care"}}] },
+};
+
 export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [activeTab, setActiveTab] = useState("all");
+  const [cms, setCms] = useState<CMSData>(FALLBACK_CMS);
+  const [cmsLoading, setCmsLoading] = useState(true);
 
-  const testimonials = [
-    {
-      quote:
-        "The silk saree and the temple necklace set I ordered for my sister's wedding completely surpassed my expectations. The zari craftsmanship is truly heirloom quality and the luxury packaging made it feel like a royal gift!",
-      author: "Priya Sundaram",
-      location: "Chennai, India",
-      role: "Verified Bride",
-      rating: 5,
-    },
-    {
-      quote:
-        "Shopping via WhatsApp concierge was the smoothest experience ever. They shared detailed 4K close-up videos of the Banarasi weaves and helped me pick the matching blouse fabric. Exceptional service!",
-      author: "Ananya Deshmukh",
-      location: "Mumbai, India",
-      role: "Verified Buyer",
-      rating: 5,
-    },
-    {
-      quote:
-        "Ordered from the US and my parcel arrived in just 4 days with pristine packing. The fabric is so soft, breathable, and authentic. Sree Collections has earned a lifelong customer!",
-      author: "Radhika Patel",
-      location: "San Jose, USA",
-      role: "International Client",
-      rating: 5,
-    },
-  ];
+  const fetchCms = useCallback(async (silent = false) => {
+    if (!silent) setCmsLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/homepage?_t=${Date.now()}`, { cache: "no-store", headers: { "Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache" } });
+      if (!res.ok) throw new Error("API error");
+      const data = await res.json();
+      if (data.success && data.data) {
+        // Merge with fallback — fallback fills any missing section so page never breaks
+        setCms({ ...FALLBACK_CMS, ...data.data });
+      }
+    } catch {
+      // Silently fall back to defaults — page renders fine without API
+    } finally {
+      if (!silent) setCmsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Initial load
+    fetchCms();
+
+    // ── Real-time sync: re-fetch whenever tab regains focus ──────────────────
+    // This means the instant an admin saves changes and switches to the
+    // storefront tab, the content updates immediately.
+    const handleFocus = () => fetchCms(true);
+    window.addEventListener("focus", handleFocus);
+    const handleVisibility = () => { if (document.visibilityState === "visible") fetchCms(true); };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    // ── Cross-tab instant sync: admin panel writes localStorage on save ─────
+    // When admin saves in another tab, storefront gets notified immediately
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "cms_updated_at") fetchCms(true);
+    };
+    window.addEventListener("storage", handleStorage);
+
+    // ── Polling: auto-refresh every 30 seconds in the background ─────────────
+    const pollInterval = setInterval(() => fetchCms(true), 30_000);
+
+    // BroadcastChannel: instant sync within same browser (works same-window cross-tab)
+    let bc: BroadcastChannel | null = null;
+    try {
+      bc = new BroadcastChannel("cms_sync");
+      bc.onmessage = () => fetchCms(true);
+    } catch { /* unsupported browser */ }
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("storage", handleStorage);
+      bc?.close();
+      clearInterval(pollInterval);
+    };
+  }, [fetchCms]);
+
+  // Convenience helpers
+  const S = (id: string): CMSSection => cms[id] || FALLBACK_CMS[id] || {} as CMSSection;
+  const items = (id: string) => (S(id).items || []).filter(i => i.isActive !== false);
+  const testimonials = items("testimonials");
+  const footerCollections = items("footer").filter(i => (i.metadata as Record<string, unknown>)?.group === "collections");
+  const footerCare = items("footer").filter(i => (i.metadata as Record<string, unknown>)?.group === "customer-care");
+  const mosaicItems = items("categories-mosaic");
+  const mosaicLeft = mosaicItems.filter(i => ["left-top","left-bottom"].includes(String((i.metadata as Record<string,unknown>)?.type || "")));
+  const mosaicRightTall = mosaicItems.find(i => (i.metadata as Record<string,unknown>)?.type === "right-tall");
+  const mosaicBottomSmallLeft = mosaicItems.find(i => (i.metadata as Record<string,unknown>)?.type === "bottom-small-left");
+  const mosaicBottomWide = mosaicItems.find(i => (i.metadata as Record<string,unknown>)?.type === "bottom-wide");
+  const mosaicBottomSmallRight = mosaicItems.find(i => (i.metadata as Record<string,unknown>)?.type === "bottom-small-right");
+  const casualCards = items("spotlight-casual");
+  const sareeCards = items("spotlight-saree");
+  const decorCards = items("spotlight-decor");
+  const waSteps = items("whatsapp-banner");
+  const navLinks = items("header").filter(i => ["nav-home","nav-about","nav-categories"].includes(i.itemId));
 
   return (
     <div style={{ backgroundColor: "#FCF8F2", minHeight: "100vh", overflowX: "hidden" }}>
@@ -78,8 +148,8 @@ export default function HomePage() {
           <div style={{ display: "flex", alignItems: "center" }}>
             <a href="#" style={{ display: "inline-block" }}>
               <img
-                src="/homepage/logo2_trans.png"
-                alt="Sree Collections"
+                src={S("header").mediaUrl || "/homepage/logo2_trans.png"}
+                alt={S("header").mediaAlt || "Sree Collections"}
                 style={{
                   height: "72px",
                   width: "auto",
@@ -100,52 +170,33 @@ export default function HomePage() {
             }}
             className="desktop-nav"
           >
-            <a
-              href="#home"
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontSize: "17px",
-                fontWeight: 700,
-                color: "#5A2035",
-                borderBottom: "2.5px solid #5A2035",
-                paddingBottom: "3px",
-                lineHeight: 1.2,
-              }}
-            >
-              Home
-            </a>
-            <a
-              href="/about"
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontSize: "17px",
-                fontWeight: 700,
-                color: "#5A2035",
-                transition: "opacity 0.2s",
-                lineHeight: 1.2,
-              }}
-              className="nav-link"
-            >
-              About
-            </a>
-            <a
-              href="/categories"
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontSize: "17px",
-                fontWeight: 700,
-                color: "#5A2035",
-                transition: "opacity 0.2s",
-                lineHeight: 1.2,
-              }}
-              className="nav-link"
-            >
-              Categories
-            </a>
+            {/* CMS-driven nav links */}
+            {navLinks.map((link) => {
+              const isHome = link.itemId === "nav-home" || link.linkUrl === "#home";
+              return (
+                <a
+                  key={link.itemId}
+                  href={link.linkUrl}
+                  style={{
+                    fontFamily: "var(--font-serif)",
+                    fontSize: "17px",
+                    fontWeight: 700,
+                    color: "#5A2035",
+                    borderBottom: isHome ? "2.5px solid #5A2035" : undefined,
+                    paddingBottom: isHome ? "3px" : undefined,
+                    transition: "opacity 0.2s",
+                    lineHeight: 1.2,
+                  }}
+                  className={isHome ? undefined : "nav-link"}
+                >
+                  {link.title}
+                </a>
+              );
+            })}
 
             {/* CONTACT US Pill Button */}
             <a
-              href="/contact"
+              href={S("header").ctaLink || "/contact"}
               style={{
                 background: "#BA8E43",
                 color: "#FFFFFF",
@@ -164,7 +215,7 @@ export default function HomePage() {
               }}
               className="primary-btn"
             >
-              CONTACT US
+              {S("header").ctaText || "CONTACT US"}
             </a>
 
             {/* Search Icon */}
@@ -246,16 +297,29 @@ export default function HomePage() {
             onClick={(e) => e.stopPropagation()}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <img src="/homepage/logo2.png" alt="Logo" style={{ height: "48px" }} />
+              <img src={S("header").secondaryMediaUrl || "/homepage/logo2.png"} alt="Logo" style={{ height: "48px" }} />
               <button onClick={() => setMobileMenuOpen(false)}>
                 <FiX size={24} />
               </button>
             </div>
             <nav style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "20px" }}>
-              <a href="#home" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 600 }}>Home</a>
-              <a href="/about" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500 }}>About</a>
-              <a href="/categories" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500 }}>Categories</a>
-              <a href="/contact" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500 }}>Contact Us</a>
+              {navLinks.map((link) => (
+                <a
+                  key={link.itemId}
+                  href={link.linkUrl}
+                  onClick={() => setMobileMenuOpen(false)}
+                  style={{ fontSize: "16px", fontWeight: link.itemId === "nav-home" ? 600 : 500 }}
+                >
+                  {link.title}
+                </a>
+              ))}
+              <a
+                href={S("header").ctaLink || "/contact"}
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ fontSize: "16px", fontWeight: 500 }}
+              >
+                {S("header").ctaText || "Contact Us"}
+              </a>
             </nav>
           </div>
         </div>
@@ -296,7 +360,7 @@ export default function HomePage() {
             transform: "translate(-50%, -50%)",
             width: "740px",
             height: "740px",
-            backgroundImage: "url('/homepage/sc_crest_watermark_trans.png')",
+            backgroundImage: `url('${(S("hero").settings?.watermarkUrl as string) || "/homepage/sc_crest_watermark_trans.png"}')`,
             backgroundSize: "contain",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "center",
@@ -389,7 +453,7 @@ export default function HomePage() {
                 display: "inline-block",
               }}
             >
-              Fashion Possibilities
+              {S("hero").subtitle || "Fashion Possibilities"}
             </span>
 
             <p
@@ -404,9 +468,7 @@ export default function HomePage() {
                 letterSpacing: "-0.2px",
               }}
             >
-              Elevate Your Wardrobe With Our Fashion Finds. Discover
-              <br />
-              Your Signature Style At Fashion Avenue.
+              {S("hero").description || "Elevate Your Wardrobe With Our Fashion Finds."}
             </p>
           </div>
         </div>
@@ -483,8 +545,8 @@ export default function HomePage() {
               className="float-hover"
             >
               <img
-                src="/homepage/hero_col1.png"
-                alt="Fashion Model in Coat"
+                src={S("hero").mediaUrl || "/homepage/hero_col1.png"}
+                alt={S("hero").mediaAlt || "Fashion Model in Coat"}
                 style={{
                   width: "100%",
                   height: "100%",
@@ -520,7 +582,7 @@ export default function HomePage() {
               >
                 {/* Button 1: SHOP NOW ───────> */}
                 <a
-                  href="#featured"
+                  href={S("hero").ctaLink || "#featured"}
                   style={{
                     background: "#BA8E43",
                     color: "#FFFFFF",
@@ -540,13 +602,13 @@ export default function HomePage() {
                   }}
                   className="primary-btn"
                 >
-                  <span>SHOP NOW</span>
+                  <span>{S("hero").ctaText || "SHOP NOW"}</span>
                   <span style={{ fontSize: "15px", letterSpacing: "-1.5px", fontWeight: 400 }}>───────&gt;</span>
                 </a>
 
                 {/* Button 2: EXPLORE MORE PRODUCTS */}
                 <a
-                  href="#categories"
+                  href={S("hero").secondaryCtaLink || "#categories"}
                   style={{
                     border: "1.5px solid #BA8E43",
                     background: "transparent",
@@ -565,7 +627,7 @@ export default function HomePage() {
                   }}
                   className="secondary-outline-btn"
                 >
-                  <span>EXPLORE MORE PRODUCTS</span>
+                  <span>{S("hero").secondaryCtaText || "EXPLORE MORE PRODUCTS"}</span>
                 </a>
               </div>
 
@@ -579,8 +641,8 @@ export default function HomePage() {
                 className="float-hover"
               >
                 <img
-                  src="/homepage/hero_bangles.png"
-                  alt="Awesome Gold Jewelry Collection"
+                  src={S("hero").secondaryMediaUrl || "/homepage/hero_bangles.png"}
+                  alt={S("hero").secondaryMediaAlt || "Awesome Gold Jewelry Collection"}
                   style={{
                     width: "100%",
                     height: "auto",
@@ -614,7 +676,7 @@ export default function HomePage() {
                       boxShadow: "0 2px 6px rgba(0,0,0,0.06)",
                     }}
                   >
-                    TRENDING
+                    {(S("hero").settings?.bangle_badge_label as string) || "TRENDING"}
                   </span>
                   <div
                     style={{
@@ -624,7 +686,7 @@ export default function HomePage() {
                       lineHeight: 1.15,
                     }}
                   >
-                    Awesome
+                    {(S("hero").settings?.bangle_badge_title as string) || "Awesome"}
                   </div>
                   <div
                     style={{
@@ -635,7 +697,7 @@ export default function HomePage() {
                       lineHeight: 1.15,
                     }}
                   >
-                    Collection
+                    {(S("hero").settings?.bangle_badge_subtitle as string) || "Collection"}
                   </div>
                 </div>
 
@@ -694,8 +756,8 @@ export default function HomePage() {
               className="float-hover"
             >
               <img
-                src="/homepage/hero_col3.png"
-                alt="Bridal Jewelry and Sets"
+                src={S("hero").tertiaryMediaUrl || "/homepage/hero_col3.png"}
+                alt={S("hero").tertiaryMediaAlt || "Bridal Jewelry and Sets"}
                 style={{
                   width: "100%",
                   height: "100%",
@@ -869,8 +931,8 @@ export default function HomePage() {
             }}
           >
             <img
-              src="/homepage/img4.png"
-              alt="Free Express Delivery Truck with Saree & Jewelry"
+              src={S("free-delivery").mediaUrl || "/homepage/img4.png"}
+              alt={S("free-delivery").mediaAlt || "Free Express Delivery Truck with Saree & Jewelry"}
               style={{
                 width: "100%",
                 maxHeight: "340px",
@@ -906,7 +968,7 @@ export default function HomePage() {
                 marginBottom: "16px",
               }}
             >
-              Free Delivery
+              {S("free-delivery").title || "Free Delivery"}
             </div>
 
             <div
@@ -923,7 +985,7 @@ export default function HomePage() {
                 marginBottom: "22px",
               }}
             >
-              🛍️ Order above $99/-
+              {S("free-delivery").subtitle || "🛍️ Order above $99/-"}
             </div>
 
             <div
@@ -940,7 +1002,7 @@ export default function HomePage() {
                 fontWeight: 600,
               }}
             >
-              <FiCheckCircle size={16} color="#BB8E43" /> No Code Required • Worldwide Express Delivery
+              <FiCheckCircle size={16} color="#BB8E43" /> {S("free-delivery").badgeText || "No Code Required • Worldwide Express Delivery"}
             </div>
           </div>
         </div>
@@ -978,7 +1040,7 @@ export default function HomePage() {
               marginBottom: "8px",
             }}
           >
-            Discover By Category
+            {S("categories-mosaic").subtitle || "Discover By Category"}
           </span>
           <h2
             style={{
@@ -989,7 +1051,7 @@ export default function HomePage() {
               margin: 0,
             }}
           >
-            Explore Our World of Styles
+            {S("categories-mosaic").title || "Explore Our World of Styles"}
           </h2>
         </div>
 
@@ -1036,7 +1098,7 @@ export default function HomePage() {
                       marginBottom: "12px",
                     }}
                   >
-                    DENIM WEAR
+                    {(mosaicLeft[0]?.badge) || "DENIM WEAR"}
                   </span>
                   <h3
                     style={{
@@ -1047,11 +1109,11 @@ export default function HomePage() {
                       lineHeight: 1.2,
                     }}
                   >
-                    Effortless Casuals
+                    {(mosaicLeft[0]?.title) || "Effortless Casuals"}
                   </h3>
                 </div>
                 <a
-                  href="#featured"
+                  href={mosaicLeft[0]?.linkUrl || "#featured"}
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
@@ -1061,13 +1123,13 @@ export default function HomePage() {
                     color: "#5D2030",
                   }}
                 >
-                  Shop Denims <FiArrowRight size={15} />
+                  {(mosaicLeft[0]?.ctaText) || "Shop Denims"} <FiArrowRight size={15} />
                 </a>
               </div>
               <div style={{ width: "48%", height: "100%", position: "relative" }}>
                 <img
-                  src="/homepage/mosaic_denim.jpg"
-                  alt="Denim Jeans"
+                  src={mosaicLeft[0]?.imageUrl || "/homepage/mosaic_denim.jpg"}
+                  alt={mosaicLeft[0]?.imageAlt || "Denim Jeans"}
                   style={{
                     width: "100%",
                     height: "100%",
@@ -1094,8 +1156,8 @@ export default function HomePage() {
             >
               <div style={{ width: "48%", height: "100%", position: "relative" }}>
                 <img
-                  src="/homepage/mosaic_ethnic.jpg"
-                  alt="Ethnic Wear"
+                  src={mosaicLeft[1]?.imageUrl || "/homepage/mosaic_ethnic.jpg"}
+                  alt={mosaicLeft[1]?.imageAlt || "Ethnic Wear"}
                   style={{
                     width: "100%",
                     height: "100%",
@@ -1127,7 +1189,7 @@ export default function HomePage() {
                       marginBottom: "12px",
                     }}
                   >
-                    ETHNIC WEAR
+                    {(mosaicLeft[1]?.badge) || "ETHNIC WEAR"}
                   </span>
                   <h3
                     style={{
@@ -1138,11 +1200,11 @@ export default function HomePage() {
                       lineHeight: 1.2,
                     }}
                   >
-                    Heritage Elegance
+                    {(mosaicLeft[1]?.title) || "Heritage Elegance"}
                   </h3>
                 </div>
                 <a
-                  href="#sarees"
+                  href={mosaicLeft[1]?.linkUrl || "#sarees"}
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
@@ -1152,7 +1214,7 @@ export default function HomePage() {
                     color: "#5D2030",
                   }}
                 >
-                  Explore Kurtas <FiArrowRight size={15} />
+                  {(mosaicLeft[1]?.ctaText) || "Explore Kurtas"} <FiArrowRight size={15} />
                 </a>
               </div>
             </div>
@@ -1161,8 +1223,8 @@ export default function HomePage() {
           {/* Right Column: Tall Frame (660.45 x 630) */}
           <div className="mosaic-right-tall float-hover">
             <img
-              src="/homepage/mosaic_necklace.jpg"
-              alt="Royal Gold Jewellery"
+              src={mosaicRightTall?.imageUrl || "/homepage/mosaic_necklace.jpg"}
+              alt={mosaicRightTall?.imageAlt || "Royal Gold Jewellery"}
               style={{
                 width: "100%",
                 height: "100%",
@@ -1193,7 +1255,7 @@ export default function HomePage() {
                   marginBottom: "8px",
                 }}
               >
-                22K PURE TEMPLE CRAFT
+                {mosaicRightTall?.badge || "22K PURE TEMPLE CRAFT"}
               </span>
               <h3
                 style={{
@@ -1205,10 +1267,10 @@ export default function HomePage() {
                   textShadow: "0 2px 8px rgba(0,0,0,0.4)",
                 }}
               >
-                Royal Gold Jewellery Collection
+                {mosaicRightTall?.title || "Royal Gold Jewellery Collection"}
               </h3>
               <a
-                href="#featured"
+                href={mosaicRightTall?.linkUrl || "#featured"}
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
@@ -1222,7 +1284,7 @@ export default function HomePage() {
                   boxShadow: "0 4px 16px rgba(187, 142, 67, 0.4)",
                 }}
               >
-                Explore Jewellery <FiChevronRight size={16} />
+                {mosaicRightTall?.ctaText || "Explore Jewellery"} <FiChevronRight size={16} />
               </a>
             </div>
           </div>
@@ -1232,8 +1294,8 @@ export default function HomePage() {
         <div className="mosaic-bottom-container">
           <div className="mosaic-bottom-small float-hover" style={{ backgroundColor: "#F2EFE9" }}>
             <img
-              src="/homepage/mosaic_shirt.jpg"
-              alt="Summer Casuals"
+              src={mosaicBottomSmallLeft?.imageUrl || "/homepage/mosaic_shirt.jpg"}
+              alt={mosaicBottomSmallLeft?.imageAlt || "Summer Casuals"}
               style={{
                 width: "100%",
                 height: "240px",
@@ -1252,10 +1314,10 @@ export default function HomePage() {
                   marginBottom: "4px",
                 }}
               >
-                Minimalist
+                {mosaicBottomSmallLeft?.badge || "Minimalist"}
               </span>
               <h4 style={{ fontFamily: "var(--font-serif)", fontSize: "18px", color: "#2F2C24", margin: 0 }}>
-                Everyday Linens
+                {mosaicBottomSmallLeft?.title || "Everyday Linens"}
               </h4>
             </div>
           </div>
@@ -1282,7 +1344,7 @@ export default function HomePage() {
                   marginBottom: "10px",
                 }}
               >
-                URBAN ATELIER
+                {mosaicBottomWide?.badge || "URBAN ATELIER"}
               </span>
               <h3
                 style={{
@@ -1294,13 +1356,13 @@ export default function HomePage() {
                   marginBottom: "16px",
                 }}
               >
-                Active Wear & Street Style
+                {mosaicBottomWide?.title || "Active Wear & Street Style"}
               </h3>
               <p style={{ fontSize: "14.5px", color: "#546E6A", marginBottom: "20px", lineHeight: 1.45 }}>
-                Vibrant hues, modern cuts, and ultimate comfort for every journey.
+                {mosaicBottomWide?.description || "Vibrant hues, modern cuts, and ultimate comfort for every journey."}
               </p>
               <a
-                href="#featured"
+                href={mosaicBottomWide?.linkUrl || "#featured"}
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
@@ -1310,13 +1372,13 @@ export default function HomePage() {
                   color: "#5D2030",
                 }}
               >
-                Shop Street Edit <FiArrowRight size={15} />
+                {mosaicBottomWide?.ctaText || "Shop Street Edit"} <FiArrowRight size={15} />
               </a>
             </div>
             <div style={{ width: "45%", height: "100%", position: "relative" }}>
               <img
-                src="/homepage/mosaic_street.jpg"
-                alt="Activewear & Street Style"
+                src={mosaicBottomWide?.imageUrl || "/homepage/mosaic_street.jpg"}
+                alt={mosaicBottomWide?.imageAlt || "Activewear & Street Style"}
                 style={{
                   width: "100%",
                   height: "100%",
@@ -1328,8 +1390,8 @@ export default function HomePage() {
 
           <div className="mosaic-bottom-small float-hover" style={{ backgroundColor: "#F7F2FA" }}>
             <img
-              src="/homepage/mosaic_decor.jpg"
-              alt="Festive Party Decor"
+              src={mosaicBottomSmallRight?.imageUrl || "/homepage/mosaic_decor.jpg"}
+              alt={mosaicBottomSmallRight?.imageAlt || "Festive Party Decor"}
               style={{
                 width: "100%",
                 height: "240px",
@@ -1348,10 +1410,10 @@ export default function HomePage() {
                   marginBottom: "4px",
                 }}
               >
-                Celebrations
+                {mosaicBottomSmallRight?.badge || "Celebrations"}
               </span>
               <h4 style={{ fontFamily: "var(--font-serif)", fontSize: "18px", color: "#2F2C24", margin: 0 }}>
-                Festive Home Decor
+                {mosaicBottomSmallRight?.title || "Festive Home Decor"}
               </h4>
             </div>
           </div>
@@ -1403,11 +1465,11 @@ export default function HomePage() {
                 color: "#5D2030",
               }}
             >
-              Your Style
+              {S("editorial-banner").title || "Your Style"}
             </span>
             <img
-              src="/homepage/your_style_pill1_hd.jpg"
-              alt="Luxury saree and pearls"
+              src={S("editorial-banner").mediaUrl || "/homepage/your_style_pill1_hd.jpg"}
+              alt={S("editorial-banner").mediaAlt || "Luxury saree and pearls"}
               className="editorial-banner-img"
               style={{
                 width: "200px",
@@ -1431,8 +1493,8 @@ export default function HomePage() {
             }}
           >
             <img
-              src="/homepage/your_style_pill2_hd.jpg"
-              alt="Jewelry display"
+              src={S("editorial-banner").secondaryMediaUrl || "/homepage/your_style_pill2_hd.jpg"}
+              alt={S("editorial-banner").secondaryMediaAlt || "Jewelry display"}
               className="editorial-banner-img"
               style={{
                 width: "200px",
@@ -1456,7 +1518,7 @@ export default function HomePage() {
                 color: "#5D2030",
               }}
             >
-              Your Rules
+              {S("editorial-banner").subtitle || "Your Rules"}
             </span>
           </div>
 
@@ -1482,7 +1544,7 @@ export default function HomePage() {
                 color: "#5D2030",
               }}
             >
-              Empower Your Fashion
+              {S("editorial-banner").description || "Empower Your Fashion"}
             </span>
           </div>
 
@@ -1519,7 +1581,7 @@ export default function HomePage() {
                   whiteSpace: "nowrap",
                 }}
               >
-                SHOP NOW
+                {S("editorial-banner").ctaText || "SHOP NOW"}
               </span>
               <svg
                 width="46"
@@ -1570,7 +1632,7 @@ export default function HomePage() {
                 marginBottom: "4px",
               }}
             >
-              Casual Wear
+              {S("spotlight-casual").title || "Casual Wear"}
             </h2>
             <h2
               style={{
@@ -1582,7 +1644,7 @@ export default function HomePage() {
                 lineHeight: 1.1,
               }}
             >
-              Collections
+              {S("spotlight-casual").subtitle || "Collections"}
             </h2>
             <p
               style={{
@@ -1594,7 +1656,7 @@ export default function HomePage() {
                 marginBottom: "32px",
               }}
             >
-              You offer your kids wardrobe to your journey wardrobe.
+              {S("spotlight-casual").description || "You offer your kids wardrobe to your journey wardrobe."}
             </p>
 
             {/* Staggered dual image cards */}
@@ -1611,8 +1673,8 @@ export default function HomePage() {
                 className="float-hover"
               >
                 <img
-                  src="/homepage/casual_model2.jpg"
-                  alt="Casual fashion"
+                  src={casualCards[0]?.imageUrl || "/homepage/casual_model2.jpg"}
+                  alt={casualCards[0]?.imageAlt || "Casual fashion"}
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
               </div>
@@ -1629,15 +1691,15 @@ export default function HomePage() {
                 className="float-hover"
               >
                 <img
-                  src="/homepage/casual_model3.jpg"
-                  alt="Casual styling"
+                  src={casualCards[1]?.imageUrl || "/homepage/casual_model3.jpg"}
+                  alt={casualCards[1]?.imageAlt || "Casual styling"}
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
               </div>
             </div>
 
             <a
-              href="#featured"
+              href={S("spotlight-casual").ctaLink || "#featured"}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -1653,7 +1715,7 @@ export default function HomePage() {
               }}
               className="secondary-btn"
             >
-              Explore <FiArrowRight size={14} />
+              {S("spotlight-casual").ctaText || "Explore"} <FiArrowRight size={14} />
             </a>
           </div>
 
@@ -1669,8 +1731,8 @@ export default function HomePage() {
             className="float-hover"
           >
             <img
-              src="/homepage/casual_model1.jpg"
-              alt="Casual Wear Model"
+              src={S("spotlight-casual").mediaUrl || "/homepage/casual_model1.jpg"}
+              alt={S("spotlight-casual").mediaAlt || "Casual Wear Model"}
               style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
           </div>
@@ -1713,8 +1775,8 @@ export default function HomePage() {
               className="float-hover"
             >
               <img
-                src="/homepage/saree_green.jpg"
-                alt="Silk Saree"
+                src={sareeCards[0]?.imageUrl || "/homepage/saree_green.jpg"}
+                alt={sareeCards[0]?.imageAlt || "Silk Saree"}
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
             </div>
@@ -1731,8 +1793,8 @@ export default function HomePage() {
               className="float-hover"
             >
               <img
-                src="/homepage/saree_models.jpg"
-                alt="Royal Silk Sarees"
+                src={sareeCards[1]?.imageUrl || "/homepage/saree_models.jpg"}
+                alt={sareeCards[1]?.imageAlt || "Royal Silk Sarees"}
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
             </div>
@@ -1751,7 +1813,7 @@ export default function HomePage() {
                 textAlign: "right",
               }}
             >
-              Saree
+              {S("spotlight-saree").title || "Saree"}
             </h2>
             <h2
               style={{
@@ -1764,7 +1826,7 @@ export default function HomePage() {
                 textAlign: "right",
               }}
             >
-              Collections
+              {S("spotlight-saree").subtitle || "Collections"}
             </h2>
             <p
               style={{
@@ -1776,11 +1838,11 @@ export default function HomePage() {
                 textAlign: "right",
               }}
             >
-              You drape your traditions and beauty with our saree collections.
+              {S("spotlight-saree").description || "You drape your traditions and beauty with our saree collections."}
             </p>
             <div style={{ textAlign: "right" }}>
               <a
-                href="#featured"
+                href={S("spotlight-saree").ctaLink || "#featured"}
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
@@ -1796,7 +1858,7 @@ export default function HomePage() {
                 }}
                 className="secondary-btn"
               >
-                Explore <FiArrowRight size={14} />
+                {S("spotlight-saree").ctaText || "Explore"} <FiArrowRight size={14} />
               </a>
             </div>
           </div>
@@ -1837,7 +1899,7 @@ export default function HomePage() {
                 marginBottom: "4px",
               }}
             >
-              Decorative Item
+              {S("spotlight-decor").title || "Decorative Item"}
             </h2>
             <h2
               style={{
@@ -1849,7 +1911,7 @@ export default function HomePage() {
                 lineHeight: 1.1,
               }}
             >
-              Collections
+              {S("spotlight-decor").subtitle || "Collections"}
             </h2>
             <p
               style={{
@@ -1861,10 +1923,10 @@ export default function HomePage() {
                 marginBottom: "32px",
               }}
             >
-              You collect your craft and art décor here with our collections.
+              {S("spotlight-decor").description || "You collect your craft and art décor here with our collections."}
             </p>
             <a
-              href="#featured"
+              href={S("spotlight-decor").ctaLink || "#featured"}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -1880,7 +1942,7 @@ export default function HomePage() {
               }}
               className="secondary-btn"
             >
-              Explore <FiArrowRight size={14} />
+              {S("spotlight-decor").ctaText || "Explore"} <FiArrowRight size={14} />
             </a>
           </div>
 
@@ -1898,8 +1960,8 @@ export default function HomePage() {
               className="float-hover"
             >
               <img
-                src="/homepage/decor_lights.jpg"
-                alt="Festive Decor Diyas"
+                src={decorCards[0]?.imageUrl || "/homepage/decor_lights.jpg"}
+                alt={decorCards[0]?.imageAlt || "Festive Decor Diyas"}
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
             </div>
@@ -1916,8 +1978,8 @@ export default function HomePage() {
               className="float-hover"
             >
               <img
-                src="/homepage/decor_handicraft.jpg"
-                alt="Artisanal Handicrafts"
+                src={decorCards[1]?.imageUrl || "/homepage/decor_handicraft.jpg"}
+                alt={decorCards[1]?.imageAlt || "Artisanal Handicrafts"}
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
             </div>
@@ -1973,7 +2035,7 @@ export default function HomePage() {
                 backdropFilter: "blur(4px)",
               }}
             >
-              <span style={{ fontSize: "15px" }}>🛍</span> Shopping Made Personal
+              <span style={{ fontSize: "15px" }}>🛍</span> {S("whatsapp-banner").badgeText || "Shopping Made Personal"}
             </div>
 
             <h2
@@ -1986,13 +2048,13 @@ export default function HomePage() {
                 marginBottom: "24px",
               }}
             >
-              Curate your cart.
+              {S("whatsapp-banner").title || "Curate your cart."}
               <br />
-              Complete on WhatsApp.
+              {S("whatsapp-banner").subtitle || "Complete on WhatsApp."}
             </h2>
 
             <a
-              href="https://wa.me/?text=Hello%20Sree%20Collections%2C%20I%20want%20to%20shop!"
+              href={S("whatsapp-banner").ctaLink || "https://wa.me/?text=Hello%20Sree%20Collections%2C%20I%20want%20to%20shop!"}
               target="_blank"
               rel="noreferrer"
               style={{
@@ -2011,7 +2073,7 @@ export default function HomePage() {
               }}
               className="primary-btn"
             >
-              <FaWhatsapp size={20} /> Chat on WhatsApp
+              <FaWhatsapp size={20} /> {S("whatsapp-banner").ctaText || "Chat on WhatsApp"}
             </a>
 
             {/* Step indicators: Added Cart → WhatsApp → Order Confirmed */}
@@ -2023,8 +2085,8 @@ export default function HomePage() {
                 flexWrap: "wrap",
               }}
             >
-              {["Added Cart", "WhatsApp", "Order Confirmed"].map((step, i) => (
-                <React.Fragment key={step}>
+              {(waSteps.length > 0 ? waSteps : [{itemId:"s1",title:"Added Cart"},{itemId:"s2",title:"WhatsApp"},{itemId:"s3",title:"Order Confirmed"}]).map((step, i, arr) => (
+                <React.Fragment key={step.itemId}>
                   <span
                     style={{
                       backgroundColor: "rgba(255,255,255,0.75)",
@@ -2037,9 +2099,9 @@ export default function HomePage() {
                       backdropFilter: "blur(4px)",
                     }}
                   >
-                    {step}
+                    {step.title}
                   </span>
-                  {i < 2 && (
+                  {i < arr.length - 1 && (
                     <span style={{ color: "#BB8E43", fontSize: "14px", fontWeight: 700 }}>→</span>
                   )}
                 </React.Fragment>
@@ -2059,8 +2121,8 @@ export default function HomePage() {
             }}
           >
             <img
-              src="/homepage/img5.png"
-              alt="Sree Collections WhatsApp Shopping Bag"
+              src={S("whatsapp-banner").mediaUrl || "/homepage/img5.png"}
+              alt={S("whatsapp-banner").mediaAlt || "Sree Collections WhatsApp Shopping Bag"}
               style={{
                 width: "100%",
                 maxHeight: "400px",
@@ -2096,7 +2158,7 @@ export default function HomePage() {
               margin: 0,
             }}
           >
-            Why our{" "}
+            {S("testimonials").title || "Why our"}{" "}
             <span style={{ color: "#5D2030" }}>Customer</span>
             {" "}says
           </h2>
@@ -2138,7 +2200,7 @@ export default function HomePage() {
               marginBottom: "32px",
             }}
           >
-            {testimonials[activeTestimonial].quote}
+            {testimonials.length > 0 ? (testimonials[activeTestimonial]?.description || "") : ""}
           </p>
 
           <div
@@ -2154,10 +2216,10 @@ export default function HomePage() {
           >
             <div>
               <h4 style={{ fontFamily: "var(--font-sans)", fontSize: "17px", fontWeight: 700, color: "#5D2030", margin: 0 }}>
-                {testimonials[activeTestimonial].author}
+                {testimonials.length > 0 ? (testimonials[activeTestimonial]?.title || "") : ""}
               </h4>
               <span style={{ fontSize: "13.5px", color: "#7A7062" }}>
-                {testimonials[activeTestimonial].location} • {testimonials[activeTestimonial].role}
+                {testimonials.length > 0 ? `${testimonials[activeTestimonial]?.badge || ""} • ${testimonials[activeTestimonial]?.subtitle || ""}` : ""}
               </span>
             </div>
 
@@ -2234,8 +2296,8 @@ export default function HomePage() {
         >
           <div>
             <img
-              src="/homepage/logo2.png"
-              alt="Sree Collections"
+              src={S("footer").mediaUrl || "/homepage/logo2.png"}
+              alt={S("footer").mediaAlt || "Sree Collections"}
               style={{
                 height: "72px",
                 width: "auto",
@@ -2244,8 +2306,7 @@ export default function HomePage() {
               }}
             />
             <p style={{ color: "#685F53", fontSize: "14.5px", lineHeight: 1.6, maxWidth: "300px" }}>
-              Celebrating timeless Indian royalty with handpicked silk sarees, designer ethnic sets,
-              and authentic temple jewellery crafted for extraordinary celebrations.
+              {S("footer").description || "Celebrating timeless Indian royalty with handpicked silk sarees, designer ethnic sets, and authentic temple jewellery crafted for extraordinary celebrations."}
             </p>
             <div style={{ display: "flex", gap: "14px", marginTop: "20px" }}>
               <a href="#" aria-label="Instagram" style={{ width: "36px", height: "36px", borderRadius: "50%", backgroundColor: "#F4EDE1", display: "flex", alignItems: "center", justifyContent: "center", color: "#5D2030" }}><FiInstagram size={17} /></a>
@@ -2258,24 +2319,18 @@ export default function HomePage() {
           <div>
             <h4 style={{ fontFamily: "var(--font-serif)", fontSize: "18px", fontWeight: 700, color: "#5D2030", marginBottom: "18px" }}>Collections</h4>
             <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "12px", fontSize: "14.5px", color: "#685F53" }}>
-              <li><a href="#featured" className="footer-link">Kanjeevaram Pure Silk</a></li>
-              <li><a href="#featured" className="footer-link">Banarasi Heritage Weaves</a></li>
-              <li><a href="#featured" className="footer-link">Bridal Lehengas & Kurtas</a></li>
-              <li><a href="#featured" className="footer-link">Temple Jewellery Sets</a></li>
-              <li><a href="#featured" className="footer-link">Everyday Casuals & Denims</a></li>
-              <li><a href="#featured" className="footer-link">Festive Home Decor</a></li>
+              {(footerCollections.length > 0 ? footerCollections : FALLBACK_CMS.footer.items.filter(i => i.metadata?.group === "collections")).map(item => (
+                <li key={item.itemId}><a href={item.linkUrl || "#featured"} className="footer-link">{item.title}</a></li>
+              ))}
             </ul>
           </div>
 
           <div>
             <h4 style={{ fontFamily: "var(--font-serif)", fontSize: "18px", fontWeight: 700, color: "#5D2030", marginBottom: "18px" }}>Customer Care</h4>
             <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "12px", fontSize: "14.5px", color: "#685F53" }}>
-              <li><a href="#home" className="footer-link">Track Your Order</a></li>
-              <li><a href="#home" className="footer-link">Shipping & Global Delivery</a></li>
-              <li><a href="#home" className="footer-link">Custom Blouse Stitching</a></li>
-              <li><a href="#home" className="footer-link">WhatsApp Live Video Call</a></li>
-              <li><a href="#home" className="footer-link">Returns & Exchanges</a></li>
-              <li><a href="#home" className="footer-link">Authenticity Certificate</a></li>
+              {(footerCare.length > 0 ? footerCare : FALLBACK_CMS.footer.items.filter(i => i.metadata?.group === "customer-care")).map(item => (
+                <li key={item.itemId}><a href={item.linkUrl || "#home"} className="footer-link">{item.title}</a></li>
+              ))}
             </ul>
           </div>
 
@@ -2289,14 +2344,14 @@ export default function HomePage() {
               <button style={{ backgroundColor: "#BB8E43", color: "#FFFFFF", padding: "11px 20px", borderRadius: "24px", fontSize: "13.5px", fontWeight: 600 }}>Join</button>
             </div>
             <div style={{ fontSize: "13.5px", color: "#685F53", display: "flex", flexDirection: "column", gap: "6px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}><FiPhone size={14} color="#BB8E43" /> +91 98765 43210</div>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}><FiMail size={14} color="#BB8E43" /> support@sreecollections.com</div>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}><FiPhone size={14} color="#BB8E43" /> {(S("footer").settings?.phone as string) || "+91 98765 43210"}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}><FiMail size={14} color="#BB8E43" /> {(S("footer").settings?.email as string) || "support@sreecollections.com"}</div>
             </div>
           </div>
         </div>
 
         <div style={{ borderTop: "1px solid #EFE4D5", paddingTop: "24px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px", fontSize: "13.5px", color: "#887D70" }}>
-          <div>© {new Date().getFullYear()} Sree Collections. All Rights Reserved.</div>
+          <div>© {new Date().getFullYear()} {(S("footer").settings?.copyright as string) || "Sree Collections. All Rights Reserved."}</div>
           <div style={{ display: "flex", gap: "24px" }}>
             <a href="#" className="footer-link">Privacy Policy</a>
             <a href="#" className="footer-link">Terms of Service</a>
