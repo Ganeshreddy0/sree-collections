@@ -123,17 +123,20 @@ export default function ContactPage() {
           >
             Contact Us
           </a>
-          <button
+          <a
+            href="/search"
             aria-label="Search"
             style={{
               color: "#5A2035",
               background: "none",
               border: "none",
               cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
             }}
           >
             <FiSearch size={22} />
-          </button>
+          </a>
           <a
             href="/product"
             aria-label="Cart"

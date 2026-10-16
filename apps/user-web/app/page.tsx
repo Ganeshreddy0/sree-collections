@@ -167,7 +167,8 @@ export default function HomePage() {
             </a>
 
             {/* Search Icon */}
-            <button
+            <a
+              href="/search"
               aria-label="Search"
               style={{
                 display: "flex",
@@ -179,7 +180,7 @@ export default function HomePage() {
               }}
             >
               <FiSearch size={22} strokeWidth={2} />
-            </button>
+            </a>
 
             {/* Cart Icon */}
             <button
