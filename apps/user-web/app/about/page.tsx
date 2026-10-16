@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import {
   FiSearch,
   FiShoppingCart,
@@ -8,6 +9,7 @@ import {
   FiX,
   FiMail,
   FiPhone,
+  FiMapPin,
 } from "react-icons/fi";
 import {
   FaFacebookF,
@@ -26,23 +28,23 @@ function NavLink({
   children: React.ReactNode;
 }) {
   return (
-    <a
+    <Link
       href={href}
       style={{
-        fontFamily: "'Playfair Display', Georgia, serif",
-        fontSize: "17px",
-        fontWeight: 700,
-        color: "#5A2035",
+        fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
+        fontSize: "16px",
+        fontWeight: active ? 700 : 500,
+        color: "#5D2030",
         textDecoration: "none",
         lineHeight: 1.2,
-        paddingBottom: active ? "3px" : undefined,
-        borderBottom: active ? "2.5px solid #5A2035" : undefined,
-        transition: "opacity 0.2s",
+        paddingBottom: active ? "4px" : undefined,
+        borderBottom: active ? "2.5px solid #5D2030" : undefined,
+        transition: "opacity 0.2s ease",
       }}
       className="about-nav-link"
     >
       {children}
-    </a>
+    </Link>
   );
 }
 
@@ -58,7 +60,9 @@ export default function AboutPage() {
         overflowX: "hidden",
       }}
     >
-      {/* HEADER / NAVIGATION */}
+      {/* =========================================================================
+          1. HEADER / NAVBAR
+         ========================================================================= */}
       <header
         style={{
           width: "100%",
@@ -73,13 +77,13 @@ export default function AboutPage() {
           zIndex: 50,
         }}
       >
-        <a href="/" style={{ display: "inline-block", flexShrink: 0 }}>
+        <Link href="/" style={{ display: "inline-block", flexShrink: 0 }}>
           <img
             src="/homepage/logo2_trans.png"
             alt="Sree Collections"
             style={{ height: "66px", width: "auto", objectFit: "contain" }}
           />
-        </a>
+        </Link>
 
         {/* Desktop Nav */}
         <nav
@@ -87,18 +91,18 @@ export default function AboutPage() {
           style={{ display: "none", alignItems: "center", gap: "36px" }}
         >
           <NavLink href="/">Home</NavLink>
-          <NavLink href="/about" active>
+          <NavLink href="/about-us" active>
             About
           </NavLink>
           <NavLink href="/categories">Categories</NavLink>
-          <a
+          <Link
             href="/contact"
             className="about-contact-btn"
             style={{
               backgroundColor: "#BB8E43",
               color: "#FFFFFF",
-              fontFamily: "'Playfair Display', Georgia, serif",
-              fontSize: "12px",
+              fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
+              fontSize: "12.5px",
               fontWeight: 700,
               letterSpacing: "1px",
               textTransform: "uppercase",
@@ -110,12 +114,12 @@ export default function AboutPage() {
             }}
           >
             Contact Us
-          </a>
-          <a
+          </Link>
+          <Link
             href="/search"
             aria-label="Search"
             style={{
-              color: "#5A2035",
+              color: "#5D2030",
               background: "none",
               border: "none",
               cursor: "pointer",
@@ -125,12 +129,12 @@ export default function AboutPage() {
             }}
           >
             <FiSearch size={21} />
-          </a>
-          <a
-            href="/product"
+          </Link>
+          <Link
+            href="/cart"
             aria-label="Cart"
             style={{
-              color: "#5A2035",
+              color: "#5D2030",
               background: "none",
               border: "none",
               cursor: "pointer",
@@ -140,7 +144,7 @@ export default function AboutPage() {
             }}
           >
             <FiShoppingCart size={21} />
-          </a>
+          </Link>
         </nav>
 
         {/* Mobile Hamburger Button */}
@@ -150,7 +154,7 @@ export default function AboutPage() {
           aria-label="Toggle navigation"
           style={{
             display: "none",
-            color: "#5A2035",
+            color: "#5D2030",
             background: "none",
             border: "none",
             cursor: "pointer",
@@ -171,7 +175,7 @@ export default function AboutPage() {
             right: 0,
             bottom: 0,
             backgroundColor: "#FAF6EE",
-            zIndex: 40,
+            zIndex: 100,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -179,43 +183,43 @@ export default function AboutPage() {
             gap: "24px",
           }}
         >
-          <a
+          <Link
             href="/"
             onClick={() => setMobileMenuOpen(false)}
             style={{
               fontSize: "20px",
               fontWeight: 700,
-              color: "#5A2035",
-              fontFamily: "'Playfair Display', Georgia, serif",
+              color: "#5D2030",
+              fontFamily: "'Blacker Display', Georgia, serif",
             }}
           >
             Home
-          </a>
-          <a
-            href="/about"
+          </Link>
+          <Link
+            href="/about-us"
             onClick={() => setMobileMenuOpen(false)}
             style={{
               fontSize: "20px",
               fontWeight: 700,
               color: "#BB8E43",
-              fontFamily: "'Playfair Display', Georgia, serif",
+              fontFamily: "'Blacker Display', Georgia, serif",
             }}
           >
             About
-          </a>
-          <a
+          </Link>
+          <Link
             href="/categories"
             onClick={() => setMobileMenuOpen(false)}
             style={{
               fontSize: "20px",
               fontWeight: 700,
-              color: "#5A2035",
-              fontFamily: "'Playfair Display', Georgia, serif",
+              color: "#5D2030",
+              fontFamily: "'Blacker Display', Georgia, serif",
             }}
           >
             Categories
-          </a>
-          <a
+          </Link>
+          <Link
             href="/contact"
             onClick={() => setMobileMenuOpen(false)}
             style={{
@@ -225,17 +229,20 @@ export default function AboutPage() {
               borderRadius: "999px",
               fontSize: "14px",
               fontWeight: 700,
+              fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
               textTransform: "uppercase",
               letterSpacing: "1px",
               marginTop: "8px",
             }}
           >
             Contact Us
-          </a>
+          </Link>
         </div>
       )}
 
-      {/* MAIN CONTAINER */}
+      {/* =========================================================================
+          2. MAIN CONTENT CONTAINER
+         ========================================================================= */}
       <main
         style={{
           width: "100%",
@@ -245,26 +252,28 @@ export default function AboutPage() {
           boxSizing: "border-box",
         }}
       >
-        {/* HERO / INTRO SECTION */}
+        {/* =======================================================================
+            HERO / INTRO SECTION
+           ======================================================================= */}
         <section
           className="about-hero-grid"
           style={{
             display: "grid",
-            gridTemplateColumns: "1.08fr 0.92fr",
-            gap: "50px",
+            gridTemplateColumns: "1.05fr 0.95fr",
+            gap: "48px",
             alignItems: "start",
             paddingTop: "24px",
-            paddingBottom: "60px",
+            paddingBottom: "50px",
           }}
         >
           {/* Left Column */}
           <div>
             <h1
               style={{
-                fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: "46px",
+                fontFamily: "'Blacker Display', Georgia, serif",
+                fontSize: "44px",
                 fontWeight: 700,
-                color: "#5A2035",
+                color: "#5D2030",
                 lineHeight: 1.15,
                 margin: 0,
               }}
@@ -280,13 +289,13 @@ export default function AboutPage() {
               </span>
             </h1>
 
-            {/* Accent underline */}
+            {/* Accent gold underline */}
             <div
               style={{
                 width: "230px",
-                height: "2.5px",
+                height: "2px",
                 backgroundColor: "#BB8E43",
-                marginTop: "8px",
+                marginTop: "10px",
                 marginBottom: "12px",
               }}
             />
@@ -294,31 +303,32 @@ export default function AboutPage() {
             {/* Tagline */}
             <p
               style={{
-                fontFamily: "'Playfair Display', Georgia, serif",
+                fontFamily: "'Blacker Display', Georgia, serif",
                 fontStyle: "italic",
                 fontSize: "16px",
-                color: "#5A2035",
-                margin: "0 0 32px 0",
-                fontWeight: 500,
+                color: "#5D2030",
+                margin: "0 0 24px 0",
+                fontWeight: 400,
+                letterSpacing: "0.2px",
               }}
             >
               Where Tradition Meets Elegance
             </p>
 
-            {/* Contact Us Pill Button */}
+            {/* Contact Us Outline Pill Button */}
             <div style={{ marginBottom: "26px" }}>
-              <a
+              <Link
                 href="/contact"
                 className="about-outline-btn"
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: "6px",
-                  padding: "7px 22px",
+                  gap: "8px",
+                  padding: "8px 26px",
                   borderRadius: "999px",
                   border: "1.5px solid #BB8E43",
                   color: "#997332",
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
                   fontSize: "13px",
                   fontWeight: 600,
                   textDecoration: "none",
@@ -326,17 +336,19 @@ export default function AboutPage() {
                   backgroundColor: "transparent",
                 }}
               >
-                &lt; Contact Us &rarr;
-              </a>
+                <span>Contact Us</span>
+                <span style={{ fontSize: "15px", lineHeight: 1 }}>&rarr;</span>
+              </Link>
             </div>
 
             {/* Descriptive Body Paragraph */}
             <p
               style={{
+                fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
                 fontSize: "15px",
-                lineHeight: "1.75",
+                lineHeight: "1.8",
                 color: "#4A3E36",
-                maxWidth: "480px",
+                maxWidth: "490px",
                 margin: 0,
               }}
             >
@@ -352,10 +364,11 @@ export default function AboutPage() {
             {/* Welcome intro text */}
             <p
               style={{
+                fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
                 fontSize: "15px",
-                lineHeight: "1.75",
+                lineHeight: "1.8",
                 color: "#4A3E36",
-                marginBottom: "36px",
+                marginBottom: "28px",
                 marginTop: "4px",
               }}
             >
@@ -365,53 +378,30 @@ export default function AboutPage() {
               special moments with elegance and charm.
             </p>
 
-            {/* Creative Two-Image Collage */}
+            {/* Two-Image Overlapping Collage */}
             <div
               className="about-collage-container"
               style={{
                 position: "relative",
                 width: "100%",
-                minHeight: "260px",
-                display: "flex",
-                justifyContent: "flex-end",
-                alignItems: "flex-start",
+                height: "270px",
+                maxWidth: "480px",
+                marginLeft: "auto",
               }}
             >
-              {/* Lower-left overlapping image (Party table) */}
+              {/* Back Upper-Right Image (Red Star Lanterns) */}
               <div
                 style={{
-                  width: "60%",
+                  position: "absolute",
+                  top: 0,
+                  right: 0,
+                  width: "56%",
+                  height: "210px",
                   borderRadius: "18px",
                   overflow: "hidden",
-                  boxShadow: "0 10px 28px rgba(90,32,53,0.14)",
-                  marginTop: "60px",
-                  marginRight: "-15%",
-                  zIndex: 2,
-                  position: "relative",
+                  boxShadow: "0 10px 28px rgba(93,32,48,0.12)",
                   backgroundColor: "#FFFFFF",
-                }}
-              >
-                <img
-                  src="/about/party.jpg"
-                  alt="Celebration & Party Collection"
-                  style={{
-                    width: "100%",
-                    height: "170px",
-                    objectFit: "cover",
-                    display: "block",
-                  }}
-                />
-              </div>
-
-              {/* Upper-right image (Festive star lanterns) */}
-              <div
-                style={{
-                  width: "55%",
-                  borderRadius: "18px",
-                  overflow: "hidden",
-                  boxShadow: "0 10px 28px rgba(90,32,53,0.14)",
                   zIndex: 1,
-                  backgroundColor: "#FFFFFF",
                 }}
               >
                 <img
@@ -419,7 +409,34 @@ export default function AboutPage() {
                   alt="Festive Star Lanterns"
                   style={{
                     width: "100%",
-                    height: "190px",
+                    height: "100%",
+                    objectFit: "cover",
+                    display: "block",
+                  }}
+                />
+              </div>
+
+              {/* Front Lower-Left Overlapping Image (Party Table) */}
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  width: "60%",
+                  height: "185px",
+                  borderRadius: "18px",
+                  overflow: "hidden",
+                  boxShadow: "0 12px 30px rgba(93,32,48,0.18)",
+                  backgroundColor: "#FFFFFF",
+                  zIndex: 2,
+                }}
+              >
+                <img
+                  src="/about/party.jpg"
+                  alt="Celebration & Party Collection"
+                  style={{
+                    width: "100%",
+                    height: "100%",
                     objectFit: "cover",
                     display: "block",
                   }}
@@ -429,14 +446,16 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* SECTION: OUR COLLECTIONS */}
-        <div style={{ textAlign: "center", margin: "40px 0 60px 0" }}>
+        {/* =======================================================================
+            SECTION: OUR COLLECTIONS
+           ======================================================================= */}
+        <div style={{ textAlign: "center", margin: "50px 0 65px 0" }}>
           <h2
             style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
+              fontFamily: "'Blacker Display', Georgia, serif",
               fontSize: "44px",
               fontWeight: 700,
-              color: "#5A2035",
+              color: "#5D2030",
               margin: 0,
             }}
           >
@@ -460,10 +479,10 @@ export default function AboutPage() {
             <div>
               <h3
                 style={{
-                  fontFamily: "'Playfair Display', Georgia, serif",
-                  fontSize: "34px",
+                  fontFamily: "'Blacker Display', Georgia, serif",
+                  fontSize: "36px",
                   fontWeight: 700,
-                  color: "#5A2035",
+                  color: "#5D2030",
                   margin: "0 0 8px 0",
                 }}
               >
@@ -485,8 +504,9 @@ export default function AboutPage() {
                   margin: "0 0 28px 0",
                   display: "flex",
                   flexDirection: "column",
-                  gap: "7px",
+                  gap: "9px",
                   fontSize: "15px",
+                  fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
                   color: "#3F352E",
                   lineHeight: "1.6",
                 }}
@@ -498,7 +518,7 @@ export default function AboutPage() {
                   "Cotton & Fancy Sarees",
                   "Lehengas & Half Sarees",
                   "Salwar Suits & Kurtis",
-                  "Designer & Ready-to-Wear Blouses",
+                  "Designer & Ready to Wear Blouses",
                   "Indo-Western Wear",
                   "Men's Traditional Wear",
                   "Kids' Ethnic Wear",
@@ -508,36 +528,36 @@ export default function AboutPage() {
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: "8px",
+                      gap: "10px",
                     }}
                   >
-                    <span style={{ color: "#5A2035", fontWeight: 700 }}>*</span>
+                    <span style={{ color: "#BB8E43", fontWeight: 700, fontSize: "16px" }}>*</span>
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
 
-              <a
+              <Link
                 href="/categories"
                 className="about-shop-btn"
                 style={{
                   display: "inline-block",
                   backgroundColor: "#BB8E43",
                   color: "#FFFFFF",
-                  fontFamily: "'Playfair Display', Georgia, serif",
+                  fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
                   fontSize: "12px",
                   fontWeight: 700,
                   letterSpacing: "1.5px",
                   textTransform: "uppercase",
-                  padding: "10px 28px",
-                  borderRadius: "6px",
+                  padding: "10px 30px",
+                  borderRadius: "999px",
                   textDecoration: "none",
                   boxShadow: "0 4px 12px rgba(187,142,67,0.25)",
                   transition: "all 0.25s ease",
                 }}
               >
                 SHOP NOW
-              </a>
+              </Link>
             </div>
 
             {/* Right Image */}
@@ -545,7 +565,7 @@ export default function AboutPage() {
               style={{
                 borderRadius: "20px",
                 overflow: "hidden",
-                boxShadow: "0 14px 34px rgba(90,32,53,0.12)",
+                boxShadow: "0 14px 34px rgba(93,32,48,0.12)",
                 backgroundColor: "#FFFFFF",
                 aspectRatio: "1 / 1",
                 maxWidth: "460px",
@@ -581,7 +601,7 @@ export default function AboutPage() {
               style={{
                 borderRadius: "20px",
                 overflow: "hidden",
-                boxShadow: "0 14px 34px rgba(90,32,53,0.12)",
+                boxShadow: "0 14px 34px rgba(93,32,48,0.12)",
                 backgroundColor: "#FFFFFF",
                 aspectRatio: "1 / 1",
                 maxWidth: "460px",
@@ -605,10 +625,10 @@ export default function AboutPage() {
             <div className="about-jewellery-content" style={{ textAlign: "right" }}>
               <h3
                 style={{
-                  fontFamily: "'Playfair Display', Georgia, serif",
-                  fontSize: "34px",
+                  fontFamily: "'Blacker Display', Georgia, serif",
+                  fontSize: "36px",
                   fontWeight: 700,
-                  color: "#5A2035",
+                  color: "#5D2030",
                   margin: "0 0 8px 0",
                   lineHeight: 1.2,
                 }}
@@ -634,8 +654,10 @@ export default function AboutPage() {
                   margin: "0 0 28px 0",
                   display: "flex",
                   flexDirection: "column",
-                  gap: "7px",
+                  alignItems: "flex-end",
+                  gap: "9px",
                   fontSize: "15px",
+                  fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
                   color: "#3F352E",
                   lineHeight: "1.6",
                 }}
@@ -657,36 +679,38 @@ export default function AboutPage() {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "flex-end",
-                      gap: "8px",
+                      gap: "10px",
                     }}
                   >
+                    <span style={{ color: "#BB8E43", fontWeight: 700, fontSize: "16px" }}>*</span>
                     <span>{item}</span>
-                    <span style={{ color: "#5A2035", fontWeight: 700 }}>*</span>
                   </li>
                 ))}
               </ul>
 
-              <a
-                href="/categories"
-                className="about-shop-btn"
-                style={{
-                  display: "inline-block",
-                  backgroundColor: "#BB8E43",
-                  color: "#FFFFFF",
-                  fontFamily: "'Playfair Display', Georgia, serif",
-                  fontSize: "12px",
-                  fontWeight: 700,
-                  letterSpacing: "1.5px",
-                  textTransform: "uppercase",
-                  padding: "10px 28px",
-                  borderRadius: "6px",
-                  textDecoration: "none",
-                  boxShadow: "0 4px 12px rgba(187,142,67,0.25)",
-                  transition: "all 0.25s ease",
-                }}
-              >
-                SHOP NOW
-              </a>
+              <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <Link
+                  href="/categories"
+                  className="about-shop-btn"
+                  style={{
+                    display: "inline-block",
+                    backgroundColor: "#BB8E43",
+                    color: "#FFFFFF",
+                    fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
+                    fontSize: "12px",
+                    fontWeight: 700,
+                    letterSpacing: "1.5px",
+                    textTransform: "uppercase",
+                    padding: "10px 30px",
+                    borderRadius: "999px",
+                    textDecoration: "none",
+                    boxShadow: "0 4px 12px rgba(187,142,67,0.25)",
+                    transition: "all 0.25s ease",
+                  }}
+                >
+                  SHOP NOW
+                </Link>
+              </div>
             </div>
           </div>
 
@@ -704,10 +728,10 @@ export default function AboutPage() {
             <div>
               <h3
                 style={{
-                  fontFamily: "'Playfair Display', Georgia, serif",
-                  fontSize: "34px",
+                  fontFamily: "'Blacker Display', Georgia, serif",
+                  fontSize: "36px",
                   fontWeight: 700,
-                  color: "#5A2035",
+                  color: "#5D2030",
                   margin: "0 0 8px 0",
                 }}
               >
@@ -729,8 +753,9 @@ export default function AboutPage() {
                   margin: "0 0 28px 0",
                   display: "flex",
                   flexDirection: "column",
-                  gap: "7px",
+                  gap: "9px",
                   fontSize: "15px",
+                  fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
                   color: "#3F352E",
                   lineHeight: "1.6",
                 }}
@@ -751,36 +776,36 @@ export default function AboutPage() {
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: "8px",
+                      gap: "10px",
                     }}
                   >
-                    <span style={{ color: "#5A2035", fontWeight: 700 }}>*</span>
+                    <span style={{ color: "#BB8E43", fontWeight: 700, fontSize: "16px" }}>*</span>
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
 
-              <a
+              <Link
                 href="/categories"
                 className="about-shop-btn"
                 style={{
                   display: "inline-block",
                   backgroundColor: "#BB8E43",
                   color: "#FFFFFF",
-                  fontFamily: "'Playfair Display', Georgia, serif",
+                  fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
                   fontSize: "12px",
                   fontWeight: 700,
                   letterSpacing: "1.5px",
                   textTransform: "uppercase",
-                  padding: "10px 28px",
-                  borderRadius: "6px",
+                  padding: "10px 30px",
+                  borderRadius: "999px",
                   textDecoration: "none",
                   boxShadow: "0 4px 12px rgba(187,142,67,0.25)",
                   transition: "all 0.25s ease",
                 }}
               >
                 SHOP NOW
-              </a>
+              </Link>
             </div>
 
             {/* Right Image */}
@@ -788,7 +813,7 @@ export default function AboutPage() {
               style={{
                 borderRadius: "20px",
                 overflow: "hidden",
-                boxShadow: "0 14px 34px rgba(90,32,53,0.12)",
+                boxShadow: "0 14px 34px rgba(93,32,48,0.12)",
                 backgroundColor: "#FFFFFF",
                 aspectRatio: "1 / 1",
                 maxWidth: "460px",
@@ -810,7 +835,9 @@ export default function AboutPage() {
           </div>
         </div>
 
-        {/* SECTION: OUR PROMISE */}
+        {/* =======================================================================
+            SECTION: OUR PROMISE
+           ======================================================================= */}
         <section
           style={{
             maxWidth: "880px",
@@ -821,10 +848,10 @@ export default function AboutPage() {
         >
           <h2
             style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
+              fontFamily: "'Blacker Display', Georgia, serif",
               fontSize: "44px",
               fontWeight: 700,
-              color: "#5A2035",
+              color: "#5D2030",
               marginBottom: "30px",
             }}
           >
@@ -833,6 +860,7 @@ export default function AboutPage() {
 
           <p
             style={{
+              fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
               fontSize: "16px",
               lineHeight: "1.8",
               color: "#4A3E36",
@@ -847,6 +875,7 @@ export default function AboutPage() {
 
           <p
             style={{
+              fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
               fontSize: "16px",
               lineHeight: "1.8",
               color: "#4A3E36",
@@ -861,7 +890,9 @@ export default function AboutPage() {
         </section>
       </main>
 
-      {/* FOOTER DIVIDER */}
+      {/* =======================================================================
+          FOOTER
+         ======================================================================= */}
       <div
         style={{
           width: "100%",
@@ -874,7 +905,6 @@ export default function AboutPage() {
         <div style={{ width: "100%", height: "1px", backgroundColor: "#D4C5B0" }} />
       </div>
 
-      {/* FOOTER */}
       <footer
         style={{
           width: "100%",
@@ -895,13 +925,13 @@ export default function AboutPage() {
           }}
         >
           {/* Footer Logo */}
-          <a href="/" style={{ display: "inline-block" }}>
+          <Link href="/" style={{ display: "inline-block" }}>
             <img
               src="/homepage/logo2_trans.png"
               alt="Sree Collections"
               style={{ height: "66px", width: "auto", objectFit: "contain" }}
             />
-          </a>
+          </Link>
 
           {/* Footer Contact Details & Social */}
           <div
@@ -919,10 +949,11 @@ export default function AboutPage() {
                 alignItems: "center",
                 gap: "8px",
                 fontSize: "14px",
-                color: "#5A2035",
+                fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
+                color: "#5D2030",
               }}
             >
-              <span style={{ fontSize: "16px" }}>📍</span>
+              <FiMapPin size={15} color="#BB8E43" />
               <span>1985 Mulberry Oak, Suite 41, Chattahoochee, GA 30545</span>
             </div>
 
@@ -940,10 +971,11 @@ export default function AboutPage() {
                   alignItems: "center",
                   gap: "8px",
                   fontSize: "14px",
-                  color: "#5A2035",
+                  fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
+                  color: "#5D2030",
                 }}
               >
-                <FiPhone size={14} />
+                <FiPhone size={14} color="#BB8E43" />
                 <span>+91 86765 43210</span>
               </div>
               <div
@@ -952,10 +984,11 @@ export default function AboutPage() {
                   alignItems: "center",
                   gap: "8px",
                   fontSize: "14px",
-                  color: "#5A2035",
+                  fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
+                  color: "#5D2030",
                 }}
               >
-                <FiMail size={14} />
+                <FiMail size={14} color="#BB8E43" />
                 <span>sreecollections47@gmail.com</span>
               </div>
             </div>
@@ -977,11 +1010,11 @@ export default function AboutPage() {
                     width: "30px",
                     height: "30px",
                     borderRadius: "50%",
-                    border: "1px solid #5A2035",
+                    border: "1px solid #5D2030",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    color: "#5A2035",
+                    color: "#5D2030",
                     transition: "all 0.2s ease",
                     textDecoration: "none",
                   }}
@@ -1004,6 +1037,7 @@ export default function AboutPage() {
             flexWrap: "wrap",
             gap: "12px",
             fontSize: "12px",
+            fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
             color: "#8A7B6F",
             textTransform: "uppercase",
             letterSpacing: "0.5px",
@@ -1011,15 +1045,15 @@ export default function AboutPage() {
         >
           <div style={{ display: "flex", gap: "22px", flexWrap: "wrap" }}>
             {[
-              { name: "About Us", href: "/about" },
+              { name: "About Us", href: "/about-us" },
               { name: "Contact Us", href: "/contact" },
               { name: "Careers", href: "#" },
               { name: "Privacy Policy", href: "#" },
               { name: "Terms & Conditions", href: "#" },
             ].map(({ name, href }) => (
-              <a key={name} href={href} className="about-footer-link">
+              <Link key={name} href={href} className="about-footer-link">
                 {name}
-              </a>
+              </Link>
             ))}
           </div>
 
@@ -1029,7 +1063,9 @@ export default function AboutPage() {
         </div>
       </footer>
 
-      {/* RESPONSIVE AND HOVER CSS */}
+      {/* =======================================================================
+          RESPONSIVE CSS
+         ======================================================================= */}
       <style>{`
         @media (min-width: 992px) {
           .about-desktop-nav {
@@ -1044,6 +1080,10 @@ export default function AboutPage() {
             grid-template-columns: 1fr !important;
             gap: 36px !important;
           }
+          .about-collage-container {
+            margin-left: 0 !important;
+            max-width: 100% !important;
+          }
           .about-collection-row {
             grid-template-columns: 1fr !important;
             gap: 36px !important;
@@ -1057,6 +1097,9 @@ export default function AboutPage() {
           }
           .about-jewellery-content div {
             margin-left: 0 !important;
+          }
+          .about-jewellery-content ul {
+            align-items: flex-start !important;
           }
           .about-jewellery-content ul li {
             justify-content: flex-start !important;
@@ -1083,7 +1126,7 @@ export default function AboutPage() {
           transform: translateY(-1px);
         }
         .about-social-icon:hover {
-          background-color: #5A2035 !important;
+          background-color: #5D2030 !important;
           color: #FFFFFF !important;
         }
         .about-footer-link {
@@ -1091,7 +1134,7 @@ export default function AboutPage() {
           text-decoration: none;
         }
         .about-footer-link:hover {
-          color: #5A2035;
+          color: #5D2030;
           text-decoration: underline;
         }
       `}</style>

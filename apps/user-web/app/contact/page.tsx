@@ -102,7 +102,7 @@ export default function ContactPage() {
           style={{ display: "none", alignItems: "center", gap: "36px" }}
         >
           <NavLink href="/">Home</NavLink>
-          <NavLink href="/#about">About</NavLink>
+          <NavLink href="/about-us">About</NavLink>
           <NavLink href="/categories">Categories</NavLink>
           <a
             href="/contact"
@@ -234,7 +234,7 @@ export default function ContactPage() {
                 Home
               </a>
               <a
-                href="/#about"
+                href="/about-us"
                 onClick={() => setMobileMenuOpen(false)}
                 style={{
                   fontSize: "17px",

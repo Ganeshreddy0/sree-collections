@@ -1121,7 +1121,7 @@ export default function CategoriesPage() {
           style={{ display: "none", alignItems: "center", gap: "28px" }}
         >
           <NavLink href="/">Home</NavLink>
-          <NavLink href="/#about">About</NavLink>
+          <NavLink href="/about-us">About</NavLink>
           <NavLink href="/categories" active>
             Categories
           </NavLink>
@@ -1314,7 +1314,7 @@ export default function CategoriesPage() {
                 Home
               </a>
               <a
-                href="/#about"
+                href="/about-us"
                 onClick={() => setMobileMenuOpen(false)}
                 style={{
                   fontSize: "17px",
