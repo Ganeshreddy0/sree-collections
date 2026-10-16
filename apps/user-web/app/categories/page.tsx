@@ -1195,6 +1195,7 @@ export default function CategoriesPage() {
 
           <a
             href="/cart"
+
             aria-label="Cart"
             style={{
               color: "#5A2035",
