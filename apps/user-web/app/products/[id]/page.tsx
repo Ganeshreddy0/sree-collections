@@ -587,11 +587,7 @@ export default function ProductDetailPage() {
           style={{ display: "none", alignItems: "center", gap: 36 }}
         >
           <NavLink href="/">Home</NavLink>
-<<<<<<< HEAD
-          <NavLink href="/about-us">About</NavLink>
-=======
           <NavLink href="/about">About</NavLink>
->>>>>>> f25f898f766c32c2ad516d6466e093e1beb35427
           <NavLink href="/categories" active>
             Categories
           </NavLink>

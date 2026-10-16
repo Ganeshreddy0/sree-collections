@@ -31,15 +31,15 @@ function NavLink({
     <Link
       href={href}
       style={{
-        fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
-        fontSize: "16px",
-        fontWeight: active ? 700 : 500,
-        color: "#5D2030",
+        fontFamily: "var(--font-serif)",
+        fontSize: "17px",
+        fontWeight: 700,
+        color: "#5A2035",
         textDecoration: "none",
         lineHeight: 1.2,
-        paddingBottom: active ? "4px" : undefined,
-        borderBottom: active ? "2.5px solid #5D2030" : undefined,
-        transition: "opacity 0.2s ease",
+        paddingBottom: active ? "3px" : undefined,
+        borderBottom: active ? "2.5px solid #5A2035" : undefined,
+        transition: "opacity 0.2s",
       }}
       className="about-nav-link"
     >
@@ -61,182 +61,166 @@ export default function AboutPage() {
       }}
     >
       {/* =========================================================================
-          1. HEADER / NAVBAR
+          1. HEADER / NAVBAR — Identical to Home Page
          ========================================================================= */}
-      <header
-        style={{
-          width: "100%",
-          maxWidth: "1320px",
-          margin: "0 auto",
-          padding: "20px 32px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          boxSizing: "border-box",
-          position: "relative",
-          zIndex: 50,
-        }}
-      >
-        <Link href="/" style={{ display: "inline-block", flexShrink: 0 }}>
-          <img
-            src="/homepage/logo2_trans.png"
-            alt="Sree Collections"
-            style={{ height: "66px", width: "auto", objectFit: "contain" }}
-          />
-        </Link>
-
-        {/* Desktop Nav */}
-        <nav
-          className="about-desktop-nav"
-          style={{ display: "none", alignItems: "center", gap: "36px" }}
-        >
-          <NavLink href="/">Home</NavLink>
-          <NavLink href="/about-us" active>
-            About
-          </NavLink>
-          <NavLink href="/categories">Categories</NavLink>
-          <Link
-            href="/contact"
-            className="about-contact-btn"
-            style={{
-              backgroundColor: "#BB8E43",
-              color: "#FFFFFF",
-              fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
-              fontSize: "12.5px",
-              fontWeight: 700,
-              letterSpacing: "1px",
-              textTransform: "uppercase",
-              padding: "11px 26px",
-              borderRadius: "999px",
-              textDecoration: "none",
-              boxShadow: "0 4px 14px rgba(187,142,67,0.25)",
-              transition: "all 0.2s ease",
-            }}
-          >
-            Contact Us
-          </Link>
-          <Link
-            href="/search"
-            aria-label="Search"
-            style={{
-              color: "#5D2030",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              padding: "4px",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <FiSearch size={21} />
-          </Link>
-          <Link
-            href="/cart"
-            aria-label="Cart"
-            style={{
-              color: "#5D2030",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              padding: "4px",
-            }}
-          >
-            <FiShoppingCart size={21} />
-          </Link>
-        </nav>
-
-        {/* Mobile Hamburger Button */}
-        <button
-          className="about-hamburger"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Toggle navigation"
+      <div style={{ width: "100%", display: "flex", justifyContent: "center", position: "sticky", top: 0, zIndex: 100, backgroundColor: "#FCF8F2" }}>
+        <header
           style={{
-            display: "none",
-            color: "#5D2030",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            padding: "8px",
+            width: "100%",
+            maxWidth: "1360px",
+            minHeight: "95px",
+            margin: "0 auto",
+            padding: "0 20px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            boxSizing: "border-box",
+            position: "relative",
+            zIndex: 50,
           }}
         >
-          {mobileMenuOpen ? <FiX size={26} /> : <FiMenu size={26} />}
-        </button>
-      </header>
+          {/* Brand Logo */}
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <Link href="/" style={{ display: "inline-block" }}>
+              <img
+                src="/homepage/logo2_trans.png"
+                alt="Sree Collections"
+                style={{
+                  height: "72px",
+                  width: "auto",
+                  objectFit: "contain",
+                  maxWidth: "340px",
+                  display: "block",
+                }}
+              />
+            </Link>
+          </div>
 
-      {/* Mobile Nav Overlay */}
+          {/* Desktop Navigation */}
+          <nav
+            className="about-desktop-nav"
+            style={{ display: "none", alignItems: "center", gap: "36px" }}
+          >
+            <NavLink href="/">Home</NavLink>
+            <NavLink href="/about" active>About</NavLink>
+            <NavLink href="/categories">Categories</NavLink>
+
+            {/* CONTACT US Pill Button */}
+            <Link
+              href="/contact"
+              className="about-contact-btn primary-btn"
+              style={{
+                background: "#BA8E43",
+                color: "#FFFFFF",
+                fontFamily: "var(--font-serif)",
+                fontSize: "12.5px",
+                fontWeight: 700,
+                letterSpacing: "0.8px",
+                textTransform: "uppercase",
+                padding: "11px 28px",
+                borderRadius: "9999px",
+                boxShadow: "0 2px 10px rgba(186, 142, 67, 0.25)",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.25s ease",
+                textDecoration: "none",
+              }}
+            >
+              CONTACT US
+            </Link>
+
+            {/* Search Icon */}
+            <Link
+              href="/search"
+              aria-label="Search"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#5A2035",
+                padding: "4px",
+                transition: "transform 0.2s ease",
+              }}
+            >
+              <FiSearch size={22} strokeWidth={2} />
+            </Link>
+
+            {/* Cart Icon */}
+            <Link
+              href="/cart"
+              aria-label="Shopping Cart"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#5A2035",
+                padding: "4px",
+                transition: "transform 0.2s ease",
+              }}
+            >
+              <FiShoppingCart size={22} strokeWidth={2} />
+            </Link>
+          </nav>
+
+          {/* Mobile Hamburger */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu"
+            style={{
+              display: "none",
+              padding: "8px",
+              color: "#2F2C24",
+            }}
+            className="about-hamburger mobile-hamburger"
+          >
+            {mobileMenuOpen ? <FiX size={26} /> : <FiMenu size={26} />}
+          </button>
+        </header>
+      </div>
+
+      {/* Mobile Drawer — same as home page */}
       {mobileMenuOpen && (
         <div
           style={{
             position: "fixed",
-            top: "80px",
+            top: 0,
             left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "#FAF6EE",
-            zIndex: 100,
+            width: "100%",
+            height: "100vh",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            zIndex: 200,
             display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            paddingTop: "40px",
-            gap: "24px",
+            justifyContent: "flex-end",
           }}
+          onClick={() => setMobileMenuOpen(false)}
         >
-          <Link
-            href="/"
-            onClick={() => setMobileMenuOpen(false)}
+          <div
             style={{
-              fontSize: "20px",
-              fontWeight: 700,
-              color: "#5D2030",
-              fontFamily: "'Blacker Display', Georgia, serif",
+              width: "290px",
+              height: "100%",
+              backgroundColor: "#FCF8F2",
+              padding: "30px 24px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "20px",
+              boxShadow: "-4px 0 20px rgba(0,0,0,0.15)",
             }}
+            onClick={(e) => e.stopPropagation()}
           >
-            Home
-          </Link>
-          <Link
-            href="/about-us"
-            onClick={() => setMobileMenuOpen(false)}
-            style={{
-              fontSize: "20px",
-              fontWeight: 700,
-              color: "#BB8E43",
-              fontFamily: "'Blacker Display', Georgia, serif",
-            }}
-          >
-            About
-          </Link>
-          <Link
-            href="/categories"
-            onClick={() => setMobileMenuOpen(false)}
-            style={{
-              fontSize: "20px",
-              fontWeight: 700,
-              color: "#5D2030",
-              fontFamily: "'Blacker Display', Georgia, serif",
-            }}
-          >
-            Categories
-          </Link>
-          <Link
-            href="/contact"
-            onClick={() => setMobileMenuOpen(false)}
-            style={{
-              backgroundColor: "#BB8E43",
-              color: "#FFFFFF",
-              padding: "12px 32px",
-              borderRadius: "999px",
-              fontSize: "14px",
-              fontWeight: 700,
-              fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
-              textTransform: "uppercase",
-              letterSpacing: "1px",
-              marginTop: "8px",
-            }}
-          >
-            Contact Us
-          </Link>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <img src="/homepage/logo2_trans.png" alt="Logo" style={{ height: "48px" }} />
+              <button onClick={() => setMobileMenuOpen(false)} style={{ background: "none", border: "none", cursor: "pointer" }}>
+                <FiX size={24} />
+              </button>
+            </div>
+            <nav style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "20px" }}>
+              <Link href="/" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 600, color: "#5A2035", fontFamily: "var(--font-serif)" }}>Home</Link>
+              <Link href="/about" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 700, color: "#BA8E43", fontFamily: "var(--font-serif)" }}>About</Link>
+              <Link href="/categories" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500, color: "#5A2035", fontFamily: "var(--font-serif)" }}>Categories</Link>
+              <Link href="/contact" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500, color: "#5A2035", fontFamily: "var(--font-serif)" }}>Contact Us</Link>
+            </nav>
+          </div>
         </div>
       )}
 
