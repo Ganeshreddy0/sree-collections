@@ -10,8 +10,42 @@ import {
   FiShield,
   FiTruck,
   FiArrowRight,
+  FiSearch,
+  FiShoppingCart,
+  FiMenu,
+  FiX,
 } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
+
+function NavLink({
+  href,
+  active,
+  children,
+}: {
+  href: string;
+  active?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      style={{
+        fontFamily: "var(--font-serif)",
+        fontSize: "17px",
+        fontWeight: 700,
+        color: "#5A2035",
+        textDecoration: "none",
+        lineHeight: 1.2,
+        paddingBottom: active ? "3px" : undefined,
+        borderBottom: active ? "2.5px solid #5A2035" : undefined,
+        transition: "opacity 0.2s",
+      }}
+      className="cart-nav-link"
+    >
+      {children}
+    </Link>
+  );
+}
 
 interface CartItem {
   productId?: string;
@@ -32,6 +66,7 @@ export default function CartPage() {
   const router = useRouter();
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Load from localStorage
   useEffect(() => {
@@ -106,27 +141,202 @@ export default function CartPage() {
         paddingBottom: "80px",
       }}
     >
-      {/* Top Header */}
-      <header
-        style={{
-          borderBottom: "1px solid rgba(187,142,67,0.2)",
-          backgroundColor: "#FFFFFF",
-          padding: "20px 32px",
-          position: "sticky",
-          top: 0,
-          zIndex: 50,
-          boxShadow: "0 2px 10px rgba(93,32,48,0.04)",
-        }}
-      >
-        <div
+      {/* =========================================================================
+          1. HEADER / NAVBAR — Identical to Home Page (Sticky / Fixed)
+         ========================================================================= */}
+      <div style={{ width: "100%", display: "flex", justifyContent: "center", position: "sticky", top: 0, zIndex: 100, backgroundColor: "#FCF8F2" }}>
+        <header
           style={{
-            maxWidth: "1200px",
+            width: "100%",
+            maxWidth: "1360px",
+            minHeight: "95px",
             margin: "0 auto",
+            padding: "0 20px",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            boxSizing: "border-box",
+            position: "relative",
+            zIndex: 50,
           }}
         >
+          {/* Brand Logo */}
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <Link href="/" style={{ display: "inline-block" }}>
+              <img
+                src="/homepage/logo2_trans.png"
+                alt="Sree Collections"
+                style={{
+                  height: "72px",
+                  width: "auto",
+                  objectFit: "contain",
+                  maxWidth: "340px",
+                  display: "block",
+                }}
+              />
+            </Link>
+          </div>
+
+          {/* Desktop Navigation */}
+          <nav
+            className="cart-desktop-nav"
+            style={{ display: "none", alignItems: "center", gap: "36px" }}
+          >
+            <NavLink href="/">Home</NavLink>
+            <NavLink href="/about">About</NavLink>
+            <NavLink href="/categories">Categories</NavLink>
+
+            {/* CONTACT US Pill Button */}
+            <Link
+              href="/contact"
+              className="cart-contact-btn primary-btn"
+              style={{
+                background: "#BA8E43",
+                color: "#FFFFFF",
+                fontFamily: "var(--font-serif)",
+                fontSize: "12.5px",
+                fontWeight: 700,
+                letterSpacing: "0.8px",
+                textTransform: "uppercase",
+                padding: "11px 28px",
+                borderRadius: "9999px",
+                boxShadow: "0 2px 10px rgba(186, 142, 67, 0.25)",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.25s ease",
+                textDecoration: "none",
+              }}
+            >
+              CONTACT US
+            </Link>
+
+            {/* Search Icon */}
+            <Link
+              href="/search"
+              aria-label="Search"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#5A2035",
+                padding: "4px",
+                transition: "transform 0.2s ease",
+              }}
+            >
+              <FiSearch size={22} strokeWidth={2} />
+            </Link>
+
+            {/* Cart Icon */}
+            <Link
+              href="/cart"
+              aria-label="Shopping Cart"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#5A2035",
+                padding: "4px",
+                transition: "transform 0.2s ease",
+                position: "relative",
+                borderBottom: "2.5px solid #5A2035",
+                paddingBottom: "3px",
+              }}
+            >
+              <FiShoppingCart size={22} strokeWidth={2} />
+              {items.length > 0 && (
+                <span
+                  style={{
+                    position: "absolute",
+                    top: "-6px",
+                    right: "-10px",
+                    backgroundColor: "#BA8E43",
+                    color: "#FFFFFF",
+                    fontSize: "10px",
+                    fontWeight: 700,
+                    width: "18px",
+                    height: "18px",
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                  }}
+                >
+                  {items.reduce((acc, it) => acc + (it.quantity || 1), 0)}
+                </span>
+              )}
+            </Link>
+          </nav>
+
+          {/* Mobile Hamburger */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu"
+            style={{
+              display: "none",
+              padding: "8px",
+              color: "#2F2C24",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+            }}
+            className="cart-hamburger mobile-hamburger"
+          >
+            {mobileMenuOpen ? <FiX size={26} /> : <FiMenu size={26} />}
+          </button>
+        </header>
+      </div>
+
+      {/* Mobile Drawer */}
+      {mobileMenuOpen && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100vh",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            zIndex: 200,
+            display: "flex",
+            justifyContent: "flex-end",
+          }}
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <div
+            style={{
+              width: "290px",
+              height: "100%",
+              backgroundColor: "#FCF8F2",
+              padding: "30px 24px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "20px",
+              boxShadow: "-4px 0 20px rgba(0,0,0,0.15)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <img src="/homepage/logo2_trans.png" alt="Logo" style={{ height: "48px" }} />
+              <button onClick={() => setMobileMenuOpen(false)} style={{ background: "none", border: "none", cursor: "pointer" }}>
+                <FiX size={24} />
+              </button>
+            </div>
+            <nav style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "20px" }}>
+              <Link href="/" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 600, color: "#5A2035", fontFamily: "var(--font-serif)" }}>Home</Link>
+              <Link href="/about" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500, color: "#5A2035", fontFamily: "var(--font-serif)" }}>About</Link>
+              <Link href="/categories" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500, color: "#5A2035", fontFamily: "var(--font-serif)" }}>Categories</Link>
+              <Link href="/contact" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500, color: "#5A2035", fontFamily: "var(--font-serif)" }}>Contact Us</Link>
+              <Link href="/cart" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 700, color: "#BA8E43", fontFamily: "var(--font-serif)" }}>Cart ({items.reduce((acc, it) => acc + (it.quantity || 1), 0)})</Link>
+            </nav>
+          </div>
+        </div>
+      )}
+
+      {/* Main Container */}
+      <main style={{ maxWidth: "1200px", margin: "28px auto 0 auto", padding: "0 24px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
           <Link
             href="/"
             style={{
@@ -142,29 +352,10 @@ export default function CartPage() {
             <FiArrowLeft size={18} />
             <span>Continue Shopping</span>
           </Link>
-
-          <Link href="/" style={{ textDecoration: "none", textAlign: "center" }}>
-            <h1
-              style={{
-                fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: "24px",
-                fontWeight: 800,
-                color: "#5D2030",
-                margin: 0,
-              }}
-            >
-              Sree Collections
-            </h1>
-          </Link>
-
-          <div style={{ width: "120px", textAlign: "right", fontSize: "13px", color: "#BB8E43", fontWeight: 600 }}>
-            {items.reduce((acc, it) => acc + (it.quantity || 1), 0)} Sarees
+          <div style={{ fontSize: "13px", color: "#BB8E43", fontWeight: 600 }}>
+            {items.reduce((acc, it) => acc + (it.quantity || 1), 0)} {items.reduce((acc, it) => acc + (it.quantity || 1), 0) === 1 ? "Item" : "Items"}
           </div>
         </div>
-      </header>
-
-      {/* Main Container */}
-      <main style={{ maxWidth: "1200px", margin: "40px auto 0 auto", padding: "0 24px" }}>
         <h2
           style={{
             fontFamily: "'Playfair Display', Georgia, serif",
@@ -480,6 +671,33 @@ export default function CartPage() {
           </div>
         )}
       </main>
+
+      {/* Responsive Styles for Header and Navbar */}
+      <style>{`
+        @media (min-width: 992px) {
+          .cart-desktop-nav {
+            display: flex !important;
+          }
+          .cart-hamburger {
+            display: none !important;
+          }
+        }
+        @media (max-width: 991px) {
+          .cart-desktop-nav {
+            display: none !important;
+          }
+          .cart-hamburger {
+            display: flex !important;
+          }
+        }
+        .cart-nav-link:hover {
+          opacity: 0.8;
+        }
+        .cart-contact-btn:hover {
+          background-color: #a87d35 !important;
+          transform: translateY(-1px);
+        }
+      `}</style>
     </div>
   );
 }
