@@ -226,6 +226,7 @@ function ProductCard({
         boxSizing: "border-box",
         position: "relative",
         cursor: "pointer",
+        minWidth: 0,
         transition: "border-color 0.2s ease",
       }}
     >
@@ -630,26 +631,45 @@ function SidebarHeading({ children }: { children: React.ReactNode }) {
 }
 
 export default function CategoriesPage() {
-  const initial = readUrlFilters();
+  // Always use safe SSR defaults for initial state to avoid hydration mismatch
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(initial.category);
-  const [selectedSubCategory, setSelectedSubCategory] = useState(initial.subCategory);
-  const [selectedSize, setSelectedSize] = useState(initial.size);
-  const [selectedColour, setSelectedColour] = useState(initial.colour);
-  const [selectedBrand, setSelectedBrand] = useState(initial.brand);
-  const [selectedFabric, setSelectedFabric] = useState(initial.fabric);
-  const [inStockOnly, setInStockOnly] = useState(initial.inStock);
-  const [checkedPrices, setCheckedPrices] = useState<string[]>(initial.prices);
+  const [selectedCategory, setSelectedCategory] = useState("All Products");
+  const [selectedSubCategory, setSelectedSubCategory] = useState("");
+  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedColour, setSelectedColour] = useState("");
+  const [selectedBrand, setSelectedBrand] = useState("");
+  const [selectedFabric, setSelectedFabric] = useState("");
+  const [inStockOnly, setInStockOnly] = useState(false);
+  const [checkedPrices, setCheckedPrices] = useState<string[]>(["All Prices"]);
   const [sortOpen, setSortOpen] = useState(false);
-  const [sortBy, setSortBy] = useState(initial.sort);
-  const [searchOpen, setSearchOpen] = useState(Boolean(initial.search));
-  const [searchQuery, setSearchQuery] = useState(initial.search);
-  const [searchInput, setSearchInput] = useState(initial.search);
+  const [sortBy, setSortBy] = useState("Featured");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [cartMap, setCartMap] = useState<Record<string, { product: Product; quantity: number }>>({});
   const [cartCount, setCartCount] = useState(0);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
+  const [mounted, setMounted] = useState(false);
+
+  // Read URL params after mount to avoid hydration mismatch
+  useEffect(() => {
+    const urlState = readUrlFilters();
+    setSelectedCategory(urlState.category);
+    setSelectedSubCategory(urlState.subCategory);
+    setSelectedSize(urlState.size);
+    setSelectedColour(urlState.colour);
+    setSelectedBrand(urlState.brand);
+    setSelectedFabric(urlState.fabric);
+    setInStockOnly(urlState.inStock);
+    setCheckedPrices(urlState.prices);
+    setSortBy(urlState.sort);
+    setSearchQuery(urlState.search);
+    setSearchInput(urlState.search);
+    setSearchOpen(Boolean(urlState.search));
+    setMounted(true);
+  }, []);
 
   const [products, setProducts] = useState<Product[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -1382,6 +1402,7 @@ export default function CategoriesPage() {
           }}
         >
           <h1
+            suppressHydrationWarning
             style={{
               fontFamily: "'Playfair Display', 'Blacker Display', Georgia, serif",
               fontWeight: 700,
@@ -1495,9 +1516,9 @@ export default function CategoriesPage() {
           width: "100%",
           maxWidth: "1440px",
           margin: "0 auto 80px",
-          padding: "0 40px",
+          padding: "0 28px",
           display: "flex",
-          gap: "48px",
+          gap: "32px",
           alignItems: "flex-start",
           boxSizing: "border-box",
         }}
@@ -1507,15 +1528,18 @@ export default function CategoriesPage() {
           className="cat-sidebar"
           style={{
             width: "220px",
+            minWidth: "220px",
+            maxWidth: "220px",
             flexShrink: 0,
             display: "flex",
             flexDirection: "column",
             gap: "36px",
             position: "sticky",
             top: "24px",
+            boxSizing: "border-box",
           }}
         >
-          {hasActiveFilters && (
+          {mounted && hasActiveFilters && (
             <button
               type="button"
               onClick={clearAllFilters}
@@ -1981,9 +2005,10 @@ export default function CategoriesPage() {
           className="cat-product-grid"
           style={{
             flex: 1,
+            minWidth: 0,
             display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "24px",
+            gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+            gap: "20px",
             alignItems: "start",
           }}
         >
@@ -2107,7 +2132,8 @@ export default function CategoriesPage() {
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: "24px",
+                  gap: "20px",
+                  minWidth: 0,
                 }}
               >
                 {col1.map((p) => (
@@ -2125,7 +2151,8 @@ export default function CategoriesPage() {
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: "24px",
+                  gap: "20px",
+                  minWidth: 0,
                 }}
               >
                 {col2.map((p) => (
@@ -2143,7 +2170,8 @@ export default function CategoriesPage() {
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: "24px",
+                  gap: "20px",
+                  minWidth: 0,
                 }}
               >
                 {col3.map((p) => (
@@ -2390,11 +2418,11 @@ export default function CategoriesPage() {
       {/* STYLES */}
       <style>{`
         @media (min-width: 992px) { .cat-desktop-nav { display: flex !important; } }
-        @media (max-width: 991px) { .cat-hamburger { display: flex !important; } }
-        @media (max-width: 900px) {
+        @media (max-width: 991px) {
+          .cat-hamburger { display: flex !important; }
           .cat-main-layout { flex-direction: column !important; padding: 0 20px !important; }
-          .cat-sidebar { width: 100% !important; position: static !important; }
-          .cat-product-grid { grid-template-columns: 1fr 1fr !important; }
+          .cat-sidebar { width: 100% !important; min-width: 100% !important; max-width: 100% !important; position: static !important; }
+          .cat-product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
         }
         @media (max-width: 600px) { .cat-product-grid { grid-template-columns: 1fr !important; } }
         .cat-nav-link:hover { opacity: 0.75; }

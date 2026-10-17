@@ -1542,140 +1542,204 @@ export default function HomePage() {
       {/* =========================================================================
           7. CATEGORY SPOTLIGHT 1: CASUAL WEAR COLLECTIONS
          ========================================================================= */}
+      {/* =========================================================================
+          7. CATEGORY SPOTLIGHT 1: CASUAL WEAR COLLECTIONS
+         ========================================================================= */}
       <section
+        id="casual-wear"
         style={{
           width: "100%",
-          maxWidth: "1280px",
-          margin: "0 auto 90px auto",
-          padding: "0 40px",
+          maxWidth: "1140px",
+          margin: "0 auto 100px auto",
+          padding: "0 28px",
           boxSizing: "border-box",
         }}
       >
-        {/* Two-column layout: Left = text + small images, Right = tall portrait */}
+        {/* Top Header Row */}
+        <div
+          className="category-section-header"
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            flexWrap: "wrap",
+            gap: "24px",
+            marginBottom: "36px",
+          }}
+        >
+          <div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "10px", flexWrap: "wrap", marginBottom: "8px" }}>
+              <h2
+                style={{
+                  fontFamily: "'Blacker Display', 'Playfair Display', Georgia, serif",
+                  fontSize: "clamp(34px, 3.8vw, 44px)",
+                  fontWeight: 700,
+                  color: "#5D2030",
+                  margin: 0,
+                  lineHeight: 1.1,
+                }}
+              >
+                {S("spotlight-casual").title || "Casual Wear"}
+              </h2>
+              <span
+                style={{
+                  fontFamily: "'Blacker Display', 'Playfair Display', Georgia, serif",
+                  fontSize: "clamp(24px, 2.8vw, 32px)",
+                  fontWeight: 400,
+                  color: "#5D2030",
+                }}
+              >
+                {S("spotlight-casual").subtitle || "Collections"}
+              </span>
+            </div>
+            <p
+              style={{
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: "12px",
+                color: "#685F53",
+                margin: 0,
+                letterSpacing: "0.2px",
+              }}
+            >
+              We consider &nbsp;your look and comfort on scorching weather.
+            </p>
+          </div>
+
+          <div style={{ maxWidth: "390px" }}>
+            <p
+              style={{
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: "12.5px",
+                color: "#685F53",
+                lineHeight: 1.6,
+                margin: 0,
+              }}
+            >
+              We provide the largest clothing collection for your comfort. You can choose trendy or classy design according to your preferences. Our services are super fast and we update within 24 hours.
+            </p>
+          </div>
+        </div>
+
+        {/* Content Row: Left tall card + text; Right overlapping cards + Explore */}
         <div
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
-            gap: "60px",
-            alignItems: "center",
+            gap: "50px",
+            alignItems: "flex-end",
           }}
           className="category-section-grid"
         >
-          {/* Left: Heading + description + staggered small images */}
-          <div>
-            <h2
+          {/* Left Column */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px", maxWidth: "420px" }}>
+            <div
               style={{
-                fontFamily: "var(--font-serif)",
-                fontSize: "clamp(36px, 3.8vw, 52px)",
-                fontWeight: 700,
-                color: "#2F2C24",
-                lineHeight: 1.1,
-                marginBottom: "4px",
+                width: "100%",
+                height: "460px",
+                borderRadius: "24px",
+                overflow: "hidden",
+                boxShadow: "0 14px 36px rgba(93, 32, 48, 0.08)",
+                backgroundColor: "#F5EFE5",
               }}
+              className="float-hover"
             >
-              {S("spotlight-casual").title || "Casual Wear"}
-            </h2>
-            <h2
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontSize: "clamp(22px, 2.4vw, 32px)",
-                fontWeight: 400,
-                color: "#5D2030",
-                marginBottom: "18px",
-                lineHeight: 1.1,
-              }}
-            >
-              {S("spotlight-casual").subtitle || "Collections"}
-            </h2>
+              <img
+                src="/homepage/casual_model1.jpg"
+                alt="Casual Wear Model"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            </div>
             <p
               style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "14px",
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: "12px",
                 color: "#685F53",
-                lineHeight: 1.65,
-                maxWidth: "420px",
-                marginBottom: "32px",
+                lineHeight: 1.6,
+                margin: 0,
               }}
             >
-              {S("spotlight-casual").description || "You offer your kids wardrobe to your journey wardrobe."}
+              Our main aim is to serve our customer with better quality product. We try to understand their needs and provide them within a short period of time.
             </p>
+          </div>
 
-            {/* Staggered dual image cards */}
-            <div style={{ display: "flex", gap: "16px", alignItems: "flex-start", marginBottom: "36px" }}>
+          {/* Right Column */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+              gap: "28px",
+            }}
+          >
+            {/* Overlapping Dual Cards */}
+            <div style={{ position: "relative", width: "100%", maxWidth: "380px", height: "380px" }}>
+              {/* Back / Main image (pink co-ord set) */}
               <div
                 style={{
-                  width: "200px",
-                  height: "280px",
-                  borderRadius: "18px",
+                  position: "absolute",
+                  top: 0,
+                  right: 0,
+                  width: "270px",
+                  height: "350px",
+                  borderRadius: "24px",
                   overflow: "hidden",
-                  boxShadow: "0 12px 28px rgba(0,0,0,0.1)",
-                  flexShrink: 0,
+                  boxShadow: "0 16px 36px rgba(0,0,0,0.08)",
+                  backgroundColor: "#F5EFE5",
                 }}
                 className="float-hover"
               >
                 <img
-                  src={casualCards[0]?.imageUrl || "/homepage/casual_model2.jpg"}
-                  alt={casualCards[0]?.imageAlt || "Casual fashion"}
+                  src="/homepage/casual_model2.jpg"
+                  alt="Casual Pink Outfit"
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
               </div>
+
+              {/* Front Overlapping image (denim & sneakers) */}
               <div
                 style={{
-                  width: "180px",
-                  height: "260px",
-                  borderRadius: "18px",
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  width: "170px",
+                  height: "210px",
+                  borderRadius: "20px",
                   overflow: "hidden",
-                  boxShadow: "0 12px 28px rgba(0,0,0,0.1)",
-                  marginTop: "28px",
-                  flexShrink: 0,
+                  boxShadow: "0 14px 34px rgba(0,0,0,0.14)",
+                  backgroundColor: "#F5EFE5",
+                  zIndex: 2,
                 }}
                 className="float-hover"
               >
                 <img
-                  src={casualCards[1]?.imageUrl || "/homepage/casual_model3.jpg"}
-                  alt={casualCards[1]?.imageAlt || "Casual styling"}
+                  src="/homepage/casual_model3.jpg"
+                  alt="Denim and Sneakers"
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
               </div>
             </div>
 
-            <a
-              href={S("spotlight-casual").ctaLink || "#featured"}
+            {/* Explore Button */}
+            <Link
+              href="/categories?category=Casual+Wear"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                gap: "8px",
-                border: "1.5px solid #5D2030",
-                color: "#5D2030",
-                fontSize: "14px",
-                fontWeight: 600,
-                padding: "10px 26px",
-                borderRadius: "28px",
+                gap: "10px",
+                border: "1.5px solid #BB8E43",
+                color: "#BB8E43",
+                fontSize: "13.5px",
+                fontFamily: "'Playfair Display', Georgia, serif",
+                padding: "8px 28px",
+                borderRadius: "999px",
+                textDecoration: "none",
                 transition: "all 0.25s ease",
-                letterSpacing: "0.3px",
+                backgroundColor: "transparent",
               }}
-              className="secondary-btn"
+              className="cat-explore-pill-btn"
             >
-              {S("spotlight-casual").ctaText || "Explore"} <FiArrowRight size={14} />
-            </a>
-          </div>
-
-          {/* Right: tall portrait */}
-          <div
-            style={{
-              width: "100%",
-              height: "580px",
-              borderRadius: "24px",
-              overflow: "hidden",
-              boxShadow: "0 18px 45px rgba(93, 32, 48, 0.1)",
-            }}
-            className="float-hover"
-          >
-            <img
-              src={S("spotlight-casual").mediaUrl || "/homepage/casual_model1.jpg"}
-              alt={S("spotlight-casual").mediaAlt || "Casual Wear Model"}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
+              Explore <FiArrowRight size={14} />
+            </Link>
           </div>
         </div>
       </section>
@@ -1687,120 +1751,171 @@ export default function HomePage() {
         id="sarees"
         style={{
           width: "100%",
-          maxWidth: "1280px",
-          margin: "0 auto 90px auto",
-          padding: "0 40px",
+          maxWidth: "1140px",
+          margin: "0 auto 100px auto",
+          padding: "0 28px",
           boxSizing: "border-box",
         }}
       >
+        {/* Top Header Row */}
+        <div
+          className="category-section-header"
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            flexWrap: "wrap",
+            gap: "24px",
+            marginBottom: "36px",
+          }}
+        >
+          <div style={{ maxWidth: "390px" }}>
+            <p
+              style={{
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: "12.5px",
+                color: "#685F53",
+                lineHeight: 1.6,
+                margin: 0,
+              }}
+            >
+              We provide the largest collection sarees. You can choose trendy or classy design according to your preferences. Our services are super fast and we update within 24 hours.
+            </p>
+          </div>
+
+          <div className="header-text-right" style={{ textAlign: "right" }}>
+            <div style={{ display: "inline-flex", alignItems: "baseline", gap: "10px", flexWrap: "wrap", marginBottom: "8px" }}>
+              <h2
+                style={{
+                  fontFamily: "'Blacker Display', 'Playfair Display', Georgia, serif",
+                  fontSize: "clamp(34px, 3.8vw, 44px)",
+                  fontWeight: 700,
+                  color: "#5D2030",
+                  margin: 0,
+                  lineHeight: 1.1,
+                }}
+              >
+                Saree
+              </h2>
+              <span
+                style={{
+                  fontFamily: "'Blacker Display', 'Playfair Display', Georgia, serif",
+                  fontSize: "clamp(24px, 2.8vw, 32px)",
+                  fontWeight: 400,
+                  color: "#5D2030",
+                }}
+              >
+                Collections
+              </span>
+            </div>
+            <p
+              style={{
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: "12px",
+                color: "#685F53",
+                margin: 0,
+                letterSpacing: "0.2px",
+              }}
+            >
+              We consider &nbsp;your look and comfort on cold &nbsp;weather.
+            </p>
+          </div>
+        </div>
+
+        {/* Content Row: Left overlapping cards; Right text + Explore */}
         <div
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
-            gap: "60px",
+            gap: "50px",
             alignItems: "center",
           }}
           className="category-section-grid"
         >
-          {/* Left: Overlapping dual saree cards */}
-          <div style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
-            <div
-              style={{
-                width: "220px",
-                height: "340px",
-                borderRadius: "20px",
-                overflow: "hidden",
-                boxShadow: "0 16px 36px rgba(0,0,0,0.1)",
-                flexShrink: 0,
-              }}
-              className="float-hover"
-            >
-              <img
-                src={sareeCards[0]?.imageUrl || "/homepage/saree_green.jpg"}
-                alt={sareeCards[0]?.imageAlt || "Silk Saree"}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
-            </div>
-            <div
-              style={{
-                width: "200px",
-                height: "310px",
-                borderRadius: "20px",
-                overflow: "hidden",
-                boxShadow: "0 16px 36px rgba(0,0,0,0.1)",
-                marginTop: "36px",
-                flexShrink: 0,
-              }}
-              className="float-hover"
-            >
-              <img
-                src={sareeCards[1]?.imageUrl || "/homepage/saree_models.jpg"}
-                alt={sareeCards[1]?.imageAlt || "Royal Silk Sarees"}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
+          {/* Left Column: Overlapping Dual Saree Cards */}
+          <div>
+            <div style={{ position: "relative", width: "100%", maxWidth: "390px", height: "350px" }}>
+              {/* Back / Main image (two models in sarees) */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  right: 0,
+                  width: "230px",
+                  height: "310px",
+                  borderRadius: "24px",
+                  overflow: "hidden",
+                  boxShadow: "0 16px 36px rgba(0,0,0,0.08)",
+                  backgroundColor: "#F5EFE5",
+                }}
+                className="float-hover"
+              >
+                <img
+                  src="/homepage/saree_models.jpg"
+                  alt="Royal Silk Sarees"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              </div>
+
+              {/* Front Overlapping image (green & pink folded sarees) */}
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  width: "260px",
+                  height: "195px",
+                  borderRadius: "24px",
+                  overflow: "hidden",
+                  boxShadow: "0 14px 34px rgba(0,0,0,0.14)",
+                  backgroundColor: "#F5EFE5",
+                  zIndex: 2,
+                }}
+                className="float-hover"
+              >
+                <img
+                  src="/homepage/saree_green.jpg"
+                  alt="Handcrafted Silk Sarees"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              </div>
             </div>
           </div>
 
-          {/* Right: Heading + description */}
-          <div style={{ textAlign: "left" }}>
-            <h2
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontSize: "clamp(36px, 3.8vw, 52px)",
-                fontWeight: 700,
-                color: "#2F2C24",
-                lineHeight: 1.1,
-                marginBottom: "4px",
-                textAlign: "right",
-              }}
-            >
-              {S("spotlight-saree").title || "Saree"}
-            </h2>
-            <h2
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontSize: "clamp(22px, 2.4vw, 32px)",
-                fontWeight: 400,
-                color: "#5D2030",
-                marginBottom: "18px",
-                lineHeight: 1.1,
-                textAlign: "right",
-              }}
-            >
-              {S("spotlight-saree").subtitle || "Collections"}
-            </h2>
+          {/* Right Column: Paragraph + Explore Button */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "28px", maxWidth: "430px" }}>
             <p
               style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "14px",
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: "12px",
                 color: "#685F53",
-                lineHeight: 1.65,
-                marginBottom: "32px",
-                textAlign: "right",
+                lineHeight: 1.6,
+                margin: 0,
               }}
             >
-              {S("spotlight-saree").description || "You drape your traditions and beauty with our saree collections."}
+              Our main aim is to serve our customer with better quality product. We try to understand their needs and provide them within a short period of time. We provide the largest clothing collection for any season. You can choose trendy or classy design according to your preferences. Our services are super fast and we update within 24 hours.
             </p>
-            <div style={{ textAlign: "right" }}>
-              <a
-                href={S("spotlight-saree").ctaLink || "#featured"}
+            <div>
+              <Link
+                href="/categories?category=Saree"
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: "8px",
-                  border: "1.5px solid #5D2030",
-                  color: "#5D2030",
-                  fontSize: "14px",
-                  fontWeight: 600,
-                  padding: "10px 26px",
-                  borderRadius: "28px",
+                  gap: "10px",
+                  border: "1.5px solid #BB8E43",
+                  color: "#BB8E43",
+                  fontSize: "13.5px",
+                  fontFamily: "'Playfair Display', Georgia, serif",
+                  padding: "8px 28px",
+                  borderRadius: "999px",
+                  textDecoration: "none",
                   transition: "all 0.25s ease",
-                  letterSpacing: "0.3px",
+                  backgroundColor: "transparent",
                 }}
-                className="secondary-btn"
+                className="cat-explore-pill-btn"
               >
-                {S("spotlight-saree").ctaText || "Explore"} <FiArrowRight size={14} />
-              </a>
+                Explore <FiArrowRight size={14} />
+              </Link>
             </div>
           </div>
         </div>
@@ -1813,116 +1928,171 @@ export default function HomePage() {
         id="decor"
         style={{
           width: "100%",
-          maxWidth: "1280px",
-          margin: "0 auto 90px auto",
-          padding: "0 40px",
+          maxWidth: "1140px",
+          margin: "0 auto 100px auto",
+          padding: "0 28px",
           boxSizing: "border-box",
         }}
       >
+        {/* Top Header Row */}
+        <div
+          className="category-section-header"
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            flexWrap: "wrap",
+            gap: "24px",
+            marginBottom: "36px",
+          }}
+        >
+          <div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "10px", flexWrap: "wrap", marginBottom: "8px" }}>
+              <h2
+                style={{
+                  fontFamily: "'Blacker Display', 'Playfair Display', Georgia, serif",
+                  fontSize: "clamp(34px, 3.8vw, 44px)",
+                  fontWeight: 700,
+                  color: "#5D2030",
+                  margin: 0,
+                  lineHeight: 1.1,
+                }}
+              >
+                Decorative Item
+              </h2>
+              <span
+                style={{
+                  fontFamily: "'Blacker Display', 'Playfair Display', Georgia, serif",
+                  fontSize: "clamp(24px, 2.8vw, 32px)",
+                  fontWeight: 400,
+                  color: "#5D2030",
+                }}
+              >
+                Collections
+              </span>
+            </div>
+            <p
+              style={{
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: "12px",
+                color: "#685F53",
+                margin: 0,
+                letterSpacing: "0.2px",
+              }}
+            >
+              We consider &nbsp;your look and comfort on cold &nbsp;weather.
+            </p>
+          </div>
+
+          <div style={{ maxWidth: "390px" }}>
+            <p
+              style={{
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: "12.5px",
+                color: "#685F53",
+                lineHeight: 1.6,
+                margin: 0,
+              }}
+            >
+              We provide the largest clothing collection for any season. You can choose trendy or classy design according to your preferences. Our services are super fast and we update within 24 hours.
+            </p>
+          </div>
+        </div>
+
+        {/* Content Row: Left Explore + text; Right overlapping cards */}
         <div
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
-            gap: "60px",
+            gap: "50px",
             alignItems: "center",
           }}
           className="category-section-grid"
         >
-          {/* Left: Heading + description + explore button */}
-          <div>
-            <h2
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontSize: "clamp(36px, 3.8vw, 52px)",
-                fontWeight: 700,
-                color: "#2F2C24",
-                lineHeight: 1.1,
-                marginBottom: "4px",
-              }}
-            >
-              {S("spotlight-decor").title || "Decorative Item"}
-            </h2>
-            <h2
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontSize: "clamp(22px, 2.4vw, 32px)",
-                fontWeight: 400,
-                color: "#5D2030",
-                marginBottom: "18px",
-                lineHeight: 1.1,
-              }}
-            >
-              {S("spotlight-decor").subtitle || "Collections"}
-            </h2>
+          {/* Left Column: Explore Button + Paragraph */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "28px", maxWidth: "430px" }}>
+            <div>
+              <Link
+                href="/categories?category=Decorative+Items"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  border: "1.5px solid #BB8E43",
+                  color: "#BB8E43",
+                  fontSize: "13.5px",
+                  fontFamily: "'Playfair Display', Georgia, serif",
+                  padding: "8px 28px",
+                  borderRadius: "999px",
+                  textDecoration: "none",
+                  transition: "all 0.25s ease",
+                  backgroundColor: "transparent",
+                }}
+                className="cat-explore-pill-btn"
+              >
+                Explore <FiArrowRight size={14} />
+              </Link>
+            </div>
             <p
               style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "14px",
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: "12px",
                 color: "#685F53",
-                lineHeight: 1.65,
-                maxWidth: "420px",
-                marginBottom: "32px",
+                lineHeight: 1.6,
+                margin: 0,
               }}
             >
-              {S("spotlight-decor").description || "You collect your craft and art décor here with our collections."}
+              Our main aim is to serve our customer with better quality product. We try to understand their needs and provide them within a short period of time. We provide the largest clothing collection for any season. You can choose trendy or classy design according to your preferences. Our services are super fast and we update within 24 hours.
             </p>
-            <a
-              href={S("spotlight-decor").ctaLink || "#featured"}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                border: "1.5px solid #5D2030",
-                color: "#5D2030",
-                fontSize: "14px",
-                fontWeight: 600,
-                padding: "10px 26px",
-                borderRadius: "28px",
-                transition: "all 0.25s ease",
-                letterSpacing: "0.3px",
-              }}
-              className="secondary-btn"
-            >
-              {S("spotlight-decor").ctaText || "Explore"} <FiArrowRight size={14} />
-            </a>
           </div>
 
-          {/* Right: Staggered dual decor images */}
-          <div style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
-            <div
-              style={{
-                width: "220px",
-                height: "300px",
-                borderRadius: "20px",
-                overflow: "hidden",
-                boxShadow: "0 16px 36px rgba(0,0,0,0.08)",
-                flexShrink: 0,
-              }}
-              className="float-hover"
-            >
-              <img
-                src={decorCards[0]?.imageUrl || "/homepage/decor_lights.jpg"}
-                alt={decorCards[0]?.imageAlt || "Festive Decor Diyas"}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
-            </div>
-            <div
-              style={{
-                width: "200px",
-                height: "280px",
-                borderRadius: "20px",
-                overflow: "hidden",
-                boxShadow: "0 16px 36px rgba(0,0,0,0.08)",
-                marginTop: "32px",
-                flexShrink: 0,
-              }}
-              className="float-hover"
-            >
-              <img
-                src={decorCards[1]?.imageUrl || "/homepage/decor_handicraft.jpg"}
-                alt={decorCards[1]?.imageAlt || "Artisanal Handicrafts"}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
+          {/* Right Column: Overlapping Dual Decor Cards */}
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <div style={{ position: "relative", width: "100%", maxWidth: "390px", height: "350px" }}>
+              {/* Back / Main image (hanging star lights) */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  right: 0,
+                  width: "230px",
+                  height: "310px",
+                  borderRadius: "24px",
+                  overflow: "hidden",
+                  boxShadow: "0 16px 36px rgba(0,0,0,0.08)",
+                  backgroundColor: "#F5EFE5",
+                }}
+                className="float-hover"
+              >
+                <img
+                  src="/about/stars.jpg"
+                  alt="Festive Star Lanterns"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              </div>
+
+              {/* Front Overlapping image (party decor cones) */}
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  width: "260px",
+                  height: "195px",
+                  borderRadius: "24px",
+                  overflow: "hidden",
+                  boxShadow: "0 14px 34px rgba(0,0,0,0.14)",
+                  backgroundColor: "#F5EFE5",
+                  zIndex: 2,
+                }}
+                className="float-hover"
+              >
+                <img
+                  src="/about/party.jpg"
+                  alt="Festive Party Decor"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -2422,7 +2592,21 @@ export default function HomePage() {
           }
         }
 
+        .cat-explore-pill-btn:hover {
+          background-color: #BB8E43 !important;
+          color: #FFFFFF !important;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 18px rgba(187, 142, 67, 0.25);
+        }
+
         @media (max-width: 768px) {
+          .category-section-header {
+            flex-direction: column !important;
+            gap: 16px !important;
+          }
+          .category-section-header .header-text-right {
+            text-align: left !important;
+          }
           .category-section-grid {
             grid-template-columns: 1fr !important;
             gap: 32px !important;
