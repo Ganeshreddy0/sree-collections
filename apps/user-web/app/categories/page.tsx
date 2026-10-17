@@ -1217,59 +1217,23 @@ export default function CategoriesPage() {
               CONTACT US
             </a>
 
-            {/* Search Toggle */}
-            <div style={{ display: "flex", alignItems: "center" }}>
-              {searchOpen && (
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      setSearchQuery(searchInput);
-                    }
-                  }}
-                  autoFocus
-                  style={{
-                    width: "200px",
-                    height: "36px",
-                    padding: "0 14px",
-                    borderRadius: "999px",
-                    border: "1.5px solid #BB8E43",
-                    backgroundColor: "#FFFFFF",
-                    fontFamily: "var(--font-sans)",
-                    fontSize: "13px",
-                    color: "#5D2030",
-                    outline: "none",
-                    marginRight: "8px",
-                  }}
-                />
-              )}
-              <button
-                aria-label="Search"
-                onClick={() => {
-                  if (searchOpen && searchInput.trim()) {
-                    setSearchQuery(searchInput);
-                  } else {
-                    setSearchOpen(!searchOpen);
-                  }
-                }}
-                style={{
-                  color: "#5A2035",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "4px",
-                  transition: "transform 0.2s ease",
-                }}
-              >
-                <FiSearch size={22} strokeWidth={2} />
-              </button>
-            </div>
+            {/* Search Link */}
+            <a
+              href="/search"
+              aria-label="Search"
+              style={{
+                color: "#5A2035",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "4px",
+                transition: "transform 0.2s ease, opacity 0.2s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+            >
+              <FiSearch size={22} strokeWidth={2} />
+            </a>
 
             {/* Cart Icon */}
             <a

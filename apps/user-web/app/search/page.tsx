@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useRef, useEffect, Suspense } from "react";
+import React, { useState, useRef, useEffect, Suspense, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   FiSearch,
@@ -11,6 +11,7 @@ import {
   FiPhone,
   FiMail,
   FiShoppingBag,
+  FiCheck,
 } from "react-icons/fi";
 import {
   FaFacebookF,
@@ -19,129 +20,29 @@ import {
   FaWhatsapp,
 } from "react-icons/fa";
 
-/* ─────────────────────────────────────────────
-   Product data
-───────────────────────────────────────────── */
-const ALL_PRODUCTS = [
-  // Indian Fashion
-  {
-    id: "p1",
-    name: "Formal Shirt For Woman",
-    price: 1455,
-    category: "Indian Fashion",
-    tag: "Casual",
-    image: "/Categories/product_formal_shirt.jpg",
-    badge: null,
-  },
-  {
-    id: "p2",
-    name: "Black and Gray Exercise Outfit",
-    price: 1899,
-    category: "Indian Fashion",
-    tag: "Casual",
-    image: "/Categories/product_exercise_outfit.jpg",
-    badge: "New",
-  },
-  {
-    id: "p3",
-    name: "Yellow Jacket For Winter",
-    price: 3455,
-    category: "Indian Fashion",
-    tag: "Ethnic Wear",
-    image: "/Categories/product_yellow_jacket.jpg",
-    badge: null,
-  },
-  {
-    id: "p4",
-    name: "Yellow Jacket For Winter",
-    price: 3199,
-    category: "Indian Fashion",
-    tag: "Ethnic Wear",
-    image: "/Categories/product_yellow_jacket.jpg",
-    badge: "Sale",
-  },
-  {
-    id: "p5",
-    name: "Black and Gray Exercise Outfit",
-    price: 1999,
-    category: "Indian Fashion",
-    tag: "Casual",
-    image: "/Categories/product_exercise_outfit.jpg",
-    badge: null,
-  },
-  {
-    id: "p6",
-    name: "Formal Shirt For Woman",
-    price: 1455,
-    category: "Indian Fashion",
-    tag: "Casual",
-    image: "/Categories/product_formal_shirt.jpg",
-    badge: null,
-  },
-  // Jewellery
-  {
-    id: "p7",
-    name: "Temple Gold Necklace Set",
-    price: 4500,
-    category: "Jewellery",
-    tag: "Jewellery",
-    image: "/homepage/mosaic_necklace.jpg",
-    badge: "New",
-  },
-  {
-    id: "p8",
-    name: "Bridal Choker Set",
-    price: 6200,
-    category: "Jewellery",
-    tag: "Jewellery",
-    image: "/homepage/mosaic_necklace.jpg",
-    badge: null,
-  },
-  // Decor
-  {
-    id: "p9",
-    name: "Festive Diya Set",
-    price: 799,
-    category: "Decor & Celebration",
-    tag: "Decor",
-    image: "/homepage/decor_handicraft.jpg",
-    badge: "Sale",
-  },
-  {
-    id: "p10",
-    name: "Wedding Door Toran",
-    price: 1200,
-    category: "Decor & Celebration",
-    tag: "Decor",
-    image: "/homepage/decor_lights.jpg",
-    badge: null,
-  },
-  {
-    id: "p11",
-    name: "Black and Gray Exercise Outfit",
-    price: 1799,
-    category: "Indian Fashion",
-    tag: "Casual",
-    image: "/Categories/product_exercise_outfit.jpg",
-    badge: null,
-  },
-  {
-    id: "p12",
-    name: "Formal Shirt For Woman",
-    price: 1555,
-    category: "Indian Fashion",
-    tag: "Ethnic Wear",
-    image: "/Categories/product_formal_shirt.jpg",
-    badge: "New",
-  },
-];
+const API_BASE = "http://localhost:5000/api";
 
-const FILTER_CHIPS = [
-  { label: "Indian Fashion", value: "Indian Fashion" },
-  { label: "Ethnic Wear", value: "Ethnic Wear" },
-  { label: "Jewellery", value: "Jewellery" },
-  { label: "Decor & Celebration", value: "Decor & Celebration" },
-];
+/* ─────────────────────────────────────────────
+   Product Interface
+───────────────────────────────────────────── */
+interface BackendProduct {
+  id: string;
+  code: string;
+  name: string;
+  price: number;
+  rawPrice: number;
+  mrp: number;
+  category: string;
+  categoryName: string;
+  subCategory: string;
+  brand: string;
+  image: string;
+  images: string[];
+  badge?: string | null;
+  featured?: boolean;
+  isNewArrival?: boolean;
+  isBestSeller?: boolean;
+}
 
 /* ─────────────────────────────────────────────
    Helpers
@@ -155,20 +56,44 @@ function fmtPrice(p: number) {
 }
 
 /* ─────────────────────────────────────────────
-   Product Card
+   Product Card Component
 ───────────────────────────────────────────── */
-function ProductCard({ product }: { product: (typeof ALL_PRODUCTS)[0] }) {
+function ProductCard({
+  product,
+  onAddToCart,
+}: {
+  product: BackendProduct;
+  onAddToCart: (p: BackendProduct) => void;
+}) {
   const [wished, setWished] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const [imgSrc, setImgSrc] = useState(product.image || "/Categories/product_formal_shirt.jpg");
+  const [addedAnim, setAddedAnim] = useState(false);
+
+  useEffect(() => {
+    setImgSrc(product.image || "/Categories/product_formal_shirt.jpg");
+  }, [product.image]);
+
+  const handleAdd = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onAddToCart(product);
+    setAddedAnim(true);
+    setTimeout(() => setAddedAnim(false), 1200);
+  };
+
+  const productUrl = `/products/${product.id}`;
 
   return (
     <div
       className="srch-card"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={() => {
+        window.location.href = productUrl;
+      }}
       style={{
         backgroundColor: "#FFFFFF",
-        borderRadius: "14px",
+        borderRadius: "16px",
         overflow: "hidden",
         boxShadow: hovered
           ? "0 18px 42px rgba(90,32,53,0.14)"
@@ -189,14 +114,18 @@ function ProductCard({ product }: { product: (typeof ALL_PRODUCTS)[0] }) {
             top: "12px",
             left: "12px",
             zIndex: 3,
-            backgroundColor: product.badge === "Sale" ? "#5A2035" : "#BB8E43",
+            backgroundColor:
+              product.badge === "SALE" || product.badge.includes("OFF") || product.badge === "Sale"
+                ? "#4A1525"
+                : "#BB8E43",
             color: "#FFF",
-            fontSize: "10px",
+            fontSize: "11px",
             fontWeight: 700,
             letterSpacing: "0.8px",
             textTransform: "uppercase",
-            padding: "3px 10px",
-            borderRadius: "999px",
+            padding: "4px 10px",
+            borderRadius: "6px",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
           }}
         >
           {product.badge}
@@ -218,7 +147,7 @@ function ProductCard({ product }: { product: (typeof ALL_PRODUCTS)[0] }) {
           width: "34px",
           height: "34px",
           borderRadius: "50%",
-          backgroundColor: "rgba(255,255,255,0.88)",
+          backgroundColor: "rgba(255,255,255,0.92)",
           border: "none",
           display: "flex",
           alignItems: "center",
@@ -226,7 +155,7 @@ function ProductCard({ product }: { product: (typeof ALL_PRODUCTS)[0] }) {
           cursor: "pointer",
           boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
           transition: "all 0.2s ease",
-          opacity: hovered ? 1 : 0,
+          opacity: hovered ? 1 : 0.8,
         }}
         aria-label="Wishlist"
       >
@@ -251,8 +180,9 @@ function ProductCard({ product }: { product: (typeof ALL_PRODUCTS)[0] }) {
         }}
       >
         <img
-          src={product.image}
+          src={imgSrc}
           alt={product.name}
+          onError={() => setImgSrc("/Categories/product_formal_shirt.jpg")}
           style={{
             width: "100%",
             height: "100%",
@@ -267,24 +197,33 @@ function ProductCard({ product }: { product: (typeof ALL_PRODUCTS)[0] }) {
       <div style={{ padding: "14px 14px 16px 14px" }}>
         <p
           style={{
-            fontSize: "13px",
+            fontSize: "12px",
             color: "#A08060",
             margin: "0 0 4px 0",
             fontFamily: "'Plus Jakarta Sans', sans-serif",
-            fontWeight: 500,
+            fontWeight: 600,
+            textTransform: "uppercase",
+            letterSpacing: "0.5px",
           }}
         >
-          From {fmtPrice(product.price)}
+          {product.category || "Collection"}
         </p>
+
         <h3
           style={{
             fontFamily: "'Playfair Display', Georgia, serif",
             fontSize: "15px",
             fontWeight: 700,
             color: "#2F2C24",
-            margin: "0 0 12px 0",
-            lineHeight: 1.3,
+            margin: "0 0 10px 0",
+            lineHeight: 1.35,
+            minHeight: "38px",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
           }}
+          title={product.name}
         >
           {product.name}
         </h3>
@@ -295,17 +234,19 @@ function ProductCard({ product }: { product: (typeof ALL_PRODUCTS)[0] }) {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            marginTop: "6px",
           }}
         >
           <button
+            onClick={handleAdd}
             className="srch-add-btn"
             style={{
               display: "flex",
               alignItems: "center",
               gap: "6px",
-              backgroundColor: "transparent",
-              border: "1.5px solid #BB8E43",
-              color: "#BB8E43",
+              backgroundColor: addedAnim ? "#5A2035" : "transparent",
+              border: `1.5px solid ${addedAnim ? "#5A2035" : "#BB8E43"}`,
+              color: addedAnim ? "#FFFFFF" : "#BB8E43",
               fontFamily: "'Plus Jakarta Sans', sans-serif",
               fontSize: "11px",
               fontWeight: 700,
@@ -318,19 +259,33 @@ function ProductCard({ product }: { product: (typeof ALL_PRODUCTS)[0] }) {
             }}
             aria-label="Add to cart"
           >
-            <FiShoppingBag size={13} />
-            Add
+            {addedAnim ? <FiCheck size={13} strokeWidth={2.5} /> : <FiShoppingBag size={13} />}
+            {addedAnim ? "Added" : "Add"}
           </button>
 
-          <div
-            style={{
-              fontSize: "14px",
-              fontWeight: 700,
-              color: "#5A2035",
-              fontFamily: "'Playfair Display', Georgia, serif",
-            }}
-          >
-            {fmtPrice(product.price)}
+          <div style={{ display: "flex", alignItems: "baseline", gap: "6px" }}>
+            <span
+              style={{
+                fontSize: "14px",
+                fontWeight: 700,
+                color: "#5A2035",
+                fontFamily: "'Playfair Display', Georgia, serif",
+              }}
+            >
+              {fmtPrice(product.price)}
+            </span>
+            {product.mrp > product.price && (
+              <span
+                style={{
+                  fontSize: "11px",
+                  color: "#9A8A7A",
+                  textDecoration: "line-through",
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                }}
+              >
+                {fmtPrice(product.mrp)}
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -339,57 +294,248 @@ function ProductCard({ product }: { product: (typeof ALL_PRODUCTS)[0] }) {
 }
 
 /* ─────────────────────────────────────────────
-   Main Search Page (inner, uses useSearchParams)
+   Main Search Page Component
 ───────────────────────────────────────────── */
 function SearchPageInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const initialQuery = searchParams.get("q") ?? "";
-  const [query, setQuery] = useState(initialQuery);
-  const [inputVal, setInputVal] = useState(initialQuery);
-  const [activeChip, setActiveChip] = useState<string | null>(null);
+  const urlQuery = searchParams.get("q") ?? "";
+  const urlCategory = searchParams.get("category") ?? null;
+
+  const [inputVal, setInputVal] = useState(urlQuery);
+  const [activeCategory, setActiveCategory] = useState<string | null>(urlCategory);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [products, setProducts] = useState<BackendProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [cartCount, setCartCount] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Focus input on mount
+  // Initialize cart count from localStorage
   useEffect(() => {
-    if (inputRef.current) inputRef.current.focus();
+    try {
+      const raw = localStorage.getItem("sree_cart");
+      if (raw) {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr)) {
+          const count = arr.reduce((sum: number, it: any) => sum + (Number(it.quantity) || 1), 0);
+          setCartCount(count);
+        }
+      }
+    } catch {
+      /* ignore */
+    }
   }, []);
 
-  const filteredProducts = useMemo(() => {
-    let list = ALL_PRODUCTS;
+  // 1. Fetch any 5 categories from backend ONLY
+  useEffect(() => {
+    let isMounted = true;
+    async function loadCategories() {
+      try {
+        const res = await fetch(`${API_BASE}/categories?status=Active`);
+        if (res.ok) {
+          const json = await res.json();
+          const items: any[] = json.data || json || [];
+          const sorted = items
+            .filter((c: any) => {
+              const name = typeof c === "string" ? c : c.name;
+              return Boolean(name) && !name.toLowerCase().includes("test");
+            })
+            .sort((a: any, b: any) => {
+              const countA = typeof a.itemCount === "number" ? a.itemCount : 0;
+              const countB = typeof b.itemCount === "number" ? b.itemCount : 0;
+              return countB - countA;
+            });
 
-    if (activeChip) {
-      list = list.filter(
-        (p) => p.category === activeChip || p.tag === activeChip
-      );
+          const catNames: string[] = sorted.map((c: any) => (typeof c === "string" ? c : c.name));
+          // Take any 5 categories from backend
+          const fiveCategories = catNames.slice(0, 5);
+          if (isMounted && fiveCategories.length > 0) {
+            setCategories(fiveCategories);
+            return;
+          }
+        }
+
+        // Fallback: fetch from /products/filters
+        const facetRes = await fetch(`${API_BASE}/products/filters`);
+        if (facetRes.ok) {
+          const facetJson = await facetRes.json();
+          const facetData = facetJson?.data || facetJson || {};
+          const facetCats: string[] = (facetData.categories || [])
+            .map((c: any) => c.name)
+            .filter((name: string) => Boolean(name) && name !== "All Products" && !name.toLowerCase().includes("test"));
+
+          const fiveCategories = facetCats.slice(0, 5);
+          if (isMounted && fiveCategories.length > 0) {
+            setCategories(fiveCategories);
+          }
+        }
+      } catch {
+        /* ignore */
+      }
     }
 
-    if (query.trim()) {
-      const q = query.trim().toLowerCase();
-      list = list.filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.category.toLowerCase().includes(q) ||
-          p.tag.toLowerCase().includes(q)
-      );
+    loadCategories();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // 2. Fetch products from MongoDB database based on search query and category
+  const loadProducts = useCallback(async (queryStr: string, catStr: string | null) => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      params.append("status", "Active");
+      params.append("limit", "100");
+
+      if (queryStr.trim()) {
+        params.append("search", queryStr.trim());
+      }
+      if (catStr && catStr !== "All Products") {
+        params.append("category", catStr);
+      }
+
+      const res = await fetch(`${API_BASE}/products?${params.toString()}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+
+      const rawItems: any[] = json.data || json.products || [];
+      const mapped: BackendProduct[] = rawItems.map((p: any, idx: number) => {
+        const selling =
+          Number(p.sellingPrice) ||
+          Number(p.rawPrice) ||
+          (typeof p.price === "number" ? p.price : 0) ||
+          0;
+        const mrp = Number(p.mrp) || 0;
+
+        let badge: string | null = p.badge || null;
+        if (!badge) {
+          if (mrp > selling && selling > 0) {
+            badge = "SALE";
+          } else if (p.isNewArrival) {
+            badge = "NEW";
+          } else if (p.featured) {
+            badge = "FEATURED";
+          } else if (p.isBestSeller) {
+            badge = "BESTSELLER";
+          }
+        }
+
+        const mainImg =
+          p.featuredImage ||
+          p.image ||
+          p.img ||
+          (Array.isArray(p.images) && p.images[0]) ||
+          (Array.isArray(p.colourImages) && p.colourImages[0]?.primaryImage) ||
+          "/Categories/product_formal_shirt.jpg";
+
+        return {
+          id: String(p.id || p._id || `item_${idx}`),
+          code: p.productCode || p.sku || `PRD-${idx + 1}`,
+          name: p.productName || p.name || p.title || "Product",
+          price: selling,
+          rawPrice: selling,
+          mrp,
+          category: p.categoryName || (typeof p.category === "string" ? p.category : "Collection"),
+          categoryName: p.categoryName || (typeof p.category === "string" ? p.category : "Collection"),
+          subCategory: p.subCategory || "",
+          brand: p.brand || "",
+          image: mainImg,
+          images: Array.isArray(p.images) ? p.images : [],
+          badge,
+          featured: Boolean(p.featured),
+          isNewArrival: Boolean(p.isNewArrival),
+          isBestSeller: Boolean(p.isBestSeller),
+        };
+      });
+
+      setProducts(mapped);
+    } catch {
+      setProducts([]);
+    } finally {
+      setLoading(false);
     }
+  }, []);
 
-    return list;
-  }, [query, activeChip]);
+  // Fetch when URL params change
+  useEffect(() => {
+    setInputVal(urlQuery);
+    setActiveCategory(urlCategory);
+    loadProducts(urlQuery, urlCategory);
+  }, [urlQuery, urlCategory, loadProducts]);
 
+  // Handle Search Submission
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
-    setQuery(inputVal);
-    router.replace(`/search?q=${encodeURIComponent(inputVal)}`, {
-      scroll: false,
-    });
+    const q = inputVal.trim();
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    if (activeCategory) params.set("category", activeCategory);
+
+    const qs = params.toString();
+    router.replace(qs ? `/search?${qs}` : "/search", { scroll: false });
+    loadProducts(q, activeCategory);
   }
 
-  function handleChip(val: string) {
-    setActiveChip((prev) => (prev === val ? null : val));
+  // Handle Clear Search
+  function handleClearSearch() {
+    setInputVal("");
+    const params = new URLSearchParams();
+    if (activeCategory) params.set("category", activeCategory);
+    const qs = params.toString();
+    router.replace(qs ? `/search?${qs}` : "/search", { scroll: false });
+    loadProducts("", activeCategory);
+    inputRef.current?.focus();
   }
+
+  // Handle Category Chip Click
+  function handleCategoryClick(catName: string) {
+    const nextCat = activeCategory === catName ? null : catName;
+    setActiveCategory(nextCat);
+
+    const params = new URLSearchParams();
+    if (inputVal.trim()) params.set("q", inputVal.trim());
+    if (nextCat) params.set("category", nextCat);
+
+    const qs = params.toString();
+    router.replace(qs ? `/search?${qs}` : "/search", { scroll: false });
+    loadProducts(inputVal.trim(), nextCat);
+  }
+
+  // Add to cart handler
+  const handleAddToCart = (product: BackendProduct) => {
+    try {
+      const raw = localStorage.getItem("sree_cart");
+      const cart: any[] = raw ? JSON.parse(raw) : [];
+
+      const existingIdx = cart.findIndex((i: any) => i.id === product.id);
+      if (existingIdx >= 0) {
+        cart[existingIdx].quantity = (cart[existingIdx].quantity || 1) + 1;
+      } else {
+        cart.push({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          rawPrice: product.price,
+          quantity: 1,
+          image: product.image,
+          category: product.category,
+        });
+      }
+
+      localStorage.setItem("sree_cart", JSON.stringify(cart));
+      const total = cart.reduce((s: number, i: any) => s + (Number(i.quantity) || 1), 0);
+      setCartCount(total);
+
+      setToastMessage(`"${product.name}" added to cart!`);
+      setTimeout(() => setToastMessage(null), 2500);
+    } catch {
+      /* ignore */
+    }
+  };
 
   return (
     <div
@@ -400,6 +546,34 @@ function SearchPageInner() {
         overflowX: "hidden",
       }}
     >
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: "30px",
+            right: "30px",
+            backgroundColor: "#5D2030",
+            color: "#FFFFFF",
+            fontFamily: "'Playfair Display', Georgia, serif",
+            fontSize: "14px",
+            fontWeight: 600,
+            padding: "14px 24px",
+            borderRadius: "10px",
+            boxShadow: "0 8px 24px rgba(93,32,48,0.35)",
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            border: "1px solid #BB8E43",
+            animation: "srchFadeUp 0.3s ease",
+          }}
+        >
+          <FiShoppingBag size={17} color="#BB8E43" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
       {/* ═══════════ HEADER ═══════════ */}
       <header
         style={{
@@ -489,17 +663,42 @@ function SearchPageInner() {
             <FiSearch size={21} strokeWidth={2.5} />
           </button>
 
+          {/* Cart Icon */}
           <a
-            href="/product"
+            href="/cart"
             aria-label="Cart"
             style={{
               color: "#5A2035",
               display: "flex",
               alignItems: "center",
               padding: "4px",
+              position: "relative",
+              textDecoration: "none",
             }}
           >
             <FiShoppingCart size={21} />
+            {cartCount > 0 && (
+              <span
+                style={{
+                  position: "absolute",
+                  top: "-4px",
+                  right: "-8px",
+                  backgroundColor: "#BB8E43",
+                  color: "#FFFFFF",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  width: "18px",
+                  height: "18px",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 2px 6px rgba(187,142,67,0.4)",
+                }}
+              >
+                {cartCount}
+              </span>
+            )}
           </a>
         </nav>
 
@@ -578,6 +777,7 @@ function SearchPageInner() {
                 { label: "Home", href: "/" },
                 { label: "About", href: "/about" },
                 { label: "Categories", href: "/categories" },
+                { label: "Cart", href: "/cart" },
                 { label: "Contact Us", href: "/contact" },
               ].map(({ label, href }) => (
                 <a
@@ -618,7 +818,7 @@ function SearchPageInner() {
             fontSize: "clamp(26px, 4.5vw, 44px)",
             fontWeight: 700,
             color: "#5A2035",
-            lineHeight: 1.2,
+            lineHeight: 1.25,
             margin: "0 0 12px 0",
           }}
         >
@@ -651,12 +851,12 @@ function SearchPageInner() {
             display: "flex",
             alignItems: "center",
             gap: "0",
-            maxWidth: "660px",
-            margin: "0 auto 22px auto",
-            boxShadow: "0 8px 30px rgba(90,32,53,0.10)",
-            borderRadius: "10px",
+            maxWidth: "680px",
+            margin: "0 auto 28px auto",
+            boxShadow: "0 6px 26px rgba(90,32,53,0.08)",
+            borderRadius: "16px",
             overflow: "hidden",
-            border: "1.5px solid #E8D9C5",
+            border: "1.5px solid #E4D7C8",
             backgroundColor: "#FFFFFF",
           }}
         >
@@ -665,11 +865,11 @@ function SearchPageInner() {
               display: "flex",
               alignItems: "center",
               flex: 1,
-              padding: "0 18px",
-              gap: "10px",
+              padding: "0 20px",
+              gap: "12px",
             }}
           >
-            <FiSearch size={18} color="#BB8E43" strokeWidth={2} />
+            <FiSearch size={20} color="#BB8E43" strokeWidth={2.2} />
             <input
               ref={inputRef}
               type="text"
@@ -691,23 +891,22 @@ function SearchPageInner() {
             {inputVal && (
               <button
                 type="button"
-                onClick={() => {
-                  setInputVal("");
-                  setQuery("");
-                  inputRef.current?.focus();
-                }}
+                onClick={handleClearSearch}
                 style={{
                   background: "none",
                   border: "none",
                   cursor: "pointer",
-                  color: "#A08060",
+                  color: "#9A8573",
                   display: "flex",
                   alignItems: "center",
-                  padding: "4px",
+                  justifyContent: "center",
+                  padding: "6px",
+                  borderRadius: "50%",
+                  transition: "background 0.2s",
                 }}
                 aria-label="Clear search"
               >
-                <FiX size={16} />
+                <FiX size={17} strokeWidth={2.2} />
               </button>
             )}
           </div>
@@ -721,9 +920,9 @@ function SearchPageInner() {
               fontFamily: "'Plus Jakarta Sans', sans-serif",
               fontSize: "14px",
               fontWeight: 700,
-              letterSpacing: "0.8px",
+              letterSpacing: "1px",
               textTransform: "uppercase",
-              padding: "16px 30px",
+              padding: "16px 32px",
               border: "none",
               cursor: "pointer",
               whiteSpace: "nowrap",
@@ -736,40 +935,44 @@ function SearchPageInner() {
           </button>
         </form>
 
-        {/* ── Filter Chips ── */}
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            gap: "10px",
-          }}
-        >
-          {FILTER_CHIPS.map((chip) => {
-            const isActive = activeChip === chip.value;
-            return (
-              <button
-                key={chip.value}
-                onClick={() => handleChip(chip.value)}
-                className="srch-chip"
-                style={{
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
-                  fontSize: "13px",
-                  fontWeight: 500,
-                  padding: "7px 18px",
-                  borderRadius: "999px",
-                  border: `1.5px solid ${isActive ? "#5A2035" : "#D5C4B0"}`,
-                  backgroundColor: isActive ? "#5A2035" : "#FFFFFF",
-                  color: isActive ? "#FFFFFF" : "#5A2035",
-                  cursor: "pointer",
-                  transition: "all 0.22s ease",
-                }}
-              >
-                {chip.label}
-              </button>
-            );
-          })}
-        </div>
+        {/* ── Category Chips (Any 5 categories from backend only) ── */}
+        {categories.length > 0 && (
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              gap: "12px",
+            }}
+          >
+            {categories.map((catName) => {
+              const isActive = activeCategory === catName;
+              return (
+                <button
+                  key={catName}
+                  type="button"
+                  onClick={() => handleCategoryClick(catName)}
+                  className="srch-chip"
+                  style={{
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontSize: "14px",
+                    fontWeight: 500,
+                    padding: "8px 22px",
+                    borderRadius: "999px",
+                    border: `1.5px solid ${isActive ? "#5A2035" : "#D4C4B2"}`,
+                    backgroundColor: isActive ? "#5A2035" : "#FFFFFF",
+                    color: isActive ? "#FFFFFF" : "#5A2035",
+                    cursor: "pointer",
+                    transition: "all 0.22s ease",
+                    boxShadow: isActive ? "0 4px 12px rgba(90,32,53,0.25)" : "0 2px 6px rgba(0,0,0,0.03)",
+                  }}
+                >
+                  {catName}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       {/* ═══════════ RESULTS SECTION ═══════════ */}
@@ -782,23 +985,83 @@ function SearchPageInner() {
           boxSizing: "border-box",
         }}
       >
-        {/* Results count */}
-        {(query || activeChip) && (
-          <p
+        {/* Results count indicator */}
+        {!loading && (
+          <div
             style={{
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
-              fontSize: "14px",
-              color: "#8A7B6F",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
               marginBottom: "24px",
+              flexWrap: "wrap",
+              gap: "12px",
             }}
           >
-            {filteredProducts.length === 0
-              ? "No products found."
-              : `Showing ${filteredProducts.length} result${filteredProducts.length !== 1 ? "s" : ""}${query ? ` for "${query}"` : ""}${activeChip ? ` in ${activeChip}` : ""}`}
-          </p>
+            <p
+              style={{
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontSize: "14px",
+                color: "#8A7B6F",
+                margin: 0,
+              }}
+            >
+              {products.length === 0
+                ? "No products found."
+                : `Showing ${products.length} product${products.length !== 1 ? "s" : ""}${inputVal ? ` for "${inputVal}"` : ""}${activeCategory ? ` in ${activeCategory}` : ""}`}
+            </p>
+
+            {activeCategory && (
+              <button
+                type="button"
+                onClick={() => handleCategoryClick(activeCategory)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "#BB8E43",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                  padding: 0,
+                }}
+              >
+                Clear category filter ({activeCategory})
+              </button>
+            )}
+          </div>
         )}
 
-        {filteredProducts.length === 0 && (
+        {/* Loading Spinner */}
+        {loading && (
+          <div
+            style={{
+              textAlign: "center",
+              padding: "70px 20px",
+              color: "#5A2035",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "14px",
+            }}
+          >
+            <div
+              style={{
+                width: "36px",
+                height: "36px",
+                border: "3px solid #E8D9C5",
+                borderTopColor: "#BB8E43",
+                borderRadius: "50%",
+                animation: "srchSpin 0.8s linear infinite",
+              }}
+            />
+            <span style={{ fontSize: "14px", fontWeight: 500 }}>
+              Searching products in database...
+            </span>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && products.length === 0 && (
           <div
             style={{
               textAlign: "center",
@@ -819,19 +1082,19 @@ function SearchPageInner() {
                 margin: 0,
               }}
             >
-              No results found
+              No products found
             </h2>
             <p
               style={{
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
                 fontSize: "15px",
                 color: "#8A7B6F",
-                maxWidth: "380px",
+                maxWidth: "400px",
                 lineHeight: 1.65,
                 margin: 0,
               }}
             >
-              Try a different keyword or browse through our collections below.
+              We couldn&apos;t find any items matching your search. Try another keyword or browse our complete collections.
             </p>
             <a
               href="/categories"
@@ -857,7 +1120,7 @@ function SearchPageInner() {
         )}
 
         {/* ── Masonry Grid ── */}
-        {filteredProducts.length > 0 && (
+        {!loading && products.length > 0 && (
           <div
             className="srch-masonry-grid"
             style={{
@@ -865,8 +1128,12 @@ function SearchPageInner() {
               columnGap: "22px",
             }}
           >
-            {filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+            {products.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onAddToCart={handleAddToCart}
+              />
             ))}
           </div>
         )}
@@ -1062,6 +1329,10 @@ function SearchPageInner() {
           from { opacity: 0; transform: translateY(18px); }
           to   { opacity: 1; transform: translateY(0); }
         }
+        @keyframes srchSpin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
         .srch-card {
           animation: srchFadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both;
         }
@@ -1071,12 +1342,27 @@ function SearchPageInner() {
 }
 
 /* ─────────────────────────────────────────────
-   Exported page — wraps inner in Suspense
-   (required because useSearchParams needs it)
+   Exported Search Page (wrapped in Suspense)
 ───────────────────────────────────────────── */
 export default function SearchPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense
+      fallback={
+        <div
+          style={{
+            minHeight: "100vh",
+            backgroundColor: "#FAF6EE",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontFamily: "'Playfair Display', Georgia, serif",
+            color: "#5A2035",
+          }}
+        >
+          Loading Search...
+        </div>
+      }
+    >
       <SearchPageInner />
     </Suspense>
   );
