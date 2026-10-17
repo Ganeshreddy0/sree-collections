@@ -100,13 +100,32 @@ function readUrlFilters() {
   }
   const sp = new URLSearchParams(window.location.search);
   const prices = sp.get("price");
+  const subCategory = sp.get("subCategory") || "";
+  let category = sp.get("category") || "All Products";
+
+  // If subCategory was passed without a category, infer parent category
+  if (category === "All Products" && subCategory) {
+    const subLower = subCategory.toLowerCase();
+    if (subLower.includes("denim") || subLower.includes("linen") || subLower.includes("active") || subLower.includes("casual") || subLower.includes("formal") || subLower.includes("street")) {
+      category = "Casual Wear";
+    } else if (subLower.includes("temple") || subLower.includes("earring") || subLower.includes("chain") || subLower.includes("jewel")) {
+      category = "Jewellery";
+    } else if (subLower.includes("decor") || subLower.includes("party")) {
+      category = "Decorative Items";
+    } else if (subLower.includes("saree") || subLower.includes("traditional")) {
+      category = "Saree";
+    } else if (subLower.includes("ethnic") || subLower.includes("kurta")) {
+      category = "Casual Wear";
+    }
+  }
+
   return {
-    category: sp.get("category") || "All Products",
+    category,
     size: sp.get("size") || "",
     colour: sp.get("colour") || "",
     brand: sp.get("brand") || "",
     fabric: sp.get("fabric") || "",
-    subCategory: sp.get("subCategory") || "",
+    subCategory,
     prices: prices ? prices.split(";").filter(Boolean) : ["All Prices"],
     sort: sp.get("sort") || "Featured",
     search: sp.get("search") || "",
@@ -693,20 +712,31 @@ export default function CategoriesPage() {
     syncUrl();
   }, [syncUrl]);
 
-  // 1. Fetch filter facets + active categories
+  const isParticularCategory = Boolean(selectedCategory && selectedCategory !== "All Products");
+
+  const handleCategorySelect = (cat: string) => {
+    if (cat === selectedCategory) return;
+    setSelectedCategory(cat);
+    setSelectedSubCategory("");
+    setSelectedSize("");
+    setSelectedColour("");
+    setSelectedBrand("");
+    setSelectedFabric("");
+    setCheckedPrices(["All Prices"]);
+  };
+
+  // 1. Fetch available categories list on mount
   useEffect(() => {
     let isMounted = true;
-    async function fetchFilters() {
+    async function fetchCategoriesList() {
       try {
-        const [filtersRes, catsRes, subRes] = await Promise.all([
+        const [filtersRes, catsRes] = await Promise.all([
           fetch(`${API_BASE}/products/filters`),
           fetch(`${API_BASE}/categories?status=Active`),
-          fetch(`${API_BASE}/sub-categories?status=Active`),
         ]);
 
         const filtersJson = filtersRes.ok ? await filtersRes.json() : null;
         const catsJson = catsRes.ok ? await catsRes.json() : null;
-        const subJson = subRes.ok ? await subRes.json() : null;
 
         if (!isMounted) return;
 
@@ -729,73 +759,78 @@ export default function CategoriesPage() {
           ])
         );
         setCategoriesList(mergedCats);
-
-        if (Array.isArray(facetData.sizes) && facetData.sizes.length > 0) {
-          setSizesList(facetData.sizes);
-        } else if (Array.isArray(filtersJson?.sizes)) {
-          setSizesList(filtersJson.sizes);
-        }
-
-        if (Array.isArray(facetData.colours)) setColoursList(facetData.colours);
-        if (Array.isArray(facetData.brands)) setBrandsList(facetData.brands);
-        if (Array.isArray(facetData.fabrics)) setFabricsList(facetData.fabrics);
-
-        if (Array.isArray(facetData.priceBuckets) && facetData.priceBuckets.length > 0) {
-          setPriceBuckets(
-            facetData.priceBuckets.map((b: { label: string }) => ({ label: b.label }))
-          );
-        }
-
-        if (Array.isArray(subJson?.data)) {
-          setSubCategoriesList(
-            subJson.data.map((s: any) => s.name).filter(Boolean)
-          );
-        } else if (Array.isArray(facetData.subCategories)) {
-          setSubCategoriesList(facetData.subCategories);
-        }
       } catch {
         // Keep empty dynamic lists; products fetch still works
       }
     }
-    fetchFilters();
+    fetchCategoriesList();
     return () => {
       isMounted = false;
     };
   }, []);
 
-  // Filter subcategories for the selected category
+  // 2. Load category-specific facets (subcategories, sizes, colours, brands, fabrics, price buckets)
+  // ONLY when a particular category is selected!
   useEffect(() => {
     let isMounted = true;
-    async function loadSubs() {
+    async function loadCategoryFacets() {
       if (!selectedCategory || selectedCategory === "All Products") {
-        try {
-          const res = await fetch(`${API_BASE}/sub-categories?status=Active`);
-          const json = await res.json();
-          if (isMounted && json.success) {
-            setSubCategoriesList(
-              (json.data || []).map((s: any) => s.name).filter(Boolean)
-            );
-          }
-        } catch {
-          /* ignore */
-        }
+        // When on All Products: clear secondary filter lists so only categories show in sidebar
+        setSubCategoriesList([]);
+        setSizesList([]);
+        setColoursList([]);
+        setBrandsList([]);
+        setFabricsList([]);
+        setPriceBuckets(DEFAULT_PRICE_BUCKETS);
         return;
       }
+
       try {
-        const res = await fetch(
-          `${API_BASE}/sub-categories?status=Active&category=${encodeURIComponent(selectedCategory)}`
-        );
-        const json = await res.json();
-        if (isMounted && json.success) {
-          setSubCategoriesList(
-            (json.data || []).map((s: any) => s.name).filter(Boolean)
-          );
+        const [filterRes, subRes] = await Promise.all([
+          fetch(`${API_BASE}/products/filters?category=${encodeURIComponent(selectedCategory)}`),
+          fetch(`${API_BASE}/sub-categories?status=Active&category=${encodeURIComponent(selectedCategory)}`),
+        ]);
+
+        const filterJson = filterRes.ok ? await filterRes.json() : null;
+        const subJson = subRes.ok ? await subRes.json() : null;
+
+        if (!isMounted) return;
+
+        const facetData = filterJson?.data || filterJson || {};
+
+        if (Array.isArray(facetData.sizes)) setSizesList(facetData.sizes);
+        else setSizesList([]);
+
+        if (Array.isArray(facetData.colours)) setColoursList(facetData.colours);
+        else setColoursList([]);
+
+        if (Array.isArray(facetData.brands)) setBrandsList(facetData.brands);
+        else setBrandsList([]);
+
+        if (Array.isArray(facetData.fabrics)) setFabricsList(facetData.fabrics);
+        else setFabricsList([]);
+
+        if (Array.isArray(facetData.priceBuckets) && facetData.priceBuckets.length > 0) {
+          setPriceBuckets(facetData.priceBuckets.map((b: { label: string }) => ({ label: b.label })));
+        } else {
+          setPriceBuckets(DEFAULT_PRICE_BUCKETS);
         }
+
+        // Subcategories from SubCategory endpoint + facetData
+        const subFromApi: string[] = Array.isArray(subJson?.data)
+          ? subJson.data.map((s: any) => s.name).filter(Boolean)
+          : [];
+        const subFromFacets: string[] = Array.isArray(facetData.subCategories)
+          ? facetData.subCategories
+          : [];
+
+        const mergedSubs = Array.from(new Set([...subFromApi, ...subFromFacets]));
+        setSubCategoriesList(mergedSubs);
       } catch {
         /* ignore */
       }
     }
-    loadSubs();
+    loadCategoryFacets();
     return () => {
       isMounted = false;
     };
@@ -1182,59 +1217,23 @@ export default function CategoriesPage() {
               CONTACT US
             </a>
 
-            {/* Search Toggle */}
-            <div style={{ display: "flex", alignItems: "center" }}>
-              {searchOpen && (
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      setSearchQuery(searchInput);
-                    }
-                  }}
-                  autoFocus
-                  style={{
-                    width: "200px",
-                    height: "36px",
-                    padding: "0 14px",
-                    borderRadius: "999px",
-                    border: "1.5px solid #BB8E43",
-                    backgroundColor: "#FFFFFF",
-                    fontFamily: "var(--font-sans)",
-                    fontSize: "13px",
-                    color: "#5D2030",
-                    outline: "none",
-                    marginRight: "8px",
-                  }}
-                />
-              )}
-              <button
-                aria-label="Search"
-                onClick={() => {
-                  if (searchOpen && searchInput.trim()) {
-                    setSearchQuery(searchInput);
-                  } else {
-                    setSearchOpen(!searchOpen);
-                  }
-                }}
-                style={{
-                  color: "#5A2035",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "4px",
-                  transition: "transform 0.2s ease",
-                }}
-              >
-                <FiSearch size={22} strokeWidth={2} />
-              </button>
-            </div>
+            {/* Search Link */}
+            <a
+              href="/search"
+              aria-label="Search"
+              style={{
+                color: "#5A2035",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "4px",
+                transition: "transform 0.2s ease, opacity 0.2s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+            >
+              <FiSearch size={22} strokeWidth={2} />
+            </a>
 
             {/* Cart Icon */}
             <a
@@ -1544,10 +1543,7 @@ export default function CategoriesPage() {
                 return active ? (
                   <button
                     key={cat}
-                    onClick={() => {
-                      setSelectedCategory(cat);
-                      setSelectedSubCategory("");
-                    }}
+                    onClick={() => handleCategorySelect(cat)}
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
@@ -1571,10 +1567,7 @@ export default function CategoriesPage() {
                 ) : (
                   <button
                     key={cat}
-                    onClick={() => {
-                      setSelectedCategory(cat);
-                      setSelectedSubCategory("");
-                    }}
+                    onClick={() => handleCategorySelect(cat)}
                     className="cat-sidebar-link"
                     style={{
                       background: "none",
@@ -1598,335 +1591,377 @@ export default function CategoriesPage() {
             </div>
           </div>
 
-          {/* Subcategories */}
-          {subCategoriesList.length > 0 && (
-            <div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <SidebarHeading>Subcategory</SidebarHeading>
-                {selectedSubCategory && (
-                  <button
-                    type="button"
-                    onClick={() => setSelectedSubCategory("")}
+          {/* Conditional Display: Respective Filters ONLY when a particular category is selected */}
+          {isParticularCategory ? (
+            <>
+              {/* Subcategories for Selected Category */}
+              {subCategoriesList.length > 0 && (
+                <div>
+                  <div
                     style={{
-                      background: "none",
-                      border: "none",
-                      color: "#BB8E43",
-                      fontSize: 13,
-                      fontFamily: "'Playfair Display', Georgia, serif",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      textDecoration: "underline",
-                      padding: 0,
-                      marginBottom: 18,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
                     }}
                   >
-                    Clear
-                  </button>
-                )}
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  gap: 12,
-                }}
-              >
-                {subCategoriesList.map((sub) => {
-                  const active =
-                    selectedSubCategory.toLowerCase() === sub.toLowerCase();
-                  return (
-                    <button
-                      key={sub}
-                      type="button"
-                      onClick={() =>
-                        setSelectedSubCategory((prev) =>
-                          prev.toLowerCase() === sub.toLowerCase() ? "" : sub
-                        )
-                      }
-                      className={active ? undefined : "cat-sidebar-link"}
-                      style={
-                        active
-                          ? {
-                              display: "inline-flex",
-                              padding: "6px 18px",
-                              borderRadius: 999,
-                              backgroundColor: "#BB8E43",
-                              color: "#FFFFFF",
-                              fontFamily: "'Playfair Display', Georgia, serif",
-                              fontWeight: 600,
-                              fontSize: 14,
-                              border: "none",
-                              cursor: "pointer",
-                            }
-                          : {
-                              background: "none",
-                              border: "none",
-                              cursor: "pointer",
-                              padding: "2px 0",
-                              fontFamily: "'Playfair Display', Georgia, serif",
-                              fontWeight: 500,
-                              fontSize: 15,
-                              color: "#5D2030",
-                              textAlign: "left",
-                            }
-                      }
-                    >
-                      {sub}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+                    <SidebarHeading>Subcategory</SidebarHeading>
+                    {selectedSubCategory && (
+                      <button
+                        type="button"
+                        onClick={() => setSelectedSubCategory("")}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: "#BB8E43",
+                          fontSize: 13,
+                          fontFamily: "'Playfair Display', Georgia, serif",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          textDecoration: "underline",
+                          padding: 0,
+                          marginBottom: 18,
+                        }}
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      gap: 12,
+                    }}
+                  >
+                    {subCategoriesList.map((sub) => {
+                      const active =
+                        selectedSubCategory.toLowerCase() === sub.toLowerCase();
+                      return (
+                        <button
+                          key={sub}
+                          type="button"
+                          onClick={() =>
+                            setSelectedSubCategory((prev) =>
+                              prev.toLowerCase() === sub.toLowerCase() ? "" : sub
+                            )
+                          }
+                          className={active ? undefined : "cat-sidebar-link"}
+                          style={
+                            active
+                              ? {
+                                  display: "inline-flex",
+                                  padding: "6px 18px",
+                                  borderRadius: 999,
+                                  backgroundColor: "#BB8E43",
+                                  color: "#FFFFFF",
+                                  fontFamily: "'Playfair Display', Georgia, serif",
+                                  fontWeight: 600,
+                                  fontSize: 14,
+                                  border: "none",
+                                  cursor: "pointer",
+                                }
+                              : {
+                                  background: "none",
+                                  border: "none",
+                                  cursor: "pointer",
+                                  padding: "2px 0",
+                                  fontFamily: "'Playfair Display', Georgia, serif",
+                                  fontWeight: 500,
+                                  fontSize: 15,
+                                  color: "#5D2030",
+                                  textAlign: "left",
+                                }
+                          }
+                        >
+                          {sub}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
-          {/* Price Range */}
-          <div>
-            <SidebarHeading>Price Range</SidebarHeading>
+              {/* Price Range */}
+              <div>
+                <SidebarHeading>Price Range</SidebarHeading>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "15px",
+                  }}
+                >
+                  {priceBuckets.map(({ label }) => (
+                    <CheckboxRow
+                      key={label}
+                      label={label}
+                      checked={checkedPrices.includes(label)}
+                      onChange={() => togglePrice(label)}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Size */}
+              {sizesList.length > 0 && (
+                <div>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      marginBottom: "16px",
+                    }}
+                  >
+                    <SidebarHeading>Size</SidebarHeading>
+                    {selectedSize && (
+                      <button
+                        onClick={() => setSelectedSize("")}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: "#BB8E43",
+                          fontSize: "13px",
+                          fontFamily: "'Playfair Display', Georgia, serif",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          textDecoration: "underline",
+                          padding: 0,
+                          marginBottom: "18px",
+                        }}
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: "10px",
+                    }}
+                  >
+                    {sizesList.map((s) => {
+                      const active = selectedSize.toLowerCase() === s.toLowerCase();
+                      return (
+                        <button
+                          key={s}
+                          onClick={() =>
+                            setSelectedSize((prev) =>
+                              prev.toLowerCase() === s.toLowerCase() ? "" : s
+                            )
+                          }
+                          style={{
+                            minWidth: "36px",
+                            height: "36px",
+                            padding: "0 10px",
+                            borderRadius: s.length > 3 ? "999px" : "50%",
+                            backgroundColor: active ? "#BB8E43" : "transparent",
+                            color: active ? "#FFFFFF" : "#5D2030",
+                            fontFamily: "'Playfair Display', Georgia, serif",
+                            fontWeight: active ? 700 : 600,
+                            fontSize: s.length > 4 ? "12px" : "15px",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            transition: "all 0.2s ease",
+                            boxShadow: active
+                              ? "0 4px 12px rgba(187,142,67,0.3)"
+                              : "none",
+                            border: active ? "none" : "1.5px solid #E3D7C5",
+                          }}
+                          title={
+                            active
+                              ? `Click to clear size ${s}`
+                              : `Filter by size ${s}`
+                          }
+                        >
+                          {s}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Colour */}
+              {coloursList.length > 0 && (
+                <div>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <SidebarHeading>Colour</SidebarHeading>
+                    {selectedColour && (
+                      <button
+                        type="button"
+                        onClick={() => setSelectedColour("")}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: "#BB8E43",
+                          fontSize: 13,
+                          fontFamily: "'Playfair Display', Georgia, serif",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          textDecoration: "underline",
+                          padding: 0,
+                          marginBottom: 18,
+                        }}
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: 10,
+                    }}
+                  >
+                    {coloursList.map((c) => {
+                      const active =
+                        selectedColour.toLowerCase() === c.toLowerCase();
+                      return (
+                        <button
+                          key={c}
+                          type="button"
+                          title={c}
+                          onClick={() =>
+                            setSelectedColour((prev) =>
+                              prev.toLowerCase() === c.toLowerCase() ? "" : c
+                            )
+                          }
+                          style={{
+                            width: 28,
+                            height: 28,
+                            borderRadius: "50%",
+                            backgroundColor: colourToHex(c),
+                            border: active
+                              ? "2.5px solid #5D2030"
+                              : "1.5px solid #E3D7C5",
+                            boxShadow: active
+                              ? "0 0 0 2px #BB8E43"
+                              : "none",
+                            cursor: "pointer",
+                            padding: 0,
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Brand */}
+              {brandsList.length > 0 && (
+                <div>
+                  <SidebarHeading>Brand</SidebarHeading>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 12,
+                    }}
+                  >
+                    {brandsList.map((b) => (
+                      <CheckboxRow
+                        key={b}
+                        label={b}
+                        checked={selectedBrand.toLowerCase() === b.toLowerCase()}
+                        onChange={() =>
+                          setSelectedBrand((prev) =>
+                            prev.toLowerCase() === b.toLowerCase() ? "" : b
+                          )
+                        }
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Fabric */}
+              {fabricsList.length > 0 && (
+                <div>
+                  <SidebarHeading>Fabric</SidebarHeading>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 12,
+                    }}
+                  >
+                    {fabricsList.map((f) => (
+                      <CheckboxRow
+                        key={f}
+                        label={f}
+                        checked={selectedFabric.toLowerCase() === f.toLowerCase()}
+                        onChange={() =>
+                          setSelectedFabric((prev) =>
+                            prev.toLowerCase() === f.toLowerCase() ? "" : f
+                          )
+                        }
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Availability */}
+              <div>
+                <SidebarHeading>Availability</SidebarHeading>
+                <CheckboxRow
+                  label="In stock only"
+                  checked={inStockOnly}
+                  onChange={() => setInStockOnly((v) => !v)}
+                />
+              </div>
+            </>
+          ) : (
+            /* Elegant prompt shown when on All Products (First showing only categories) */
             <div
               style={{
+                padding: "20px 18px",
+                borderRadius: "14px",
+                backgroundColor: "#FBF5EC",
+                border: "1.5px dashed #BB8E43",
                 display: "flex",
                 flexDirection: "column",
-                gap: "15px",
+                gap: "8px",
               }}
             >
-              {priceBuckets.map(({ label }) => (
-                <CheckboxRow
-                  key={label}
-                  label={label}
-                  checked={checkedPrices.includes(label)}
-                  onChange={() => togglePrice(label)}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Size */}
-          {sizesList.length > 0 && (
-            <div>
-              <div
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span style={{ fontSize: "18px" }}>✨</span>
+                <span
+                  style={{
+                    fontFamily: "'Playfair Display', Georgia, serif",
+                    fontSize: "15px",
+                    fontWeight: 700,
+                    color: "#5D2030",
+                  }}
+                >
+                  Select a Category
+                </span>
+              </div>
+              <p
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  marginBottom: "16px",
+                  fontSize: "13px",
+                  color: "#7A685D",
+                  lineHeight: 1.5,
+                  margin: 0,
+                  fontFamily: "var(--font-sans)",
                 }}
               >
-                <SidebarHeading>Size</SidebarHeading>
-                {selectedSize && (
-                  <button
-                    onClick={() => setSelectedSize("")}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      color: "#BB8E43",
-                      fontSize: "13px",
-                      fontFamily: "'Playfair Display', Georgia, serif",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      textDecoration: "underline",
-                      padding: 0,
-                      marginBottom: "18px",
-                    }}
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  gap: "14px",
-                }}
-              >
-                {sizesList.map((s) => {
-                  const active = selectedSize.toLowerCase() === s.toLowerCase();
-                  return (
-                    <button
-                      key={s}
-                      onClick={() =>
-                        setSelectedSize((prev) =>
-                          prev.toLowerCase() === s.toLowerCase() ? "" : s
-                        )
-                      }
-                      style={{
-                        minWidth: "36px",
-                        height: "36px",
-                        padding: "0 10px",
-                        borderRadius: s.length > 3 ? "999px" : "50%",
-                        backgroundColor: active ? "#BB8E43" : "transparent",
-                        color: active ? "#FFFFFF" : "#5D2030",
-                        fontFamily: "'Playfair Display', Georgia, serif",
-                        fontWeight: active ? 700 : 600,
-                        fontSize: s.length > 4 ? "12px" : "16px",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        transition: "all 0.2s ease",
-                        boxShadow: active
-                          ? "0 4px 12px rgba(187,142,67,0.3)"
-                          : "none",
-                        border: "none",
-                      }}
-                      title={
-                        active
-                          ? `Click to clear size ${s}`
-                          : `Filter by size ${s}`
-                      }
-                    >
-                      {s}
-                    </button>
-                  );
-                })}
-              </div>
+                Choose any category above to reveal tailored subcategories, sizes, price ranges, and brands.
+              </p>
             </div>
           )}
-
-          {/* Colour */}
-          {coloursList.length > 0 && (
-            <div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <SidebarHeading>Colour</SidebarHeading>
-                {selectedColour && (
-                  <button
-                    type="button"
-                    onClick={() => setSelectedColour("")}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      color: "#BB8E43",
-                      fontSize: 13,
-                      fontFamily: "'Playfair Display', Georgia, serif",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      textDecoration: "underline",
-                      padding: 0,
-                      marginBottom: 18,
-                    }}
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: 10,
-                }}
-              >
-                {coloursList.map((c) => {
-                  const active =
-                    selectedColour.toLowerCase() === c.toLowerCase();
-                  return (
-                    <button
-                      key={c}
-                      type="button"
-                      title={c}
-                      onClick={() =>
-                        setSelectedColour((prev) =>
-                          prev.toLowerCase() === c.toLowerCase() ? "" : c
-                        )
-                      }
-                      style={{
-                        width: 28,
-                        height: 28,
-                        borderRadius: "50%",
-                        backgroundColor: colourToHex(c),
-                        border: active
-                          ? "2.5px solid #5D2030"
-                          : "1.5px solid #E3D7C5",
-                        boxShadow: active
-                          ? "0 0 0 2px #BB8E43"
-                          : "none",
-                        cursor: "pointer",
-                        padding: 0,
-                      }}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Brand */}
-          {brandsList.length > 0 && (
-            <div>
-              <SidebarHeading>Brand</SidebarHeading>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 12,
-                }}
-              >
-                {brandsList.map((b) => (
-                  <CheckboxRow
-                    key={b}
-                    label={b}
-                    checked={selectedBrand.toLowerCase() === b.toLowerCase()}
-                    onChange={() =>
-                      setSelectedBrand((prev) =>
-                        prev.toLowerCase() === b.toLowerCase() ? "" : b
-                      )
-                    }
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Fabric */}
-          {fabricsList.length > 0 && (
-            <div>
-              <SidebarHeading>Fabric</SidebarHeading>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 12,
-                }}
-              >
-                {fabricsList.map((f) => (
-                  <CheckboxRow
-                    key={f}
-                    label={f}
-                    checked={selectedFabric.toLowerCase() === f.toLowerCase()}
-                    onChange={() =>
-                      setSelectedFabric((prev) =>
-                        prev.toLowerCase() === f.toLowerCase() ? "" : f
-                      )
-                    }
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Availability */}
-          <div>
-            <SidebarHeading>Availability</SidebarHeading>
-            <CheckboxRow
-              label="In stock only"
-              checked={inStockOnly}
-              onChange={() => setInStockOnly((v) => !v)}
-            />
-          </div>
         </aside>
 
         {/* PRODUCT GRID - Exact 3-column masonry with calculated height alignment */}
