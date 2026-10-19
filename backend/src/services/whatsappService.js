@@ -113,11 +113,9 @@ export async function sendOrderConfirmation(order) {
         {
           type: 'body',
           parameters: [
-            { type: 'text', text: order.customerName || 'Valued Customer' },
-            { type: 'text', text: order.orderNumber },
-            { type: 'text', text: itemsSummary.slice(0, 1000) },
-            { type: 'text', text: formattedTotal },
-            { type: 'text', text: order.orderStatus || 'Confirmed' },
+            { type: 'text', text: String(order.customerName || 'Valued Customer') },
+            { type: 'text', text: String(order.orderNumber || '') },
+            { type: 'text', text: String(formattedTotal || '') },
           ],
         },
       ],

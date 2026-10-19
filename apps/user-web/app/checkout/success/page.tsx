@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -14,10 +14,38 @@ import {
   FiClock,
   FiCopy,
   FiCheck,
+  FiSearch,
+  FiShoppingCart,
+  FiMenu,
+  FiX,
 } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 
 const API_BASE = "http://localhost:5000/api";
+
+function NavLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      style={{
+        fontFamily: "'Playfair Display', Georgia, serif",
+        fontSize: "17px",
+        fontWeight: 700,
+        color: "#5A2035",
+        textDecoration: "none",
+        lineHeight: 1.2,
+      }}
+    >
+      {children}
+    </Link>
+  );
+}
 
 interface OrderData {
   _id: string;
@@ -58,7 +86,7 @@ interface OrderData {
   };
 }
 
-export default function OrderSuccessPage() {
+function OrderSuccessContent() {
   const searchParams = useSearchParams();
   const orderNumberParam = searchParams.get("orderNumber");
   const orderIdParam = searchParams.get("id");
@@ -67,6 +95,7 @@ export default function OrderSuccessPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const lookupId = orderNumberParam || orderIdParam;
@@ -103,21 +132,194 @@ export default function OrderSuccessPage() {
     }
   };
 
-  if (loading) {
-    return (
+  const siteHeader = (
+    <>
       <div
         style={{
-          minHeight: "80vh",
+          width: "100%",
           display: "flex",
-          alignItems: "center",
           justifyContent: "center",
+          position: "sticky",
+          top: 0,
+          zIndex: 100,
           backgroundColor: "#FCF8F2",
-          fontFamily: "'Playfair Display', Georgia, serif",
-          color: "#5D2030",
-          fontSize: "20px",
+          borderBottom: "1px solid rgba(187,142,67,0.18)",
         }}
       >
-        Loading your order confirmation...
+        <header
+          style={{
+            width: "100%",
+            maxWidth: "1360px",
+            minHeight: "88px",
+            margin: "0 auto",
+            padding: "0 20px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            boxSizing: "border-box",
+          }}
+        >
+          <Link href="/" style={{ display: "inline-block" }}>
+            <img
+              src="/homepage/logo2_trans.png"
+              alt="Sree Collections"
+              style={{
+                height: "68px",
+                width: "auto",
+                objectFit: "contain",
+                maxWidth: "320px",
+                display: "block",
+              }}
+            />
+          </Link>
+
+          <nav
+            className="success-desktop-nav"
+            style={{ display: "none", alignItems: "center", gap: "32px" }}
+          >
+            <NavLink href="/">Home</NavLink>
+            <NavLink href="/#about">About</NavLink>
+            <NavLink href="/categories">Categories</NavLink>
+            <Link
+              href="/contact"
+              style={{
+                background: "#BA8E43",
+                color: "#FFFFFF",
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: "12.5px",
+                fontWeight: 700,
+                letterSpacing: "0.8px",
+                textTransform: "uppercase",
+                padding: "11px 28px",
+                borderRadius: "9999px",
+                textDecoration: "none",
+                boxShadow: "0 2px 10px rgba(186, 142, 67, 0.25)",
+              }}
+            >
+              CONTACT US
+            </Link>
+            <Link
+              href="/categories"
+              aria-label="Search"
+              style={{ color: "#5A2035", display: "flex" }}
+            >
+              <FiSearch size={22} strokeWidth={2} />
+            </Link>
+            <Link
+              href="/cart"
+              aria-label="Shopping Cart"
+              style={{ color: "#5A2035", display: "flex" }}
+            >
+              <FiShoppingCart size={22} strokeWidth={2} />
+            </Link>
+          </nav>
+
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu"
+            className="success-hamburger"
+            style={{
+              display: "none",
+              padding: "8px",
+              color: "#2F2C24",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            {mobileMenuOpen ? <FiX size={26} /> : <FiMenu size={26} />}
+          </button>
+        </header>
+      </div>
+
+      {mobileMenuOpen && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(0,0,0,0.45)",
+            zIndex: 200,
+            display: "flex",
+            justifyContent: "flex-end",
+          }}
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <div
+            style={{
+              width: "280px",
+              height: "100%",
+              backgroundColor: "#FCF8F2",
+              padding: "28px 24px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "18px",
+              boxShadow: "-4px 0 20px rgba(0,0,0,0.15)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <img
+                src="/homepage/logo2_trans.png"
+                alt="Logo"
+                style={{ height: "48px" }}
+              />
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ background: "none", border: "none", cursor: "pointer" }}
+              >
+                <FiX size={22} />
+              </button>
+            </div>
+            <Link href="/" onClick={() => setMobileMenuOpen(false)} style={{ color: "#5D2030", textDecoration: "none", fontFamily: "'Playfair Display', Georgia, serif", fontSize: 17, fontWeight: 600 }}>
+              Home
+            </Link>
+            <Link href="/#about" onClick={() => setMobileMenuOpen(false)} style={{ color: "#5D2030", textDecoration: "none", fontFamily: "'Playfair Display', Georgia, serif", fontSize: 17, fontWeight: 600 }}>
+              About
+            </Link>
+            <Link href="/categories" onClick={() => setMobileMenuOpen(false)} style={{ color: "#5D2030", textDecoration: "none", fontFamily: "'Playfair Display', Georgia, serif", fontSize: 17, fontWeight: 600 }}>
+              Categories
+            </Link>
+            <Link href="/cart" onClick={() => setMobileMenuOpen(false)} style={{ color: "#5D2030", textDecoration: "none", fontFamily: "'Playfair Display', Georgia, serif", fontSize: 17, fontWeight: 600 }}>
+              Cart
+            </Link>
+            <Link href="/contact" onClick={() => setMobileMenuOpen(false)} style={{ color: "#5D2030", textDecoration: "none", fontFamily: "'Playfair Display', Georgia, serif", fontSize: 17, fontWeight: 600 }}>
+              Contact Us
+            </Link>
+          </div>
+        </div>
+      )}
+    </>
+  );
+
+  if (loading) {
+    return (
+      <div style={{ minHeight: "100vh", backgroundColor: "#FCF8F2", display: "flex", flexDirection: "column" }}>
+        {siteHeader}
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontFamily: "'Playfair Display', Georgia, serif",
+            color: "#5D2030",
+            fontSize: "20px",
+          }}
+        >
+          Loading your order confirmation...
+        </div>
+        <style>{`
+          @media (min-width: 992px) { .success-desktop-nav { display: flex !important; } }
+          @media (max-width: 991px) { .success-hamburger { display: flex !important; } }
+        `}</style>
       </div>
     );
   }
@@ -131,11 +333,13 @@ export default function OrderSuccessPage() {
         backgroundColor: "#FCF8F2",
         color: "#2F2C24",
         fontFamily: "'Plus Jakarta Sans', sans-serif",
-        padding: "40px 20px 80px 20px",
       }}
     >
+      {siteHeader}
+
+      <div style={{ padding: "32px 20px 80px 20px" }}>
       <div style={{ maxWidth: "860px", margin: "0 auto" }}>
-        {/* Top Header / Success Banner */}
+        {/* Success Banner */}
         <div
           style={{
             backgroundColor: "#FFFFFF",
@@ -638,6 +842,37 @@ export default function OrderSuccessPage() {
           </Link>
         </div>
       </div>
+      </div>
+
+      <style>{`
+        @media (min-width: 992px) { .success-desktop-nav { display: flex !important; } }
+        @media (max-width: 991px) { .success-hamburger { display: flex !important; } }
+      `}</style>
     </div>
+  );
+}
+
+export default function OrderSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          style={{
+            minHeight: "100vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#FCF8F2",
+            fontFamily: "'Playfair Display', Georgia, serif",
+            color: "#5D2030",
+            fontSize: 18,
+          }}
+        >
+          Loading…
+        </div>
+      }
+    >
+      <OrderSuccessContent />
+    </Suspense>
   );
 }
