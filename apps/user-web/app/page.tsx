@@ -10,13 +10,10 @@ import {
   FiChevronRight,
   FiMenu,
   FiX,
-  FiInstagram,
-  FiFacebook,
-  FiPhone,
-  FiMail,
   FiCheckCircle,
 } from "react-icons/fi";
-import { FaWhatsapp, FaPinterest } from "react-icons/fa";
+import { FaWhatsapp } from "react-icons/fa";
+import FeaturedCardsShowcase from "@/components/FeaturedCardsShowcase";
 
 // ─── CMS API types & defaults ────────────────────────────────────────────────
 const API_BASE = "http://localhost:5000/api";
@@ -27,17 +24,17 @@ type CMSData = Record<string, CMSSection>;
 
 // Graceful fallbacks — identical to original hardcoded data — used when API is offline
 const FALLBACK_CMS: CMSData = {
-  header: { sectionId: "header", title: "Sree Collections", subtitle: "", description: "Celebrating timeless Indian royalty with handpicked silk sarees, designer ethnic sets, and authentic temple jewellery crafted for extraordinary celebrations.", badgeText: "", mediaUrl: "/homepage/logo2_trans.png", mediaAlt: "Sree Collections", secondaryMediaUrl: "/homepage/logo2.png", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "CONTACT US", ctaLink: "/contact", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{itemId:"nav-home",title:"Home",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#home",ctaText:"",bgColor:"",displayOrder:1,isActive:true,metadata:{}},{itemId:"nav-about",title:"About",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#about",ctaText:"",bgColor:"",displayOrder:2,isActive:true,metadata:{}},{itemId:"nav-categories",title:"Categories",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"/categories",ctaText:"",bgColor:"",displayOrder:3,isActive:true,metadata:{}}] },
+  header: { sectionId: "header", title: "Sree Collections", subtitle: "", description: "Celebrating timeless Indian royalty with handpicked silk sarees, designer ethnic sets, and authentic temple jewellery crafted for extraordinary celebrations.", badgeText: "", mediaUrl: "/homepage/logo2_trans.png", mediaAlt: "Sree Collections", secondaryMediaUrl: "/homepage/logo2.png", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "CONTACT US", ctaLink: "/contact", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{ itemId: "nav-home", title: "Home", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: {} }, { itemId: "nav-about", title: "About", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#about", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: {} }, { itemId: "nav-categories", title: "Categories", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "/categories", ctaText: "", bgColor: "", displayOrder: 3, isActive: true, metadata: {} }] },
   hero: { sectionId: "hero", title: "Dive Into A World Of Endless", subtitle: "Fashion Possibilities", description: "Elevate Your Wardrobe With Our Fashion Finds. Discover Your Signature Style At Fashion Avenue.", badgeText: "", mediaUrl: "/homepage/hero_col1.png", mediaAlt: "Fashion Model in Coat", secondaryMediaUrl: "/homepage/hero_bangles.png", secondaryMediaAlt: "Awesome Gold Jewelry Collection", tertiaryMediaUrl: "/homepage/hero_col3.png", tertiaryMediaAlt: "Bridal Jewelry and Sets", ctaText: "SHOP NOW", ctaLink: "#featured", secondaryCtaText: "EXPLORE MORE PRODUCTS", secondaryCtaLink: "#categories", isActive: true, settings: { watermarkUrl: "/homepage/sc_crest_watermark_trans.png", bangle_badge_label: "TRENDING", bangle_badge_title: "Awesome", bangle_badge_subtitle: "Collection" }, items: [] },
   "free-delivery": { sectionId: "free-delivery", title: "Free Delivery", subtitle: "🛍️ Order above $99/-", description: "", badgeText: "No Code Required • Worldwide Express Delivery", mediaUrl: "/homepage/img4.png", mediaAlt: "Free Express Delivery Truck", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "", ctaLink: "#", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [] },
-  "categories-mosaic": { sectionId: "categories-mosaic", title: "Explore Our World of Styles", subtitle: "Discover By Category", description: "", badgeText: "", mediaUrl: "", mediaAlt: "", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "", ctaLink: "#", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{itemId:"mosaic-denim",title:"Effortless Casuals",subtitle:"",description:"",badge:"DENIM WEAR",imageUrl:"/homepage/mosaic_denim.jpg",imageAlt:"Denim Jeans",linkUrl:"#featured",ctaText:"Shop Denims",bgColor:"#DDEBEA",displayOrder:1,isActive:true,metadata:{type:"left-top",textColor:"#4A6261"}},{itemId:"mosaic-ethnic",title:"Heritage Elegance",subtitle:"",description:"",badge:"ETHNIC WEAR",imageUrl:"/homepage/mosaic_ethnic.jpg",imageAlt:"Ethnic Wear",linkUrl:"#sarees",ctaText:"Explore Kurtas",bgColor:"#EFE4E0",displayOrder:2,isActive:true,metadata:{type:"left-bottom",textColor:"#7D534A"}},{itemId:"mosaic-necklace",title:"Royal Gold Jewellery Collection",subtitle:"",description:"",badge:"22K PURE TEMPLE CRAFT",imageUrl:"/homepage/mosaic_necklace.jpg",imageAlt:"Royal Gold Jewellery",linkUrl:"#featured",ctaText:"Explore Jewellery",bgColor:"",displayOrder:3,isActive:true,metadata:{type:"right-tall"}},{itemId:"mosaic-shirt",title:"Everyday Linens",subtitle:"",description:"",badge:"Minimalist",imageUrl:"/homepage/mosaic_shirt.jpg",imageAlt:"Summer Casuals",linkUrl:"#",ctaText:"",bgColor:"#F2EFE9",displayOrder:4,isActive:true,metadata:{type:"bottom-small-left"}},{itemId:"mosaic-street",title:"Active Wear & Street Style",subtitle:"",description:"Vibrant hues, modern cuts, and ultimate comfort for every journey.",badge:"URBAN ATELIER",imageUrl:"/homepage/mosaic_street.jpg",imageAlt:"Activewear & Street Style",linkUrl:"#featured",ctaText:"Shop Street Edit",bgColor:"#D8F0EC",displayOrder:5,isActive:true,metadata:{type:"bottom-wide",badgeColor:"#2F5F58"}},{itemId:"mosaic-decor",title:"Festive Home Decor",subtitle:"",description:"",badge:"Celebrations",imageUrl:"/homepage/mosaic_decor.jpg",imageAlt:"Festive Party Decor",linkUrl:"#",ctaText:"",bgColor:"#F7F2FA",displayOrder:6,isActive:true,metadata:{type:"bottom-small-right"}}] },
+  "categories-mosaic": { sectionId: "categories-mosaic", title: "Explore Our World of Styles", subtitle: "Discover By Category", description: "", badgeText: "", mediaUrl: "", mediaAlt: "", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "", ctaLink: "#", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{ itemId: "mosaic-denim", title: "Effortless Casuals", subtitle: "", description: "", badge: "DENIM WEAR", imageUrl: "/homepage/mosaic_denim.jpg", imageAlt: "Denim Jeans", linkUrl: "#featured", ctaText: "Shop Denims", bgColor: "#DDEBEA", displayOrder: 1, isActive: true, metadata: { type: "left-top", textColor: "#4A6261" } }, { itemId: "mosaic-ethnic", title: "Heritage Elegance", subtitle: "", description: "", badge: "ETHNIC WEAR", imageUrl: "/homepage/mosaic_ethnic.jpg", imageAlt: "Ethnic Wear", linkUrl: "#sarees", ctaText: "Explore Kurtas", bgColor: "#EFE4E0", displayOrder: 2, isActive: true, metadata: { type: "left-bottom", textColor: "#7D534A" } }, { itemId: "mosaic-necklace", title: "Royal Gold Jewellery Collection", subtitle: "", description: "", badge: "22K PURE TEMPLE CRAFT", imageUrl: "/homepage/mosaic_necklace.jpg", imageAlt: "Royal Gold Jewellery", linkUrl: "#featured", ctaText: "Explore Jewellery", bgColor: "", displayOrder: 3, isActive: true, metadata: { type: "right-tall" } }, { itemId: "mosaic-shirt", title: "Everyday Linens", subtitle: "", description: "", badge: "Minimalist", imageUrl: "/homepage/mosaic_shirt.jpg", imageAlt: "Summer Casuals", linkUrl: "#", ctaText: "", bgColor: "#F2EFE9", displayOrder: 4, isActive: true, metadata: { type: "bottom-small-left" } }, { itemId: "mosaic-street", title: "Active Wear & Street Style", subtitle: "", description: "Vibrant hues, modern cuts, and ultimate comfort for every journey.", badge: "URBAN ATELIER", imageUrl: "/homepage/mosaic_street.jpg", imageAlt: "Activewear & Street Style", linkUrl: "#featured", ctaText: "Shop Street Edit", bgColor: "#D8F0EC", displayOrder: 5, isActive: true, metadata: { type: "bottom-wide", badgeColor: "#2F5F58" } }, { itemId: "mosaic-decor", title: "Festive Home Decor", subtitle: "", description: "", badge: "Celebrations", imageUrl: "/homepage/mosaic_decor.jpg", imageAlt: "Festive Party Decor", linkUrl: "#", ctaText: "", bgColor: "#F7F2FA", displayOrder: 6, isActive: true, metadata: { type: "bottom-small-right" } }] },
   "editorial-banner": { sectionId: "editorial-banner", title: "Your Style", subtitle: "Your Rules", description: "Empower Your Fashion", badgeText: "", mediaUrl: "/homepage/your_style_pill1_hd.jpg", mediaAlt: "Luxury saree and pearls", secondaryMediaUrl: "/homepage/your_style_pill2_hd.jpg", secondaryMediaAlt: "Jewelry display", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "SHOP NOW", ctaLink: "#featured", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [] },
-  "spotlight-casual": { sectionId: "spotlight-casual", title: "Casual Wear", subtitle: "Collections", description: "You offer your kids wardrobe to your journey wardrobe.", badgeText: "", mediaUrl: "/homepage/casual_model1.jpg", mediaAlt: "Casual Wear Model", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "Explore", ctaLink: "#featured", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{itemId:"casual-card-1",title:"",subtitle:"",description:"",badge:"",imageUrl:"/homepage/casual_model2.jpg",imageAlt:"Casual fashion",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:1,isActive:true,metadata:{width:200,height:280}},{itemId:"casual-card-2",title:"",subtitle:"",description:"",badge:"",imageUrl:"/homepage/casual_model3.jpg",imageAlt:"Casual styling",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:2,isActive:true,metadata:{width:180,height:260,marginTop:28}}] },
-  "spotlight-saree": { sectionId: "spotlight-saree", title: "Saree", subtitle: "Collections", description: "You drape your traditions and beauty with our saree collections.", badgeText: "", mediaUrl: "", mediaAlt: "", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "Explore", ctaLink: "#featured", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{itemId:"saree-card-1",title:"",subtitle:"",description:"",badge:"",imageUrl:"/homepage/saree_green.jpg",imageAlt:"Silk Saree",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:1,isActive:true,metadata:{width:220,height:340}},{itemId:"saree-card-2",title:"",subtitle:"",description:"",badge:"",imageUrl:"/homepage/saree_models.jpg",imageAlt:"Royal Silk Sarees",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:2,isActive:true,metadata:{width:200,height:310,marginTop:36}}] },
-  "spotlight-decor": { sectionId: "spotlight-decor", title: "Decorative Item", subtitle: "Collections", description: "You collect your craft and art décor here with our collections.", badgeText: "", mediaUrl: "", mediaAlt: "", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "Explore", ctaLink: "#featured", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{itemId:"decor-card-1",title:"",subtitle:"",description:"",badge:"",imageUrl:"/homepage/decor_lights.jpg",imageAlt:"Festive Decor Diyas",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:1,isActive:true,metadata:{width:220,height:300}},{itemId:"decor-card-2",title:"",subtitle:"",description:"",badge:"",imageUrl:"/homepage/decor_handicraft.jpg",imageAlt:"Artisanal Handicrafts",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:2,isActive:true,metadata:{width:200,height:280,marginTop:32}}] },
-  "whatsapp-banner": { sectionId: "whatsapp-banner", title: "Curate your cart.", subtitle: "Complete on WhatsApp.", description: "", badgeText: "🛍 Shopping Made Personal", mediaUrl: "/homepage/img5.png", mediaAlt: "Sree Collections WhatsApp Shopping Bag", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "Chat on WhatsApp", ctaLink: "https://wa.me/?text=Hello%20Sree%20Collections%2C%20I%20want%20to%20shop!", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{itemId:"wa-step-1",title:"Added Cart",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:1,isActive:true,metadata:{}},{itemId:"wa-step-2",title:"WhatsApp",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:2,isActive:true,metadata:{}},{itemId:"wa-step-3",title:"Order Confirmed",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:3,isActive:true,metadata:{}}] },
-  testimonials: { sectionId: "testimonials", title: "Why our Customer says", subtitle: "", description: "", badgeText: "", mediaUrl: "", mediaAlt: "", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "", ctaLink: "#", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{itemId:"t1",title:"Priya Sundaram",subtitle:"Verified Bride",description:"The silk saree and the temple necklace set I ordered for my sister's wedding completely surpassed my expectations.",badge:"Chennai, India",imageUrl:"",imageAlt:"",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:1,isActive:true,metadata:{rating:5}},{itemId:"t2",title:"Ananya Deshmukh",subtitle:"Verified Buyer",description:"Shopping via WhatsApp concierge was the smoothest experience ever. They shared detailed 4K close-up videos of the Banarasi weaves.",badge:"Mumbai, India",imageUrl:"",imageAlt:"",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:2,isActive:true,metadata:{rating:5}},{itemId:"t3",title:"Radhika Patel",subtitle:"International Client",description:"Ordered from the US and my parcel arrived in just 4 days with pristine packing. The fabric is so soft, breathable, and authentic.",badge:"San Jose, USA",imageUrl:"",imageAlt:"",linkUrl:"#",ctaText:"",bgColor:"",displayOrder:3,isActive:true,metadata:{rating:5}}] },
-  footer: { sectionId: "footer", title: "", subtitle: "", description: "Celebrating timeless Indian royalty with handpicked silk sarees, designer ethnic sets, and authentic temple jewellery crafted for extraordinary celebrations.", badgeText: "", mediaUrl: "/homepage/logo2.png", mediaAlt: "Sree Collections", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "", ctaLink: "#", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: { phone: "+91 98765 43210", email: "support@sreecollections.com", copyright: "Sree Collections. All Rights Reserved." }, items: [{itemId:"footer-col-1",title:"Kanjeevaram Pure Silk",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#featured",ctaText:"",bgColor:"",displayOrder:1,isActive:true,metadata:{group:"collections"}},{itemId:"footer-col-2",title:"Banarasi Heritage Weaves",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#featured",ctaText:"",bgColor:"",displayOrder:2,isActive:true,metadata:{group:"collections"}},{itemId:"footer-col-3",title:"Bridal Lehengas & Kurtas",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#featured",ctaText:"",bgColor:"",displayOrder:3,isActive:true,metadata:{group:"collections"}},{itemId:"footer-col-4",title:"Temple Jewellery Sets",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#featured",ctaText:"",bgColor:"",displayOrder:4,isActive:true,metadata:{group:"collections"}},{itemId:"footer-col-5",title:"Everyday Casuals & Denims",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#featured",ctaText:"",bgColor:"",displayOrder:5,isActive:true,metadata:{group:"collections"}},{itemId:"footer-col-6",title:"Festive Home Decor",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#featured",ctaText:"",bgColor:"",displayOrder:6,isActive:true,metadata:{group:"collections"}},{itemId:"footer-care-1",title:"Track Your Order",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#home",ctaText:"",bgColor:"",displayOrder:1,isActive:true,metadata:{group:"customer-care"}},{itemId:"footer-care-2",title:"Shipping & Global Delivery",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#home",ctaText:"",bgColor:"",displayOrder:2,isActive:true,metadata:{group:"customer-care"}},{itemId:"footer-care-3",title:"Custom Blouse Stitching",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#home",ctaText:"",bgColor:"",displayOrder:3,isActive:true,metadata:{group:"customer-care"}},{itemId:"footer-care-4",title:"WhatsApp Live Video Call",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#home",ctaText:"",bgColor:"",displayOrder:4,isActive:true,metadata:{group:"customer-care"}},{itemId:"footer-care-5",title:"Returns & Exchanges",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#home",ctaText:"",bgColor:"",displayOrder:5,isActive:true,metadata:{group:"customer-care"}},{itemId:"footer-care-6",title:"Authenticity Certificate",subtitle:"",description:"",badge:"",imageUrl:"",imageAlt:"",linkUrl:"#home",ctaText:"",bgColor:"",displayOrder:6,isActive:true,metadata:{group:"customer-care"}}] },
+  "spotlight-casual": { sectionId: "spotlight-casual", title: "Casual Wear", subtitle: "Collections", description: "You offer your kids wardrobe to your journey wardrobe.", badgeText: "", mediaUrl: "/homepage/casual_model1.jpg", mediaAlt: "Casual Wear Model", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "Explore", ctaLink: "#featured", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{ itemId: "casual-card-1", title: "", subtitle: "", description: "", badge: "", imageUrl: "/homepage/casual_model2.jpg", imageAlt: "Casual fashion", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: { width: 200, height: 280 } }, { itemId: "casual-card-2", title: "", subtitle: "", description: "", badge: "", imageUrl: "/homepage/casual_model3.jpg", imageAlt: "Casual styling", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: { width: 180, height: 260, marginTop: 28 } }] },
+  "spotlight-saree": { sectionId: "spotlight-saree", title: "Saree", subtitle: "Collections", description: "You drape your traditions and beauty with our saree collections.", badgeText: "", mediaUrl: "", mediaAlt: "", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "Explore", ctaLink: "#featured", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{ itemId: "saree-card-1", title: "", subtitle: "", description: "", badge: "", imageUrl: "/homepage/saree_green.jpg", imageAlt: "Silk Saree", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: { width: 220, height: 340 } }, { itemId: "saree-card-2", title: "", subtitle: "", description: "", badge: "", imageUrl: "/homepage/saree_models.jpg", imageAlt: "Royal Silk Sarees", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: { width: 200, height: 310, marginTop: 36 } }] },
+  "spotlight-decor": { sectionId: "spotlight-decor", title: "Decorative Item", subtitle: "Collections", description: "You collect your craft and art décor here with our collections.", badgeText: "", mediaUrl: "", mediaAlt: "", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "Explore", ctaLink: "#featured", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{ itemId: "decor-card-1", title: "", subtitle: "", description: "", badge: "", imageUrl: "/homepage/decor_lights.jpg", imageAlt: "Festive Decor Diyas", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: { width: 220, height: 300 } }, { itemId: "decor-card-2", title: "", subtitle: "", description: "", badge: "", imageUrl: "/homepage/decor_handicraft.jpg", imageAlt: "Artisanal Handicrafts", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: { width: 200, height: 280, marginTop: 32 } }] },
+  "whatsapp-banner": { sectionId: "whatsapp-banner", title: "Curate your cart.", subtitle: "Complete on WhatsApp.", description: "", badgeText: "🛍 Shopping Made Personal", mediaUrl: "/homepage/img5.png", mediaAlt: "Sree Collections WhatsApp Shopping Bag", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "Chat on WhatsApp", ctaLink: "https://wa.me/?text=Hello%20Sree%20Collections%2C%20I%20want%20to%20shop!", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{ itemId: "wa-step-1", title: "Added Cart", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: {} }, { itemId: "wa-step-2", title: "WhatsApp", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: {} }, { itemId: "wa-step-3", title: "Order Confirmed", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 3, isActive: true, metadata: {} }] },
+  testimonials: { sectionId: "testimonials", title: "Why our Customer says", subtitle: "", description: "", badgeText: "", mediaUrl: "", mediaAlt: "", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "", ctaLink: "#", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{ itemId: "t1", title: "Priya Sundaram", subtitle: "Verified Bride", description: "The silk saree and the temple necklace set I ordered for my sister's wedding completely surpassed my expectations.", badge: "Chennai, India", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: { rating: 5 } }, { itemId: "t2", title: "Ananya Deshmukh", subtitle: "Verified Buyer", description: "Shopping via WhatsApp concierge was the smoothest experience ever. They shared detailed 4K close-up videos of the Banarasi weaves.", badge: "Mumbai, India", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: { rating: 5 } }, { itemId: "t3", title: "Radhika Patel", subtitle: "International Client", description: "Ordered from the US and my parcel arrived in just 4 days with pristine packing. The fabric is so soft, breathable, and authentic.", badge: "San Jose, USA", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 3, isActive: true, metadata: { rating: 5 } }] },
+  footer: { sectionId: "footer", title: "", subtitle: "", description: "Celebrating timeless Indian royalty with handpicked silk sarees, designer ethnic sets, and authentic temple jewellery crafted for extraordinary celebrations.", badgeText: "", mediaUrl: "/homepage/logo2.png", mediaAlt: "Sree Collections", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "", ctaLink: "#", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: { phone: "+91 98765 43210", email: "support@sreecollections.com", copyright: "Sree Collections. All Rights Reserved." }, items: [{ itemId: "footer-col-1", title: "Kanjeevaram Pure Silk", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-col-2", title: "Banarasi Heritage Weaves", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-col-3", title: "Bridal Lehengas & Kurtas", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 3, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-col-4", title: "Temple Jewellery Sets", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 4, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-col-5", title: "Everyday Casuals & Denims", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 5, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-col-6", title: "Festive Home Decor", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 6, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-care-1", title: "Track Your Order", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: { group: "customer-care" } }, { itemId: "footer-care-2", title: "Shipping & Global Delivery", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: { group: "customer-care" } }, { itemId: "footer-care-3", title: "Custom Blouse Stitching", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 3, isActive: true, metadata: { group: "customer-care" } }, { itemId: "footer-care-4", title: "WhatsApp Live Video Call", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 4, isActive: true, metadata: { group: "customer-care" } }, { itemId: "footer-care-5", title: "Returns & Exchanges", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 5, isActive: true, metadata: { group: "customer-care" } }, { itemId: "footer-care-6", title: "Authenticity Certificate", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 6, isActive: true, metadata: { group: "customer-care" } }] },
 };
 
 export default function HomePage() {
@@ -106,19 +103,17 @@ export default function HomePage() {
   const S = (id: string): CMSSection => cms[id] || FALLBACK_CMS[id] || {} as CMSSection;
   const items = (id: string) => (S(id).items || []).filter(i => i.isActive !== false);
   const testimonials = items("testimonials");
-  const footerCollections = items("footer").filter(i => (i.metadata as Record<string, unknown>)?.group === "collections");
-  const footerCare = items("footer").filter(i => (i.metadata as Record<string, unknown>)?.group === "customer-care");
   const mosaicItems = items("categories-mosaic");
-  const mosaicLeft = mosaicItems.filter(i => ["left-top","left-bottom"].includes(String((i.metadata as Record<string,unknown>)?.type || "")));
-  const mosaicRightTall = mosaicItems.find(i => (i.metadata as Record<string,unknown>)?.type === "right-tall");
-  const mosaicBottomSmallLeft = mosaicItems.find(i => (i.metadata as Record<string,unknown>)?.type === "bottom-small-left");
-  const mosaicBottomWide = mosaicItems.find(i => (i.metadata as Record<string,unknown>)?.type === "bottom-wide");
-  const mosaicBottomSmallRight = mosaicItems.find(i => (i.metadata as Record<string,unknown>)?.type === "bottom-small-right");
+  const mosaicLeft = mosaicItems.filter(i => ["left-top", "left-bottom"].includes(String((i.metadata as Record<string, unknown>)?.type || "")));
+  const mosaicRightTall = mosaicItems.find(i => (i.metadata as Record<string, unknown>)?.type === "right-tall");
+  const mosaicBottomSmallLeft = mosaicItems.find(i => (i.metadata as Record<string, unknown>)?.type === "bottom-small-left");
+  const mosaicBottomWide = mosaicItems.find(i => (i.metadata as Record<string, unknown>)?.type === "bottom-wide");
+  const mosaicBottomSmallRight = mosaicItems.find(i => (i.metadata as Record<string, unknown>)?.type === "bottom-small-right");
   const casualCards = items("spotlight-casual");
   const sareeCards = items("spotlight-saree");
   const decorCards = items("spotlight-decor");
   const waSteps = items("whatsapp-banner");
-  const navLinks = items("header").filter(i => ["nav-home","nav-about","nav-categories"].includes(i.itemId));
+  const navLinks = items("header").filter(i => ["nav-home", "nav-about", "nav-categories"].includes(i.itemId));
 
   return (
     <div style={{ backgroundColor: "#FCF8F2", minHeight: "100vh", overflowX: "hidden" }}>
@@ -805,68 +800,8 @@ export default function HomePage() {
           </h2>
         </div>
 
-        {/* Category Pill Filters */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "12px",
-            marginBottom: "36px",
-            flexWrap: "wrap",
-          }}
-        >
-          {["All", "Silk Sarees", "Bridal Lehengas", "Temple Jewellery", "Ethnic Casuals"].map(
-            (tab) => {
-              const isActive = activeTab.toLowerCase() === tab.toLowerCase() || (activeTab === "all" && tab === "All");
-              return (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab.toLowerCase())}
-                  style={{
-                    padding: "9px 24px",
-                    borderRadius: "24px",
-                    fontSize: "14px",
-                    fontWeight: 600,
-                    letterSpacing: "0.3px",
-                    transition: "all 0.25s ease",
-                    backgroundColor: isActive ? "#5D2030" : "#FFFDF9",
-                    color: isActive ? "#FFFFFF" : "#554D42",
-                    border: isActive ? "1px solid #5D2030" : "1px solid #E5D7C5",
-                    boxShadow: isActive ? "0 4px 14px rgba(93, 32, 48, 0.25)" : "none",
-                  }}
-                >
-                  {tab}
-                </button>
-              );
-            }
-          )}
-        </div>
-
-        {/* Featured Showcase: img3.png */}
-        <div
-          style={{
-            width: "100%",
-            maxWidth: "1440px",
-            margin: "0 auto",
-            position: "relative",
-            borderRadius: "32px",
-            overflow: "hidden",
-            boxShadow: "0 18px 45px rgba(93, 32, 48, 0.08)",
-            transition: "transform 0.35s ease",
-          }}
-          className="float-hover"
-        >
-          <img
-            src="/homepage/img3.png"
-            alt="Sree Collections Featured Fan Showcase"
-            style={{
-              width: "100%",
-              height: "auto",
-              display: "block",
-              borderRadius: "32px",
-            }}
-          />
-        </div>
+        {/* Dynamic Featured Collection Showcase (7-Card Curved Diamond Layout) */}
+        <FeaturedCardsShowcase />
       </section>
 
       {/* =========================================================================
@@ -1601,140 +1536,204 @@ export default function HomePage() {
       {/* =========================================================================
           7. CATEGORY SPOTLIGHT 1: CASUAL WEAR COLLECTIONS
          ========================================================================= */}
+      {/* =========================================================================
+          7. CATEGORY SPOTLIGHT 1: CASUAL WEAR COLLECTIONS
+         ========================================================================= */}
       <section
+        id="casual-wear"
         style={{
           width: "100%",
-          maxWidth: "1280px",
-          margin: "0 auto 90px auto",
-          padding: "0 40px",
+          maxWidth: "1140px",
+          margin: "0 auto 100px auto",
+          padding: "0 28px",
           boxSizing: "border-box",
         }}
       >
-        {/* Two-column layout: Left = text + small images, Right = tall portrait */}
+        {/* Top Header Row */}
+        <div
+          className="category-section-header"
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            flexWrap: "wrap",
+            gap: "24px",
+            marginBottom: "36px",
+          }}
+        >
+          <div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "10px", flexWrap: "wrap", marginBottom: "8px" }}>
+              <h2
+                style={{
+                  fontFamily: "'Blacker Display', 'Playfair Display', Georgia, serif",
+                  fontSize: "clamp(34px, 3.8vw, 44px)",
+                  fontWeight: 700,
+                  color: "#5D2030",
+                  margin: 0,
+                  lineHeight: 1.1,
+                }}
+              >
+                {S("spotlight-casual").title || "Casual Wear"}
+              </h2>
+              <span
+                style={{
+                  fontFamily: "'Blacker Display', 'Playfair Display', Georgia, serif",
+                  fontSize: "clamp(24px, 2.8vw, 32px)",
+                  fontWeight: 400,
+                  color: "#5D2030",
+                }}
+              >
+                {S("spotlight-casual").subtitle || "Collections"}
+              </span>
+            </div>
+            <p
+              style={{
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: "12px",
+                color: "#685F53",
+                margin: 0,
+                letterSpacing: "0.2px",
+              }}
+            >
+              We consider &nbsp;your look and comfort on scorching weather.
+            </p>
+          </div>
+
+          <div style={{ maxWidth: "390px" }}>
+            <p
+              style={{
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: "12.5px",
+                color: "#685F53",
+                lineHeight: 1.6,
+                margin: 0,
+              }}
+            >
+              We provide the largest clothing collection for your comfort. You can choose trendy or classy design according to your preferences. Our services are super fast and we update within 24 hours.
+            </p>
+          </div>
+        </div>
+
+        {/* Content Row: Left tall card + text; Right overlapping cards + Explore */}
         <div
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
-            gap: "60px",
-            alignItems: "center",
+            gap: "50px",
+            alignItems: "flex-end",
           }}
           className="category-section-grid"
         >
-          {/* Left: Heading + description + staggered small images */}
-          <div>
-            <h2
+          {/* Left Column */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px", maxWidth: "420px" }}>
+            <div
               style={{
-                fontFamily: "var(--font-serif)",
-                fontSize: "clamp(36px, 3.8vw, 52px)",
-                fontWeight: 700,
-                color: "#2F2C24",
-                lineHeight: 1.1,
-                marginBottom: "4px",
+                width: "100%",
+                height: "460px",
+                borderRadius: "24px",
+                overflow: "hidden",
+                boxShadow: "0 14px 36px rgba(93, 32, 48, 0.08)",
+                backgroundColor: "#F5EFE5",
               }}
+              className="float-hover"
             >
-              {S("spotlight-casual").title || "Casual Wear"}
-            </h2>
-            <h2
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontSize: "clamp(22px, 2.4vw, 32px)",
-                fontWeight: 400,
-                color: "#5D2030",
-                marginBottom: "18px",
-                lineHeight: 1.1,
-              }}
-            >
-              {S("spotlight-casual").subtitle || "Collections"}
-            </h2>
+              <img
+                src="/homepage/casual_model1.jpg"
+                alt="Casual Wear Model"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            </div>
             <p
               style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "14px",
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: "12px",
                 color: "#685F53",
-                lineHeight: 1.65,
-                maxWidth: "420px",
-                marginBottom: "32px",
+                lineHeight: 1.6,
+                margin: 0,
               }}
             >
-              {S("spotlight-casual").description || "You offer your kids wardrobe to your journey wardrobe."}
+              Our main aim is to serve our customer with better quality product. We try to understand their needs and provide them within a short period of time.
             </p>
+          </div>
 
-            {/* Staggered dual image cards */}
-            <div style={{ display: "flex", gap: "16px", alignItems: "flex-start", marginBottom: "36px" }}>
+          {/* Right Column */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+              gap: "28px",
+            }}
+          >
+            {/* Overlapping Dual Cards */}
+            <div style={{ position: "relative", width: "100%", maxWidth: "380px", height: "380px" }}>
+              {/* Back / Main image (pink co-ord set) */}
               <div
                 style={{
-                  width: "200px",
-                  height: "280px",
-                  borderRadius: "18px",
+                  position: "absolute",
+                  top: 0,
+                  right: 0,
+                  width: "270px",
+                  height: "350px",
+                  borderRadius: "24px",
                   overflow: "hidden",
-                  boxShadow: "0 12px 28px rgba(0,0,0,0.1)",
-                  flexShrink: 0,
+                  boxShadow: "0 16px 36px rgba(0,0,0,0.08)",
+                  backgroundColor: "#F5EFE5",
                 }}
                 className="float-hover"
               >
                 <img
-                  src={casualCards[0]?.imageUrl || "/homepage/casual_model2.jpg"}
-                  alt={casualCards[0]?.imageAlt || "Casual fashion"}
+                  src="/homepage/casual_model2.jpg"
+                  alt="Casual Pink Outfit"
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
               </div>
+
+              {/* Front Overlapping image (denim & sneakers) */}
               <div
                 style={{
-                  width: "180px",
-                  height: "260px",
-                  borderRadius: "18px",
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  width: "170px",
+                  height: "210px",
+                  borderRadius: "20px",
                   overflow: "hidden",
-                  boxShadow: "0 12px 28px rgba(0,0,0,0.1)",
-                  marginTop: "28px",
-                  flexShrink: 0,
+                  boxShadow: "0 14px 34px rgba(0,0,0,0.14)",
+                  backgroundColor: "#F5EFE5",
+                  zIndex: 2,
                 }}
                 className="float-hover"
               >
                 <img
-                  src={casualCards[1]?.imageUrl || "/homepage/casual_model3.jpg"}
-                  alt={casualCards[1]?.imageAlt || "Casual styling"}
+                  src="/homepage/casual_model3.jpg"
+                  alt="Denim and Sneakers"
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
               </div>
             </div>
 
-            <a
-              href={S("spotlight-casual").ctaLink || "#featured"}
+            {/* Explore Button */}
+            <Link
+              href="/categories?category=Casual+Wear"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                gap: "8px",
-                border: "1.5px solid #5D2030",
-                color: "#5D2030",
-                fontSize: "14px",
-                fontWeight: 600,
-                padding: "10px 26px",
-                borderRadius: "28px",
+                gap: "10px",
+                border: "1.5px solid #BB8E43",
+                color: "#BB8E43",
+                fontSize: "13.5px",
+                fontFamily: "'Playfair Display', Georgia, serif",
+                padding: "8px 28px",
+                borderRadius: "999px",
+                textDecoration: "none",
                 transition: "all 0.25s ease",
-                letterSpacing: "0.3px",
+                backgroundColor: "transparent",
               }}
-              className="secondary-btn"
+              className="cat-explore-pill-btn"
             >
-              {S("spotlight-casual").ctaText || "Explore"} <FiArrowRight size={14} />
-            </a>
-          </div>
-
-          {/* Right: tall portrait */}
-          <div
-            style={{
-              width: "100%",
-              height: "580px",
-              borderRadius: "24px",
-              overflow: "hidden",
-              boxShadow: "0 18px 45px rgba(93, 32, 48, 0.1)",
-            }}
-            className="float-hover"
-          >
-            <img
-              src={S("spotlight-casual").mediaUrl || "/homepage/casual_model1.jpg"}
-              alt={S("spotlight-casual").mediaAlt || "Casual Wear Model"}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
+              Explore <FiArrowRight size={14} />
+            </Link>
           </div>
         </div>
       </section>
@@ -1746,120 +1745,171 @@ export default function HomePage() {
         id="sarees"
         style={{
           width: "100%",
-          maxWidth: "1280px",
-          margin: "0 auto 90px auto",
-          padding: "0 40px",
+          maxWidth: "1140px",
+          margin: "0 auto 100px auto",
+          padding: "0 28px",
           boxSizing: "border-box",
         }}
       >
+        {/* Top Header Row */}
+        <div
+          className="category-section-header"
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            flexWrap: "wrap",
+            gap: "24px",
+            marginBottom: "36px",
+          }}
+        >
+          <div style={{ maxWidth: "390px" }}>
+            <p
+              style={{
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: "12.5px",
+                color: "#685F53",
+                lineHeight: 1.6,
+                margin: 0,
+              }}
+            >
+              We provide the largest collection sarees. You can choose trendy or classy design according to your preferences. Our services are super fast and we update within 24 hours.
+            </p>
+          </div>
+
+          <div className="header-text-right" style={{ textAlign: "right" }}>
+            <div style={{ display: "inline-flex", alignItems: "baseline", gap: "10px", flexWrap: "wrap", marginBottom: "8px" }}>
+              <h2
+                style={{
+                  fontFamily: "'Blacker Display', 'Playfair Display', Georgia, serif",
+                  fontSize: "clamp(34px, 3.8vw, 44px)",
+                  fontWeight: 700,
+                  color: "#5D2030",
+                  margin: 0,
+                  lineHeight: 1.1,
+                }}
+              >
+                Saree
+              </h2>
+              <span
+                style={{
+                  fontFamily: "'Blacker Display', 'Playfair Display', Georgia, serif",
+                  fontSize: "clamp(24px, 2.8vw, 32px)",
+                  fontWeight: 400,
+                  color: "#5D2030",
+                }}
+              >
+                Collections
+              </span>
+            </div>
+            <p
+              style={{
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: "12px",
+                color: "#685F53",
+                margin: 0,
+                letterSpacing: "0.2px",
+              }}
+            >
+              We consider &nbsp;your look and comfort on cold &nbsp;weather.
+            </p>
+          </div>
+        </div>
+
+        {/* Content Row: Left overlapping cards; Right text + Explore */}
         <div
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
-            gap: "60px",
+            gap: "50px",
             alignItems: "center",
           }}
           className="category-section-grid"
         >
-          {/* Left: Overlapping dual saree cards */}
-          <div style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
-            <div
-              style={{
-                width: "220px",
-                height: "340px",
-                borderRadius: "20px",
-                overflow: "hidden",
-                boxShadow: "0 16px 36px rgba(0,0,0,0.1)",
-                flexShrink: 0,
-              }}
-              className="float-hover"
-            >
-              <img
-                src={sareeCards[0]?.imageUrl || "/homepage/saree_green.jpg"}
-                alt={sareeCards[0]?.imageAlt || "Silk Saree"}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
-            </div>
-            <div
-              style={{
-                width: "200px",
-                height: "310px",
-                borderRadius: "20px",
-                overflow: "hidden",
-                boxShadow: "0 16px 36px rgba(0,0,0,0.1)",
-                marginTop: "36px",
-                flexShrink: 0,
-              }}
-              className="float-hover"
-            >
-              <img
-                src={sareeCards[1]?.imageUrl || "/homepage/saree_models.jpg"}
-                alt={sareeCards[1]?.imageAlt || "Royal Silk Sarees"}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
+          {/* Left Column: Overlapping Dual Saree Cards */}
+          <div>
+            <div style={{ position: "relative", width: "100%", maxWidth: "390px", height: "350px" }}>
+              {/* Back / Main image (two models in sarees) */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  right: 0,
+                  width: "230px",
+                  height: "310px",
+                  borderRadius: "24px",
+                  overflow: "hidden",
+                  boxShadow: "0 16px 36px rgba(0,0,0,0.08)",
+                  backgroundColor: "#F5EFE5",
+                }}
+                className="float-hover"
+              >
+                <img
+                  src="/homepage/saree_models.jpg"
+                  alt="Royal Silk Sarees"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              </div>
+
+              {/* Front Overlapping image (green & pink folded sarees) */}
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  width: "260px",
+                  height: "195px",
+                  borderRadius: "24px",
+                  overflow: "hidden",
+                  boxShadow: "0 14px 34px rgba(0,0,0,0.14)",
+                  backgroundColor: "#F5EFE5",
+                  zIndex: 2,
+                }}
+                className="float-hover"
+              >
+                <img
+                  src="/homepage/saree_green.jpg"
+                  alt="Handcrafted Silk Sarees"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              </div>
             </div>
           </div>
 
-          {/* Right: Heading + description */}
-          <div style={{ textAlign: "left" }}>
-            <h2
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontSize: "clamp(36px, 3.8vw, 52px)",
-                fontWeight: 700,
-                color: "#2F2C24",
-                lineHeight: 1.1,
-                marginBottom: "4px",
-                textAlign: "right",
-              }}
-            >
-              {S("spotlight-saree").title || "Saree"}
-            </h2>
-            <h2
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontSize: "clamp(22px, 2.4vw, 32px)",
-                fontWeight: 400,
-                color: "#5D2030",
-                marginBottom: "18px",
-                lineHeight: 1.1,
-                textAlign: "right",
-              }}
-            >
-              {S("spotlight-saree").subtitle || "Collections"}
-            </h2>
+          {/* Right Column: Paragraph + Explore Button */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "28px", maxWidth: "430px" }}>
             <p
               style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "14px",
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: "12px",
                 color: "#685F53",
-                lineHeight: 1.65,
-                marginBottom: "32px",
-                textAlign: "right",
+                lineHeight: 1.6,
+                margin: 0,
               }}
             >
-              {S("spotlight-saree").description || "You drape your traditions and beauty with our saree collections."}
+              Our main aim is to serve our customer with better quality product. We try to understand their needs and provide them within a short period of time. We provide the largest clothing collection for any season. You can choose trendy or classy design according to your preferences. Our services are super fast and we update within 24 hours.
             </p>
-            <div style={{ textAlign: "right" }}>
-              <a
-                href={S("spotlight-saree").ctaLink || "#featured"}
+            <div>
+              <Link
+                href="/categories?category=Saree"
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: "8px",
-                  border: "1.5px solid #5D2030",
-                  color: "#5D2030",
-                  fontSize: "14px",
-                  fontWeight: 600,
-                  padding: "10px 26px",
-                  borderRadius: "28px",
+                  gap: "10px",
+                  border: "1.5px solid #BB8E43",
+                  color: "#BB8E43",
+                  fontSize: "13.5px",
+                  fontFamily: "'Playfair Display', Georgia, serif",
+                  padding: "8px 28px",
+                  borderRadius: "999px",
+                  textDecoration: "none",
                   transition: "all 0.25s ease",
-                  letterSpacing: "0.3px",
+                  backgroundColor: "transparent",
                 }}
-                className="secondary-btn"
+                className="cat-explore-pill-btn"
               >
-                {S("spotlight-saree").ctaText || "Explore"} <FiArrowRight size={14} />
-              </a>
+                Explore <FiArrowRight size={14} />
+              </Link>
             </div>
           </div>
         </div>
@@ -1872,116 +1922,171 @@ export default function HomePage() {
         id="decor"
         style={{
           width: "100%",
-          maxWidth: "1280px",
-          margin: "0 auto 90px auto",
-          padding: "0 40px",
+          maxWidth: "1140px",
+          margin: "0 auto 100px auto",
+          padding: "0 28px",
           boxSizing: "border-box",
         }}
       >
+        {/* Top Header Row */}
+        <div
+          className="category-section-header"
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            flexWrap: "wrap",
+            gap: "24px",
+            marginBottom: "36px",
+          }}
+        >
+          <div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "10px", flexWrap: "wrap", marginBottom: "8px" }}>
+              <h2
+                style={{
+                  fontFamily: "'Blacker Display', 'Playfair Display', Georgia, serif",
+                  fontSize: "clamp(34px, 3.8vw, 44px)",
+                  fontWeight: 700,
+                  color: "#5D2030",
+                  margin: 0,
+                  lineHeight: 1.1,
+                }}
+              >
+                Decorative Item
+              </h2>
+              <span
+                style={{
+                  fontFamily: "'Blacker Display', 'Playfair Display', Georgia, serif",
+                  fontSize: "clamp(24px, 2.8vw, 32px)",
+                  fontWeight: 400,
+                  color: "#5D2030",
+                }}
+              >
+                Collections
+              </span>
+            </div>
+            <p
+              style={{
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: "12px",
+                color: "#685F53",
+                margin: 0,
+                letterSpacing: "0.2px",
+              }}
+            >
+              We consider &nbsp;your look and comfort on cold &nbsp;weather.
+            </p>
+          </div>
+
+          <div style={{ maxWidth: "390px" }}>
+            <p
+              style={{
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: "12.5px",
+                color: "#685F53",
+                lineHeight: 1.6,
+                margin: 0,
+              }}
+            >
+              We provide the largest clothing collection for any season. You can choose trendy or classy design according to your preferences. Our services are super fast and we update within 24 hours.
+            </p>
+          </div>
+        </div>
+
+        {/* Content Row: Left Explore + text; Right overlapping cards */}
         <div
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
-            gap: "60px",
+            gap: "50px",
             alignItems: "center",
           }}
           className="category-section-grid"
         >
-          {/* Left: Heading + description + explore button */}
-          <div>
-            <h2
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontSize: "clamp(36px, 3.8vw, 52px)",
-                fontWeight: 700,
-                color: "#2F2C24",
-                lineHeight: 1.1,
-                marginBottom: "4px",
-              }}
-            >
-              {S("spotlight-decor").title || "Decorative Item"}
-            </h2>
-            <h2
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontSize: "clamp(22px, 2.4vw, 32px)",
-                fontWeight: 400,
-                color: "#5D2030",
-                marginBottom: "18px",
-                lineHeight: 1.1,
-              }}
-            >
-              {S("spotlight-decor").subtitle || "Collections"}
-            </h2>
+          {/* Left Column: Explore Button + Paragraph */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "28px", maxWidth: "430px" }}>
+            <div>
+              <Link
+                href="/categories?category=Decorative+Items"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  border: "1.5px solid #BB8E43",
+                  color: "#BB8E43",
+                  fontSize: "13.5px",
+                  fontFamily: "'Playfair Display', Georgia, serif",
+                  padding: "8px 28px",
+                  borderRadius: "999px",
+                  textDecoration: "none",
+                  transition: "all 0.25s ease",
+                  backgroundColor: "transparent",
+                }}
+                className="cat-explore-pill-btn"
+              >
+                Explore <FiArrowRight size={14} />
+              </Link>
+            </div>
             <p
               style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "14px",
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: "12px",
                 color: "#685F53",
-                lineHeight: 1.65,
-                maxWidth: "420px",
-                marginBottom: "32px",
+                lineHeight: 1.6,
+                margin: 0,
               }}
             >
-              {S("spotlight-decor").description || "You collect your craft and art décor here with our collections."}
+              Our main aim is to serve our customer with better quality product. We try to understand their needs and provide them within a short period of time. We provide the largest clothing collection for any season. You can choose trendy or classy design according to your preferences. Our services are super fast and we update within 24 hours.
             </p>
-            <a
-              href={S("spotlight-decor").ctaLink || "#featured"}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                border: "1.5px solid #5D2030",
-                color: "#5D2030",
-                fontSize: "14px",
-                fontWeight: 600,
-                padding: "10px 26px",
-                borderRadius: "28px",
-                transition: "all 0.25s ease",
-                letterSpacing: "0.3px",
-              }}
-              className="secondary-btn"
-            >
-              {S("spotlight-decor").ctaText || "Explore"} <FiArrowRight size={14} />
-            </a>
           </div>
 
-          {/* Right: Staggered dual decor images */}
-          <div style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
-            <div
-              style={{
-                width: "220px",
-                height: "300px",
-                borderRadius: "20px",
-                overflow: "hidden",
-                boxShadow: "0 16px 36px rgba(0,0,0,0.08)",
-                flexShrink: 0,
-              }}
-              className="float-hover"
-            >
-              <img
-                src={decorCards[0]?.imageUrl || "/homepage/decor_lights.jpg"}
-                alt={decorCards[0]?.imageAlt || "Festive Decor Diyas"}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
-            </div>
-            <div
-              style={{
-                width: "200px",
-                height: "280px",
-                borderRadius: "20px",
-                overflow: "hidden",
-                boxShadow: "0 16px 36px rgba(0,0,0,0.08)",
-                marginTop: "32px",
-                flexShrink: 0,
-              }}
-              className="float-hover"
-            >
-              <img
-                src={decorCards[1]?.imageUrl || "/homepage/decor_handicraft.jpg"}
-                alt={decorCards[1]?.imageAlt || "Artisanal Handicrafts"}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
+          {/* Right Column: Overlapping Dual Decor Cards */}
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <div style={{ position: "relative", width: "100%", maxWidth: "390px", height: "350px" }}>
+              {/* Back / Main image (hanging star lights) */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  right: 0,
+                  width: "230px",
+                  height: "310px",
+                  borderRadius: "24px",
+                  overflow: "hidden",
+                  boxShadow: "0 16px 36px rgba(0,0,0,0.08)",
+                  backgroundColor: "#F5EFE5",
+                }}
+                className="float-hover"
+              >
+                <img
+                  src="/about/stars.jpg"
+                  alt="Festive Star Lanterns"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              </div>
+
+              {/* Front Overlapping image (party decor cones) */}
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  width: "260px",
+                  height: "195px",
+                  borderRadius: "24px",
+                  overflow: "hidden",
+                  boxShadow: "0 14px 34px rgba(0,0,0,0.14)",
+                  backgroundColor: "#F5EFE5",
+                  zIndex: 2,
+                }}
+                className="float-hover"
+              >
+                <img
+                  src="/about/party.jpg"
+                  alt="Festive Party Decor"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -2085,7 +2190,7 @@ export default function HomePage() {
                 flexWrap: "wrap",
               }}
             >
-              {(waSteps.length > 0 ? waSteps : [{itemId:"s1",title:"Added Cart"},{itemId:"s2",title:"WhatsApp"},{itemId:"s3",title:"Order Confirmed"}]).map((step, i, arr) => (
+              {(waSteps.length > 0 ? waSteps : [{ itemId: "s1", title: "Added Cart" }, { itemId: "s2", title: "WhatsApp" }, { itemId: "s3", title: "Order Confirmed" }]).map((step, i, arr) => (
                 <React.Fragment key={step.itemId}>
                   <span
                     style={{
@@ -2271,96 +2376,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* =========================================================================
-          12. FOOTER
-         ========================================================================= */}
-      <footer
-        id="footer"
-        style={{
-          width: "100%",
-          maxWidth: "1535px",
-          margin: "0 auto",
-          padding: "60px 32px 36px 32px",
-          borderTop: "2px solid #BB8E43",
-          boxSizing: "border-box",
-        }}
-      >
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-            gap: "40px",
-            marginBottom: "50px",
-          }}
-        >
-          <div>
-            <img
-              src={S("footer").mediaUrl || "/homepage/logo2.png"}
-              alt={S("footer").mediaAlt || "Sree Collections"}
-              style={{
-                height: "72px",
-                width: "auto",
-                objectFit: "contain",
-                marginBottom: "16px",
-              }}
-            />
-            <p style={{ color: "#685F53", fontSize: "14.5px", lineHeight: 1.6, maxWidth: "300px" }}>
-              {S("footer").description || "Celebrating timeless Indian royalty with handpicked silk sarees, designer ethnic sets, and authentic temple jewellery crafted for extraordinary celebrations."}
-            </p>
-            <div style={{ display: "flex", gap: "14px", marginTop: "20px" }}>
-              <a href="#" aria-label="Instagram" style={{ width: "36px", height: "36px", borderRadius: "50%", backgroundColor: "#F4EDE1", display: "flex", alignItems: "center", justifyContent: "center", color: "#5D2030" }}><FiInstagram size={17} /></a>
-              <a href="#" aria-label="Facebook" style={{ width: "36px", height: "36px", borderRadius: "50%", backgroundColor: "#F4EDE1", display: "flex", alignItems: "center", justifyContent: "center", color: "#5D2030" }}><FiFacebook size={17} /></a>
-              <a href="#" aria-label="WhatsApp" style={{ width: "36px", height: "36px", borderRadius: "50%", backgroundColor: "#F4EDE1", display: "flex", alignItems: "center", justifyContent: "center", color: "#5D2030" }}><FaWhatsapp size={17} /></a>
-              <a href="#" aria-label="Pinterest" style={{ width: "36px", height: "36px", borderRadius: "50%", backgroundColor: "#F4EDE1", display: "flex", alignItems: "center", justifyContent: "center", color: "#5D2030" }}><FaPinterest size={17} /></a>
-            </div>
-          </div>
-
-          <div>
-            <h4 style={{ fontFamily: "var(--font-serif)", fontSize: "18px", fontWeight: 700, color: "#5D2030", marginBottom: "18px" }}>Collections</h4>
-            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "12px", fontSize: "14.5px", color: "#685F53" }}>
-              {(footerCollections.length > 0 ? footerCollections : FALLBACK_CMS.footer.items.filter(i => i.metadata?.group === "collections")).map(item => (
-                <li key={item.itemId}><a href={item.linkUrl || "#featured"} className="footer-link">{item.title}</a></li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h4 style={{ fontFamily: "var(--font-serif)", fontSize: "18px", fontWeight: 700, color: "#5D2030", marginBottom: "18px" }}>Customer Care</h4>
-            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "12px", fontSize: "14.5px", color: "#685F53" }}>
-              {(footerCare.length > 0 ? footerCare : FALLBACK_CMS.footer.items.filter(i => i.metadata?.group === "customer-care")).map(item => (
-                <li key={item.itemId}><a href={item.linkUrl || "#home"} className="footer-link">{item.title}</a></li>
-              ))}
-            </ul>
-          </div>
-
-          <div id="contact">
-            <h4 style={{ fontFamily: "var(--font-serif)", fontSize: "18px", fontWeight: 700, color: "#5D2030", marginBottom: "18px" }}>Stay In Touch</h4>
-            <p style={{ fontSize: "14px", color: "#685F53", lineHeight: 1.5, marginBottom: "14px" }}>
-              Subscribe to unlock private festive previews, bridal edits, and seasonal offers.
-            </p>
-            <div style={{ display: "flex", gap: "8px", marginBottom: "18px" }}>
-              <input type="email" placeholder="Enter your email" style={{ flex: 1, padding: "11px 16px", borderRadius: "24px", border: "1px solid #DFBE7E", backgroundColor: "#FFFDF9", outline: "none", fontSize: "13.5px" }} />
-              <button style={{ backgroundColor: "#BB8E43", color: "#FFFFFF", padding: "11px 20px", borderRadius: "24px", fontSize: "13.5px", fontWeight: 600 }}>Join</button>
-            </div>
-            <div style={{ fontSize: "13.5px", color: "#685F53", display: "flex", flexDirection: "column", gap: "6px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}><FiPhone size={14} color="#BB8E43" /> {(S("footer").settings?.phone as string) || "+91 98765 43210"}</div>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}><FiMail size={14} color="#BB8E43" /> {(S("footer").settings?.email as string) || "support@sreecollections.com"}</div>
-            </div>
-          </div>
-        </div>
-
-        <div style={{ borderTop: "1px solid #EFE4D5", paddingTop: "24px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px", fontSize: "13.5px", color: "#887D70" }}>
-          <div>© {new Date().getFullYear()} {(S("footer").settings?.copyright as string) || "Sree Collections. All Rights Reserved."}</div>
-          <div style={{ display: "flex", gap: "24px" }}>
-            <a href="#" className="footer-link">Privacy Policy</a>
-            <a href="#" className="footer-link">Terms of Service</a>
-            <a href="#" className="footer-link">Security</a>
-          </div>
-        </div>
-      </footer>
-
-      {/* Responsive Styles */}
+{/* Responsive Styles */}
       <style>{`
         @media (min-width: 1400px) {
           .hero-main-title,
@@ -2481,7 +2497,21 @@ export default function HomePage() {
           }
         }
 
+        .cat-explore-pill-btn:hover {
+          background-color: #BB8E43 !important;
+          color: #FFFFFF !important;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 18px rgba(187, 142, 67, 0.25);
+        }
+
         @media (max-width: 768px) {
+          .category-section-header {
+            flex-direction: column !important;
+            gap: 16px !important;
+          }
+          .category-section-header .header-text-right {
+            text-align: left !important;
+          }
           .category-section-grid {
             grid-template-columns: 1fr !important;
             gap: 32px !important;
@@ -2535,10 +2565,6 @@ export default function HomePage() {
           background-color: #5D2030 !important;
           color: #FFFFFF !important;
           transform: translateY(-2px);
-        }
-        .footer-link:hover {
-          color: #5D2030 !important;
-          text-decoration: underline;
         }
       `}</style>
     </div>

@@ -62,7 +62,7 @@ body {
   background-color: var(--cream-bg);
   color: var(--dark);
   font-family: var(--font-sans);
-  overflow-x: hidden;
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
 }
 
