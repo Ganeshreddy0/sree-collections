@@ -153,6 +153,12 @@ export default function EditCategoryModal({
       }
 
       setSuccessMsg("Category updated successfully!");
+      try {
+        localStorage.setItem("category_updated_at", Date.now().toString());
+        new BroadcastChannel("cms_sync").postMessage("category_updated");
+      } catch {
+        /* noop */
+      }
       onSaveSuccess({
         id: category.id,
         _id: category._id,

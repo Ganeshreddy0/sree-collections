@@ -459,12 +459,219 @@ function ItemsManager({ section, onRefresh }: { section: HomepageSection; onRefr
   );
 }
 
-function SectionEditor({ section, onUpdated }: { section: HomepageSection; onUpdated: () => void }) {
+function AddSpotlightModal({
+  isOpen,
+  onClose,
+  onSuccess,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: (newSectionId: string) => void;
+}) {
+  const [title, setTitle] = useState("");
+  const [subtitle, setSubtitle] = useState("Collections");
+  const [tagline, setTagline] = useState("We consider your look and comfort on cold weather.");
+  const [categoryLink, setCategoryLink] = useState("");
+  const [ctaText, setCtaText] = useState("Explore");
+  const [layout, setLayout] = useState<"left-tall" | "left-overlapping" | "right-overlapping">("left-tall");
+  const [mainDesc, setMainDesc] = useState("We provide the largest clothing collection for your comfort. You can choose trendy or classy design according to your preferences. Our services are super fast and we update within 24 hours.");
+  const [secDesc, setSecDesc] = useState("Our main aim is to serve our customer with better quality product. We try to understand their needs and provide them within a short period of time.");
+  const [mediaUrl, setMediaUrl] = useState("/homepage/casual_model1.jpg");
+  const [secondaryMediaUrl, setSecondaryMediaUrl] = useState("/homepage/casual_model2.jpg");
+  const [tertiaryMediaUrl, setTertiaryMediaUrl] = useState("/homepage/casual_model3.jpg");
+  const [saving, setSaving] = useState(false);
+
+  // Auto-fill category link as title changes if link not customized
+  const handleTitleChange = (val: string) => {
+    setTitle(val);
+    if (!categoryLink || categoryLink.startsWith("/categories?category=")) {
+      setCategoryLink(`/categories?category=${encodeURIComponent(val)}`);
+    }
+  };
+
+  const handleCreate = async () => {
+    if (!title.trim()) {
+      alert("Please enter a category or spotlight title.");
+      return;
+    }
+    const slug = title.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-");
+    const sectionId = `spotlight-${slug}`;
+
+    setSaving(true);
+    try {
+      const res = await fetch(`${API}/homepage/admin`, {
+        method: "POST",
+        headers: { Authorization: AUTH, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sectionId,
+          displayName: `Category Spotlight: ${title}`,
+          title: title.trim(),
+          subtitle: subtitle.trim(),
+          badgeText: tagline.trim(),
+          description: mainDesc.trim(),
+          mediaUrl: mediaUrl.trim(),
+          mediaAlt: title.trim(),
+          secondaryMediaUrl: secondaryMediaUrl.trim(),
+          secondaryMediaAlt: `${title.trim()} Detail`,
+          tertiaryMediaUrl: tertiaryMediaUrl.trim(),
+          tertiaryMediaAlt: `${title.trim()} Front`,
+          ctaText: ctaText.trim() || "Explore",
+          ctaLink: categoryLink.trim() || `/categories?category=${encodeURIComponent(title.trim())}`,
+          isActive: true,
+          settings: {
+            layout,
+            secondaryDescription: secDesc.trim(),
+          },
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        localStorage.setItem("cms_updated_at", Date.now().toString());
+        try { new BroadcastChannel("cms_sync").postMessage("updated"); } catch {}
+        onSuccess(sectionId);
+        onClose();
+      } else {
+        alert(data.message || "Failed to create spotlight section.");
+      }
+    } catch {
+      alert("Network error creating spotlight section.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      style={{
+        position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+        backgroundColor: "rgba(30, 20, 25, 0.6)",
+        zIndex: 10000,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        padding: 20,
+        backdropFilter: "blur(4px)",
+      }}
+    >
+      <div
+        style={{
+          background: "#FFFFFF",
+          borderRadius: 16,
+          maxWidth: 680,
+          width: "100%",
+          maxHeight: "90vh",
+          overflowY: "auto",
+          padding: 28,
+          boxShadow: "0 24px 60px rgba(0,0,0,0.25)",
+          border: "1.5px solid #E5D7C5",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+          <div>
+            <h3 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#5A2035" }}>
+              Add New Category Spotlight
+            </h3>
+            <p style={{ margin: "4px 0 0 0", fontSize: 12, color: "#A8926B" }}>
+              Creates an editable spotlight section on the homepage linking directly to the category.
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            style={{ background: "#F5EFE6", border: "none", borderRadius: "50%", width: 32, height: 32, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+          >
+            <FiX size={16} color="#5A2035" />
+          </button>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+          <Field label="Category / Section Title *" value={title} onChange={handleTitleChange} placeholder="e.g. Bridal Jewellery, Silk Sarees" />
+          <Field label="Subtitle" value={subtitle} onChange={setSubtitle} placeholder="e.g. Collections" />
+        </div>
+
+        <div style={{ marginBottom: 14 }}>
+          <label style={{ fontSize: 12, fontWeight: 600, color: "#5A2035", display: "block", marginBottom: 5, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+            Spotlight Layout Style
+          </label>
+          <select
+            value={layout}
+            onChange={(e) => setLayout(e.target.value as any)}
+            style={{
+              width: "100%", padding: "9px 13px", borderRadius: 8,
+              border: "1px solid #E5D7C5", fontSize: 13, background: "#FDFAF5",
+              outline: "none", boxSizing: "border-box", fontFamily: "inherit",
+              color: "#2F2C24", fontWeight: 600,
+            }}
+          >
+            <option value="left-tall">Layout A: Left Tall Photo + Right Overlapping Photos (Casual Wear style)</option>
+            <option value="left-overlapping">Layout B: Left Overlapping Photos + Right Text & Button (Saree style)</option>
+            <option value="right-overlapping">Layout C: Left Text & Button + Right Overlapping Photos (Decorative Items style)</option>
+          </select>
+        </div>
+
+        <Field label="Tagline (Headline subtext)" value={tagline} onChange={setTagline} placeholder="e.g. We consider your look and comfort..." />
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 18px" }}>
+          <Field label="Category Redirection Link" value={categoryLink} onChange={setCategoryLink} placeholder="/categories?category=..." />
+          <Field label="Button Text" value={ctaText} onChange={setCtaText} placeholder="Explore" />
+        </div>
+
+        <Field label="Main Paragraph" value={mainDesc} onChange={setMainDesc} multiline placeholder="Primary descriptive text" />
+        <Field label="Secondary Paragraph" value={secDesc} onChange={setSecDesc} multiline placeholder="Secondary descriptive text" />
+
+        <div style={{ background: "#FDF8F0", borderRadius: 10, padding: 14, border: "1px solid #E5D7C5", margin: "16px 0" }}>
+          <h5 style={{ margin: "0 0 10px 0", fontSize: 13, color: "#5A2035", fontWeight: 700 }}>
+            Spotlight Photos
+          </h5>
+          <ImageUploader label="Photo 1 (Main Tall or Left Back)" value={mediaUrl} onChange={setMediaUrl} hint="e.g. /homepage/casual_model1.jpg or upload" />
+          <ImageUploader label="Photo 2 (Overlap Back or Front)" value={secondaryMediaUrl} onChange={setSecondaryMediaUrl} hint="e.g. /homepage/casual_model2.jpg or upload" />
+          {layout === "left-tall" && (
+            <ImageUploader label="Photo 3 (Small Front Overlap)" value={tertiaryMediaUrl} onChange={setTertiaryMediaUrl} hint="e.g. /homepage/casual_model3.jpg or upload" />
+          )}
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 20 }}>
+          <button
+            onClick={onClose}
+            style={{ background: "transparent", color: "#685F53", border: "1px solid #E5D7C5", borderRadius: 8, padding: "10px 20px", cursor: "pointer", fontSize: 13, fontWeight: 600 }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleCreate}
+            disabled={saving}
+            style={{
+              background: "#5A2035", color: "#FFFFFF", border: "none", borderRadius: 8,
+              padding: "10px 24px", cursor: "pointer", fontSize: 13, fontWeight: 700,
+              display: "flex", alignItems: "center", gap: 8, opacity: saving ? 0.7 : 1,
+            }}
+          >
+            {saving ? <FiRefreshCw size={14} className="spinning" /> : <FiPlus size={14} />}
+            {saving ? "Creating…" : "Create Spotlight Section"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SectionEditor({
+  section,
+  onUpdated,
+  onDeleted,
+}: {
+  section: HomepageSection;
+  onUpdated: () => void;
+  onDeleted?: (sectionId: string) => void;
+}) {
   const [local, setLocal] = useState<HomepageSection>({ ...section });
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
   useEffect(() => { setLocal({ ...section }); }, [section]);
+
+  const isSpotlight = local.sectionId.startsWith("spotlight-");
 
   const handleSave = async () => {
     setSaving(true);
@@ -473,21 +680,32 @@ function SectionEditor({ section, onUpdated }: { section: HomepageSection; onUpd
         method: "PUT",
         headers: { Authorization: AUTH, "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: local.title, subtitle: local.subtitle, description: local.description,
-          badgeText: local.badgeText, mediaUrl: local.mediaUrl, mediaAlt: local.mediaAlt,
-          secondaryMediaUrl: local.secondaryMediaUrl, secondaryMediaAlt: local.secondaryMediaAlt,
-          tertiaryMediaUrl: local.tertiaryMediaUrl, tertiaryMediaAlt: local.tertiaryMediaAlt,
-          ctaText: local.ctaText, ctaLink: local.ctaLink,
-          secondaryCtaText: local.secondaryCtaText, secondaryCtaLink: local.secondaryCtaLink,
-          displayOrder: local.displayOrder, isActive: local.isActive, settings: local.settings,
+          displayName: local.displayName,
+          title: local.title,
+          subtitle: local.subtitle,
+          description: local.description,
+          badgeText: local.badgeText,
+          mediaUrl: local.mediaUrl,
+          mediaAlt: local.mediaAlt,
+          secondaryMediaUrl: local.secondaryMediaUrl,
+          secondaryMediaAlt: local.secondaryMediaAlt,
+          tertiaryMediaUrl: local.tertiaryMediaUrl,
+          tertiaryMediaAlt: local.tertiaryMediaAlt,
+          ctaText: local.ctaText,
+          ctaLink: local.ctaLink,
+          secondaryCtaText: local.secondaryCtaText,
+          secondaryCtaLink: local.secondaryCtaLink,
+          displayOrder: local.displayOrder,
+          isActive: local.isActive,
+          settings: local.settings,
         }),
       });
       const data = await res.json();
       if (data.success) {
         // Broadcast to storefront tabs so they re-fetch immediately
         localStorage.setItem("cms_updated_at", Date.now().toString());
-        try { new BroadcastChannel("cms_sync").postMessage("updated"); } catch { /* unsupported */ }
-        setToast({ message: `"${section.displayName}" saved successfully!`, type: "success" });
+        try { new BroadcastChannel("cms_sync").postMessage("updated"); } catch {}
+        setToast({ message: `"${local.displayName || local.title}" saved successfully!`, type: "success" });
         onUpdated();
       } else {
         setToast({ message: data.message || "Failed to save section.", type: "error" });
@@ -499,9 +717,41 @@ function SectionEditor({ section, onUpdated }: { section: HomepageSection; onUpd
     }
   };
 
+  const handleDeleteSection = async () => {
+    if (!confirm(`Are you sure you want to delete "${local.displayName || local.title}"? This will remove it from the homepage.`)) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`${API}/homepage/admin/${local.sectionId}`, {
+        method: "DELETE",
+        headers: { Authorization: AUTH },
+      });
+      const data = await res.json();
+      if (data.success) {
+        localStorage.setItem("cms_updated_at", Date.now().toString());
+        try { new BroadcastChannel("cms_sync").postMessage("updated"); } catch {}
+        onDeleted?.(local.sectionId);
+      } else {
+        alert(data.message || "Failed to delete section.");
+      }
+    } catch {
+      alert("Network error deleting section.");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const set = (field: keyof HomepageSection, value: unknown) => {
     setLocal((prev) => ({ ...prev, [field]: value }));
   };
+
+  // Safe layout getter
+  const currentLayout =
+    (local.settings?.layout as string) ||
+    (local.sectionId.includes("casual")
+      ? "left-tall"
+      : local.sectionId.includes("saree")
+      ? "left-overlapping"
+      : "right-overlapping");
 
   return (
     <div>
@@ -510,8 +760,15 @@ function SectionEditor({ section, onUpdated }: { section: HomepageSection; onUpd
       {/* Section Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 22 }}>
         <div>
-          <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#2F2C24" }}>{section.displayName}</h2>
-          <p style={{ margin: "4px 0 0 0", fontSize: 12, color: "#A8926B" }}>sectionId: <code>{section.sectionId}</code></p>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#2F2C24" }}>{local.displayName || local.title}</h2>
+            {isSpotlight && (
+              <span style={{ background: "#F5EFE5", color: "#5A2035", border: "1px solid #DFBE7E", fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 6, textTransform: "uppercase" }}>
+                Spotlight Section
+              </span>
+            )}
+          </div>
+          <p style={{ margin: "4px 0 0 0", fontSize: 12, color: "#A8926B" }}>sectionId: <code>{local.sectionId}</code></p>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           {/* Active Toggle */}
@@ -534,50 +791,181 @@ function SectionEditor({ section, onUpdated }: { section: HomepageSection; onUpd
               boxShadow: "0 4px 14px rgba(90, 32, 53, 0.22)",
             }}
           >
-            {saving ? <FiRefreshCw size={14} /> : <FiSave size={14} />}
+            {saving ? <FiRefreshCw size={14} className="spinning" /> : <FiSave size={14} />}
             {saving ? "Saving…" : "Save Changes"}
           </button>
         </div>
       </div>
 
+      {/* Spotlight Notice Banner */}
+      {isSpotlight && (
+        <div style={{ background: "linear-gradient(135deg, #FBF3E2 0%, #F5E4C4 100%)", border: "1px solid #DFBE7E", borderRadius: 10, padding: "12px 18px", marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <strong style={{ color: "#5A2035", fontSize: 13 }}>Dynamic Category Spotlight</strong>
+            <p style={{ margin: "2px 0 0 0", fontSize: 12, color: "#685F53" }}>
+              This section is rendered dynamically on the storefront home page with luxury styling and direct category redirection.
+            </p>
+          </div>
+          <button
+            onClick={handleDeleteSection}
+            disabled={deleting}
+            style={{
+              background: "#FEE2E2", color: "#DC2626", border: "1px solid #FCA5A5", borderRadius: 8,
+              padding: "6px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer",
+              display: "flex", alignItems: "center", gap: 6,
+            }}
+          >
+            {deleting ? <FiRefreshCw size={12} className="spinning" /> : <FiTrash2 size={12} />}
+            {deleting ? "Deleting…" : "Delete Section"}
+          </button>
+        </div>
+      )}
+
+      {/* Layout Selection for Spotlights */}
+      {isSpotlight && (
+        <div style={{ background: "#FDFAF5", borderRadius: 12, padding: 18, border: "1px solid #E5D7C5", marginBottom: 20 }}>
+          <label style={{ fontSize: 12, fontWeight: 700, color: "#5A2035", display: "block", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+            Spotlight Layout Structure
+          </label>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+            {[
+              {
+                id: "left-tall",
+                title: "Layout A: Left Tall Photo",
+                desc: "Left tall card + Right dual overlapping cards + Explore button (Casual Wear)",
+              },
+              {
+                id: "left-overlapping",
+                title: "Layout B: Left Overlapping",
+                desc: "Left dual overlapping cards + Right headline, paragraph & Explore button (Saree)",
+              },
+              {
+                id: "right-overlapping",
+                title: "Layout C: Right Overlapping",
+                desc: "Left headline, paragraph & Explore button + Right dual overlapping cards (Decor)",
+              },
+            ].map((opt) => {
+              const selected = currentLayout === opt.id;
+              return (
+                <div
+                  key={opt.id}
+                  onClick={() => set("settings", { ...(local.settings || {}), layout: opt.id })}
+                  style={{
+                    border: selected ? "2px solid #5A2035" : "1px solid #E5D7C5",
+                    background: selected ? "#FBF3E6" : "#FFFFFF",
+                    borderRadius: 10,
+                    padding: 12,
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                  }}
+                >
+                  <p style={{ margin: "0 0 4px 0", fontSize: 13, fontWeight: 700, color: selected ? "#5A2035" : "#2F2C24" }}>
+                    {opt.title}
+                  </p>
+                  <p style={{ margin: 0, fontSize: 11, color: "#7A6A50", lineHeight: 1.4 }}>
+                    {opt.desc}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Form Fields Grid */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 24px" }}>
-        <Field label="Title / Heading" value={local.title} onChange={v => set("title", v)} placeholder="Main heading text" />
-        <Field label="Subtitle" value={local.subtitle} onChange={v => set("subtitle", v)} placeholder="Secondary heading or label" />
-        <Field label="Badge / Label Text" value={local.badgeText} onChange={v => set("badgeText", v)} placeholder="e.g. Discover By Category" />
-        <Field label="Display Order" value={String(local.displayOrder)} onChange={v => set("displayOrder", parseInt(v) || 0)} type="number" placeholder="1-12" />
-        <Field label="Primary CTA Text" value={local.ctaText} onChange={v => set("ctaText", v)} placeholder="SHOP NOW" />
-        <Field label="Primary CTA Link" value={local.ctaLink} onChange={v => set("ctaLink", v)} placeholder="#featured or /categories" />
-        <Field label="Secondary CTA Text" value={local.secondaryCtaText} onChange={v => set("secondaryCtaText", v)} placeholder="EXPLORE MORE" />
-        <Field label="Secondary CTA Link" value={local.secondaryCtaLink} onChange={v => set("secondaryCtaLink", v)} placeholder="#categories" />
+        <Field
+          label={isSpotlight ? "Category / Headline Title" : "Title / Heading"}
+          value={local.title}
+          onChange={v => set("title", v)}
+          placeholder="Main heading text"
+        />
+        <Field
+          label={isSpotlight ? "Category Subtitle (e.g. Collections)" : "Subtitle"}
+          value={local.subtitle}
+          onChange={v => set("subtitle", v)}
+          placeholder="Secondary heading or label"
+        />
+        <Field
+          label={isSpotlight ? "Tagline / Badge Text" : "Badge / Label Text"}
+          value={local.badgeText}
+          onChange={v => set("badgeText", v)}
+          placeholder="e.g. We consider your look and comfort..."
+        />
+        <Field
+          label="Display Order (Sorting on Page)"
+          value={String(local.displayOrder ?? "")}
+          onChange={v => set("displayOrder", parseInt(v) || 0)}
+          type="number"
+          placeholder="1-12"
+        />
+        <Field
+          label={isSpotlight ? "Button Text (e.g. Explore)" : "Primary CTA Text"}
+          value={local.ctaText}
+          onChange={v => set("ctaText", v)}
+          placeholder="Explore"
+        />
+        <Field
+          label={isSpotlight ? "Category Redirection Link" : "Primary CTA Link"}
+          value={local.ctaLink}
+          onChange={v => set("ctaLink", v)}
+          placeholder="/categories?category=Casual+Wear"
+        />
+        {!isSpotlight && (
+          <>
+            <Field label="Secondary CTA Text" value={local.secondaryCtaText} onChange={v => set("secondaryCtaText", v)} placeholder="EXPLORE MORE" />
+            <Field label="Secondary CTA Link" value={local.secondaryCtaLink} onChange={v => set("secondaryCtaLink", v)} placeholder="#categories" />
+          </>
+        )}
       </div>
-      <Field label="Description / Body Text" value={local.description} onChange={v => set("description", v)} multiline placeholder="Supporting text shown in this section" />
+
+      <Field
+        label={isSpotlight ? "Primary Description Paragraph (Header Row)" : "Description / Body Text"}
+        value={local.description}
+        onChange={v => set("description", v)}
+        multiline
+        placeholder="Supporting text shown in this section"
+      />
+
+      {isSpotlight && (
+        <Field
+          label="Secondary Description Paragraph (Content Row next to button/cards)"
+          value={((local.settings?.secondaryDescription as string) || "")}
+          onChange={v => set("settings", { ...(local.settings || {}), secondaryDescription: v })}
+          multiline
+          placeholder="Secondary description shown beneath the card or button..."
+        />
+      )}
 
       {/* Media Section */}
       <div style={{ background: "#F7F1E8", borderRadius: 12, padding: 18, border: "1px solid #E5D7C5", marginBottom: 20 }}>
-        <h4 style={{ margin: "0 0 16px 0", fontSize: 14, fontWeight: 700, color: "#5A2035" }}>Media & Images</h4>
+        <h4 style={{ margin: "0 0 16px 0", fontSize: 14, fontWeight: 700, color: "#5A2035" }}>
+          {isSpotlight ? "Spotlight Media & Cards" : "Media & Images"}
+        </h4>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 24px" }}>
           <ImageUploader
-            label="Primary Media (Image / Logo)"
+            label={isSpotlight ? "Photo 1 (Main Card / Overlap Back)" : "Primary Media (Image / Logo)"}
             value={local.mediaUrl}
             onChange={v => set("mediaUrl", v)}
-            hint="Main image, hero image, logo, or delivery truck"
+            hint={isSpotlight ? "Main tall card or back overlapping photo" : "Main image, hero image, logo, or delivery truck"}
           />
           <ImageUploader
-            label="Secondary Media"
+            label={isSpotlight ? "Photo 2 (Overlapping Front/Back Photo)" : "Secondary Media"}
             value={local.secondaryMediaUrl}
             onChange={v => set("secondaryMediaUrl", v)}
-            hint="Second image, hero column 2, pill image 2, etc."
+            hint={isSpotlight ? "Second photo for dual overlapping stack" : "Second image, hero column 2, pill image 2, etc."}
           />
           <Field label="Primary Media Alt Text" value={local.mediaAlt} onChange={v => set("mediaAlt", v)} placeholder="Accessible alt description" />
           <Field label="Secondary Media Alt Text" value={local.secondaryMediaAlt} onChange={v => set("secondaryMediaAlt", v)} placeholder="Accessible alt description" />
-          {(local.tertiaryMediaUrl !== undefined) && (
+
+          {/* Tertiary Media */}
+          {(isSpotlight || local.tertiaryMediaUrl !== undefined) && (
             <>
               <ImageUploader
-                label="Tertiary Media (Hero Col 3, etc.)"
+                label={isSpotlight ? "Photo 3 (Front Overlap Photo for Layout A)" : "Tertiary Media (Hero Col 3, etc.)"}
                 value={local.tertiaryMediaUrl}
                 onChange={v => set("tertiaryMediaUrl", v)}
-                hint="Third image slot (e.g. hero column 3)"
+                hint={isSpotlight ? "Front overlapping card in Layout A (e.g. sneakers / detail photo)" : "Third image slot (e.g. hero column 3)"}
               />
               <Field label="Tertiary Media Alt Text" value={local.tertiaryMediaAlt} onChange={v => set("tertiaryMediaAlt", v)} placeholder="Accessible alt description" />
             </>
@@ -585,8 +973,8 @@ function SectionEditor({ section, onUpdated }: { section: HomepageSection; onUpd
         </div>
       </div>
 
-      {/* Settings (JSON) for advanced config */}
-      {Object.keys(local.settings || {}).length > 0 && (
+      {/* Settings (JSON) for non-spotlight advanced config */}
+      {!isSpotlight && Object.keys(local.settings || {}).length > 0 && (
         <div style={{ background: "#F7F1E8", borderRadius: 12, padding: 18, border: "1px solid #E5D7C5", marginBottom: 20 }}>
           <h4 style={{ margin: "0 0 10px 0", fontSize: 14, fontWeight: 700, color: "#5A2035" }}>Advanced Settings</h4>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 24px" }}>
@@ -604,6 +992,24 @@ function SectionEditor({ section, onUpdated }: { section: HomepageSection; onUpd
 
       {/* Items Manager */}
       <ItemsManager section={local} onRefresh={onUpdated} />
+
+      {/* Bottom Delete Button for Spotlights */}
+      {isSpotlight && (
+        <div style={{ marginTop: 24, paddingTop: 18, borderTop: "1px solid #E5D7C5", display: "flex", justifyContent: "flex-end" }}>
+          <button
+            onClick={handleDeleteSection}
+            disabled={deleting}
+            style={{
+              background: "#FEE2E2", color: "#DC2626", border: "1px solid #FCA5A5", borderRadius: 8,
+              padding: "9px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer",
+              display: "flex", alignItems: "center", gap: 6,
+            }}
+          >
+            {deleting ? <FiRefreshCw size={13} className="spinning" /> : <FiTrash2 size={13} />}
+            {deleting ? "Deleting Section…" : "Delete This Spotlight Section"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -614,6 +1020,7 @@ export default function HomepageCMSPage() {
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
   const [seeding, setSeeding] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isAddSpotlightOpen, setIsAddSpotlightOpen] = useState(false);
 
   const fetchSections = useCallback(async () => {
     setLoading(true);
@@ -624,9 +1031,10 @@ export default function HomepageCMSPage() {
       });
       const data = await res.json();
       if (data.success) {
-        setSections(data.ordered || Object.values(data.data || {}));
-        if (!activeSectionId && data.ordered?.length) {
-          setActiveSectionId(data.ordered[0].sectionId);
+        const list = data.ordered || Object.values(data.data || {});
+        setSections(list);
+        if (!activeSectionId && list.length) {
+          setActiveSectionId(list[0].sectionId);
         }
       } else {
         setError(data.message || "Failed to load homepage sections.");
@@ -656,6 +1064,21 @@ export default function HomepageCMSPage() {
     finally { setSeeding(false); }
   };
 
+  const handleSectionDeleted = (deletedId: string) => {
+    const remaining = sections.filter(s => s.sectionId !== deletedId);
+    setSections(remaining);
+    if (activeSectionId === deletedId && remaining.length > 0) {
+      setActiveSectionId(remaining[0].sectionId);
+    }
+    fetchSections();
+  };
+
+  const handleSpotlightCreated = (newSectionId: string) => {
+    fetchSections().then(() => {
+      setActiveSectionId(newSectionId);
+    });
+  };
+
   const activeSection = sections.find(s => s.sectionId === activeSectionId);
 
   return (
@@ -666,15 +1089,32 @@ export default function HomepageCMSPage() {
         .spinning { animation: spin 0.8s linear infinite; }
       `}</style>
 
+      {/* Add Spotlight Modal */}
+      <AddSpotlightModal
+        isOpen={isAddSpotlightOpen}
+        onClose={() => setIsAddSpotlightOpen(false)}
+        onSuccess={handleSpotlightCreated}
+      />
+
       {/* Page Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "#2F2C24" }}>Homepage CMS</h1>
           <p style={{ margin: "4px 0 0 0", fontSize: 13, color: "#A8926B" }}>
-            Manage all non-exempt homepage sections. <strong style={{ color: "#5A2035" }}>Featured Collection is protected and excluded.</strong>
+            Manage all non-exempt homepage sections & Category Spotlights. <strong style={{ color: "#5A2035" }}>Featured Collection is protected and excluded.</strong>
           </p>
         </div>
         <div style={{ display: "flex", gap: 12 }}>
+          <button
+            onClick={() => setIsAddSpotlightOpen(true)}
+            style={{
+              background: "#5A2035", color: "#FFFFFF", border: "none", borderRadius: 8,
+              padding: "9px 18px", cursor: "pointer", display: "flex", alignItems: "center",
+              gap: 8, fontSize: 13, fontWeight: 700, boxShadow: "0 4px 12px rgba(90, 32, 53, 0.2)",
+            }}
+          >
+            <FiPlus size={15} /> Add Category Spotlight
+          </button>
           <button
             onClick={fetchSections} disabled={loading}
             style={{ background: "#F7F1E8", color: "#5A2035", border: "1px solid #E5D7C5", borderRadius: 8, padding: "9px 16px", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600 }}
@@ -691,7 +1131,7 @@ export default function HomepageCMSPage() {
             href="http://localhost:3000"
             target="_blank"
             rel="noreferrer"
-            style={{ background: "#5A2035", color: "#fff", border: "none", borderRadius: 8, padding: "9px 16px", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, textDecoration: "none" }}
+            style={{ background: "#F7F1E8", color: "#5A2035", border: "1px solid #E5D7C5", borderRadius: 8, padding: "9px 16px", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, textDecoration: "none" }}
           >
             <FiEye size={14} /> Preview Site
           </a>
@@ -710,13 +1150,27 @@ export default function HomepageCMSPage() {
           <p style={{ color: "#A8926B", fontSize: 14 }}>Loading homepage sections…</p>
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: 24, alignItems: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: 24, alignItems: "start" }}>
           {/* Section Sidebar */}
           <div style={{ background: "#FDFAF5", borderRadius: 14, border: "1px solid #E5D7C5", padding: 12, position: "sticky", top: 24 }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: "#A8926B", textTransform: "uppercase", letterSpacing: "0.8px", margin: "0 0 10px 6px" }}>
-              Sections ({sections.length})
-            </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, padding: "0 4px" }}>
+              <p style={{ fontSize: 11, fontWeight: 700, color: "#A8926B", textTransform: "uppercase", letterSpacing: "0.8px", margin: 0 }}>
+                Sections ({sections.length})
+              </p>
+              <button
+                onClick={() => setIsAddSpotlightOpen(true)}
+                style={{
+                  background: "#5A2035", color: "#FFFFFF", border: "none", borderRadius: 6,
+                  padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer",
+                  display: "flex", alignItems: "center", gap: 4,
+                }}
+                title="Add a new Spotlight section"
+              >
+                <FiPlus size={11} /> + Spotlight
+              </button>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 3, maxHeight: "calc(100vh - 240px)", overflowY: "auto" }}>
               {sections.map(s => (
                 <SectionTab
                   key={s.sectionId}
@@ -726,6 +1180,7 @@ export default function HomepageCMSPage() {
                 />
               ))}
             </div>
+
             <div style={{ marginTop: 16, padding: "12px 14px", background: "#F0E8D8", borderRadius: 8, border: "1px solid #DBC49A" }}>
               <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: "#5A2035", marginBottom: 4 }}>🔒 Protected</p>
               <p style={{ margin: 0, fontSize: 11, color: "#7A6A50" }}>Featured Collection is excluded per Rule A and cannot be managed here.</p>
@@ -739,6 +1194,7 @@ export default function HomepageCMSPage() {
                 key={activeSection.sectionId}
                 section={activeSection}
                 onUpdated={fetchSections}
+                onDeleted={handleSectionDeleted}
               />
             ) : (
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 300, color: "#A8926B", fontSize: 14 }}>
@@ -751,3 +1207,4 @@ export default function HomepageCMSPage() {
     </AdminShell>
   );
 }
+

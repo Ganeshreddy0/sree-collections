@@ -92,6 +92,91 @@ export const getAdminSection = async (req, res, next) => {
 };
 
 // ─────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────
+// ADMIN: POST /api/homepage/admin
+// Creates a new homepage section (e.g. new Spotlight section).
+// ─────────────────────────────────────────────────────────
+export const createAdminSection = async (req, res, next) => {
+  try {
+    const {
+      sectionId, displayName, title, subtitle, description, badgeText,
+      mediaUrl, mediaAlt, secondaryMediaUrl, secondaryMediaAlt,
+      tertiaryMediaUrl, tertiaryMediaAlt, ctaText, ctaLink,
+      secondaryCtaText, secondaryCtaLink, displayOrder, isActive,
+      settings, items
+    } = req.body;
+
+    if (!sectionId || !String(sectionId).trim()) {
+      return res.status(400).json({ success: false, message: 'sectionId is required.' });
+    }
+
+    const cleanSectionId = String(sectionId).toLowerCase().trim().replace(/[^a-z0-9_-]+/g, '-');
+
+    if (isProtectedSection(cleanSectionId)) {
+      return res.status(403).json({ success: false, message: `Section "${cleanSectionId}" is protected and cannot be created.` });
+    }
+
+    const exists = await HomepageSection.findOne({ sectionId: cleanSectionId });
+    if (exists) {
+      return res.status(409).json({ success: false, message: `Section with ID "${cleanSectionId}" already exists.` });
+    }
+
+    const maxOrder = await HomepageSection.findOne().sort({ displayOrder: -1 }).select('displayOrder');
+    const nextOrder = displayOrder !== undefined ? Number(displayOrder) : ((maxOrder?.displayOrder || 0) + 1);
+
+    const section = await HomepageSection.create({
+      sectionId: cleanSectionId,
+      displayName: displayName || title || cleanSectionId,
+      title: title || '',
+      subtitle: subtitle || '',
+      description: description || '',
+      badgeText: badgeText || '',
+      mediaUrl: mediaUrl || '',
+      mediaAlt: mediaAlt || '',
+      secondaryMediaUrl: secondaryMediaUrl || '',
+      secondaryMediaAlt: secondaryMediaAlt || '',
+      tertiaryMediaUrl: tertiaryMediaUrl || '',
+      tertiaryMediaAlt: tertiaryMediaAlt || '',
+      ctaText: ctaText || 'Explore',
+      ctaLink: ctaLink || '#',
+      secondaryCtaText: secondaryCtaText || '',
+      secondaryCtaLink: secondaryCtaLink || '',
+      displayOrder: nextOrder,
+      isActive: isActive !== false,
+      settings: settings || {},
+      items: Array.isArray(items) ? items : [],
+    });
+
+    res.status(201).json({ success: true, data: section });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ─────────────────────────────────────────────────────────
+// ADMIN: DELETE /api/homepage/admin/:sectionId
+// Deletes a homepage section.
+// ─────────────────────────────────────────────────────────
+export const deleteAdminSection = async (req, res, next) => {
+  try {
+    const { sectionId } = req.params;
+
+    if (isProtectedSection(sectionId)) {
+      return res.status(403).json({ success: false, message: `Section "${sectionId}" is protected and cannot be deleted.` });
+    }
+
+    const section = await HomepageSection.findOneAndDelete({ sectionId });
+    if (!section) {
+      return res.status(404).json({ success: false, message: `Section "${sectionId}" not found.` });
+    }
+
+    res.json({ success: true, message: `Section "${sectionId}" deleted successfully.`, data: section });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ─────────────────────────────────────────────────────────
 // ADMIN: PUT /api/homepage/admin/:sectionId
 // Updates section-level fields (headings, media, CTAs, visibility, order, settings).
 // ─────────────────────────────────────────────────────────
@@ -107,7 +192,7 @@ export const updateAdminSection = async (req, res, next) => {
     }
 
     const allowedFields = [
-      'title', 'subtitle', 'description', 'badgeText',
+      'displayName', 'title', 'subtitle', 'description', 'badgeText',
       'mediaUrl', 'mediaAlt', 'secondaryMediaUrl', 'secondaryMediaAlt',
       'tertiaryMediaUrl', 'tertiaryMediaAlt',
       'ctaText', 'ctaLink', 'secondaryCtaText', 'secondaryCtaLink',

@@ -75,6 +75,10 @@ export default function CategoriesPage() {
     const res = await fetch(`${API}/categories/${id}/status`, { method: "PATCH", headers: { Authorization: AUTH } });
     const data = await res.json();
     if (data.success) {
+      try {
+        localStorage.setItem("category_updated_at", Date.now().toString());
+        new BroadcastChannel("cms_sync").postMessage("category_updated");
+      } catch { /* noop */ }
       setRows((prev) => prev.map((r) => r.id === id ? { ...r, status: data.data.status } : r));
     }
   };
@@ -82,7 +86,13 @@ export default function CategoriesPage() {
   const confirmDeleteCategory = async () => {
     if (!deletingCategory) return;
     const res = await fetch(`${API}/categories/${deletingCategory.id}`, { method: "DELETE", headers: { Authorization: AUTH } });
-    if (res.ok) setRows((prev) => prev.filter((r) => r.id !== deletingCategory.id));
+    if (res.ok) {
+      try {
+        localStorage.setItem("category_updated_at", Date.now().toString());
+        new BroadcastChannel("cms_sync").postMessage("category_updated");
+      } catch { /* noop */ }
+      setRows((prev) => prev.filter((r) => r.id !== deletingCategory.id));
+    }
   };
 
   const handleSaveCategory = (updated: CategoryData) => {
