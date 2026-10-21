@@ -258,19 +258,57 @@ export default function HomePage() {
             </Link>
           </nav>
 
-          {/* Mobile Hamburger */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
+          {/* Mobile Right Actions: Search + Cart + Hamburger */}
+          <div
             style={{
               display: "none",
-              padding: "8px",
-              color: "#2F2C24",
+              alignItems: "center",
+              gap: "8px",
             }}
-            className="mobile-hamburger"
+            className="mobile-header-actions"
           >
-            {mobileMenuOpen ? <FiX size={26} /> : <FiMenu size={26} />}
-          </button>
+            <a
+              href="/search"
+              aria-label="Search"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#5A2035",
+                padding: "6px",
+              }}
+            >
+              <FiSearch size={21} strokeWidth={2} />
+            </a>
+            <Link
+              href="/cart"
+              aria-label="Shopping Cart"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#5A2035",
+                padding: "6px",
+                position: "relative",
+              }}
+            >
+              <FiShoppingCart size={21} strokeWidth={2} />
+            </Link>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+              style={{
+                padding: "6px",
+                color: "#2F2C24",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+              }}
+              className="mobile-hamburger"
+            >
+              {mobileMenuOpen ? <FiX size={25} /> : <FiMenu size={25} />}
+            </button>
+          </div>
         </header>
       </div>
 
@@ -404,36 +442,40 @@ export default function HomePage() {
               margin: "0 0 6px 0",
             }}
           >
-            Dive Into A W
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                verticalAlign: "middle",
-                margin: "0 4px",
-                width: "0.8em",
-                height: "0.8em",
-                transform: "translateY(-0.06em)",
-              }}
-            >
-              <svg viewBox="0 0 100 100" style={{ width: "100%", height: "100%", display: "block" }}>
-                <circle cx="50" cy="50" r="48" fill="#BA8E43" />
-                <circle cx="50" cy="50" r="44" fill="#B3863B" stroke="#DFC487" strokeWidth="1.2" />
-                <g fill="#FFFDF8">
-                  {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
-                    <path
-                      key={i}
-                      d="M 50 16 C 54.5 16, 55 35, 50 41 C 45 35, 45.5 16, 50 16 Z"
-                      transform={`rotate(${angle} 50 50)`}
-                    />
-                  ))}
-                </g>
-                <circle cx="50" cy="50" r="7.5" fill="#BA8E43" stroke="#FFFDF8" strokeWidth="2" />
-                <circle cx="50" cy="50" r="2.5" fill="#FFFDF8" />
-              </svg>
-            </span>
-            Rld Of Endless
+            Dive Into A{" "}
+            <span style={{ display: "inline-flex", alignItems: "center", whiteSpace: "nowrap" }}>
+              W
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  verticalAlign: "middle",
+                  margin: "0 4px",
+                  width: "0.8em",
+                  height: "0.8em",
+                  transform: "translateY(-0.06em)",
+                }}
+              >
+                <svg viewBox="0 0 100 100" style={{ width: "100%", height: "100%", display: "block" }}>
+                  <circle cx="50" cy="50" r="48" fill="#BA8E43" />
+                  <circle cx="50" cy="50" r="44" fill="#B3863B" stroke="#DFC487" strokeWidth="1.2" />
+                  <g fill="#FFFDF8">
+                    {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
+                      <path
+                        key={i}
+                        d="M 50 16 C 54.5 16, 55 35, 50 41 C 45 35, 45.5 16, 50 16 Z"
+                        transform={`rotate(${angle} 50 50)`}
+                      />
+                    ))}
+                  </g>
+                  <circle cx="50" cy="50" r="7.5" fill="#BA8E43" stroke="#FFFDF8" strokeWidth="2" />
+                  <circle cx="50" cy="50" r="2.5" fill="#FFFDF8" />
+                </svg>
+              </span>
+              Rld
+            </span>{" "}
+            Of Endless
           </h1>
 
           {/* Line 2: Fashion Possibilities + Subtitle */}
@@ -1021,7 +1063,7 @@ export default function HomePage() {
                 boxShadow: "0 10px 28px rgba(0,0,0,0.04)",
                 transition: "all 0.35s ease",
               }}
-              className="float-hover"
+              className="float-hover mosaic-split-card"
             >
               <div
                 style={{
@@ -1032,6 +1074,7 @@ export default function HomePage() {
                   justifyContent: "space-between",
                   zIndex: 2,
                 }}
+                className="mosaic-card-text-wrap"
               >
                 <div>
                   <span
@@ -1075,7 +1118,7 @@ export default function HomePage() {
                   {(mosaicLeft[0]?.ctaText) || "Shop Denims"} <FiArrowRight size={15} />
                 </a>
               </div>
-              <div style={{ width: "48%", height: "100%", position: "relative" }}>
+              <div style={{ width: "48%", height: "100%", position: "relative" }} className="mosaic-card-img-wrap">
                 <img
                   src={mosaicLeft[0]?.imageUrl || "/homepage/mosaic_denim.jpg"}
                   alt={mosaicLeft[0]?.imageAlt || "Denim Jeans"}
@@ -1101,9 +1144,9 @@ export default function HomePage() {
                 boxShadow: "0 10px 28px rgba(0,0,0,0.04)",
                 transition: "all 0.35s ease",
               }}
-              className="float-hover"
+              className="float-hover mosaic-split-card"
             >
-              <div style={{ width: "48%", height: "100%", position: "relative" }}>
+              <div style={{ width: "48%", height: "100%", position: "relative" }} className="mosaic-card-img-wrap">
                 <img
                   src={mosaicLeft[1]?.imageUrl || "/homepage/mosaic_ethnic.jpg"}
                   alt={mosaicLeft[1]?.imageAlt || "Ethnic Wear"}
@@ -1123,6 +1166,7 @@ export default function HomePage() {
                   justifyContent: "space-between",
                   zIndex: 2,
                 }}
+                className="mosaic-card-text-wrap"
               >
                 <div>
                   <span
@@ -1281,6 +1325,7 @@ export default function HomePage() {
                 justifyContent: "center",
                 zIndex: 2,
               }}
+              className="mosaic-bottom-text-wrap"
             >
               <span
                 style={{
@@ -1324,7 +1369,7 @@ export default function HomePage() {
                 {mosaicBottomWide?.ctaText || "Shop Street Edit"} <FiArrowRight size={15} />
               </a>
             </div>
-            <div style={{ width: "45%", height: "100%", position: "relative" }}>
+            <div style={{ width: "45%", height: "100%", position: "relative" }} className="mosaic-bottom-img-wrap">
               <img
                 src={mosaicBottomWide?.imageUrl || "/homepage/mosaic_street.jpg"}
                 alt={mosaicBottomWide?.imageAlt || "Activewear & Street Style"}
@@ -2517,10 +2562,19 @@ export default function HomePage() {
           .desktop-nav {
             display: flex !important;
           }
+          .mobile-header-actions {
+            display: none !important;
+          }
         }
         @media (max-width: 991px) {
+          .desktop-nav {
+            display: none !important;
+          }
+          .mobile-header-actions {
+            display: flex !important;
+          }
           .mobile-hamburger {
-            display: block !important;
+            display: flex !important;
           }
           .hero-frame-svg {
             display: none !important;
@@ -2662,6 +2716,9 @@ export default function HomePage() {
             align-items: flex-start !important;
             text-align: left !important;
           }
+          .spotlight-header-right p {
+            text-align: left !important;
+          }
           .spotlight-offset-col {
             padding-top: 0 !important;
             margin-top: 0 !important;
@@ -2671,7 +2728,7 @@ export default function HomePage() {
           }
           .testimonial-review-text {
             max-width: 100% !important;
-            line-height: 1.45 !important;
+            line-height: 1.5 !important;
           }
           .testimonials-header {
             align-items: flex-start !important;
@@ -2682,13 +2739,34 @@ export default function HomePage() {
           .testimonials-header p {
             text-align: left !important;
           }
+          .mosaic-split-card {
+            height: auto !important;
+            min-height: 240px !important;
+            flex-direction: column !important;
+          }
+          .mosaic-split-card .mosaic-card-text-wrap {
+            width: 100% !important;
+            padding: 24px 20px !important;
+          }
+          .mosaic-split-card .mosaic-card-img-wrap {
+            width: 100% !important;
+            height: 190px !important;
+          }
           .mosaic-right-tall {
             height: 380px !important;
           }
           .mosaic-bottom-wide {
             height: auto !important;
-            min-height: 280px !important;
+            min-height: 260px !important;
             flex-direction: column !important;
+          }
+          .mosaic-bottom-wide .mosaic-bottom-text-wrap {
+            width: 100% !important;
+            padding: 24px 20px !important;
+          }
+          .mosaic-bottom-wide .mosaic-bottom-img-wrap {
+            width: 100% !important;
+            height: 200px !important;
           }
           .mosaic-bottom-small {
             height: 300px !important;
