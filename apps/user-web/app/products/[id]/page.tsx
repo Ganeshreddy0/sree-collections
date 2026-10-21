@@ -653,19 +653,63 @@ export default function ProductDetailPage() {
             )}
           </a>
         </nav>
-        <button
-          className="pdp-hamburger"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        {/* Mobile Right Actions: Cart + Hamburger */}
+        <div
+          className="mobile-header-actions"
           style={{
             display: "none",
-            color: "#5A2035",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
+            alignItems: "center",
+            gap: 8,
           }}
         >
-          {mobileMenuOpen ? <FiX size={26} /> : <FiMenu size={26} />}
-        </button>
+          <a
+            href="/cart"
+            aria-label="Cart"
+            style={{
+              color: "#5A2035",
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              padding: "6px",
+            }}
+          >
+            <FiShoppingCart size={21} />
+            {cartCount > 0 && (
+              <span
+                style={{
+                  position: "absolute",
+                  top: -2,
+                  right: -4,
+                  backgroundColor: "#BB8E43",
+                  color: "#FFF",
+                  borderRadius: "50%",
+                  width: 17,
+                  height: 17,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 10,
+                  fontWeight: 700,
+                }}
+              >
+                {cartCount > 9 ? "9+" : cartCount}
+              </span>
+            )}
+          </a>
+          <button
+            className="pdp-hamburger mobile-hamburger"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            style={{
+              color: "#5A2035",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: 6,
+            }}
+          >
+            {mobileMenuOpen ? <FiX size={25} /> : <FiMenu size={25} />}
+          </button>
+        </div>
       </header>
 
       {mobileMenuOpen && (
@@ -1638,8 +1682,11 @@ export default function ProductDetailPage() {
       <style>{`
         @media (min-width: 992px) {
           .pdp-desktop-nav { display: flex !important; }
+          .mobile-header-actions { display: none !important; }
         }
         @media (max-width: 991px) {
+          .pdp-desktop-nav { display: none !important; }
+          .mobile-header-actions { display: flex !important; }
           .pdp-hamburger { display: flex !important; }
           .pdp-showcase { grid-template-columns: 1fr !important; gap: 28px !important; padding: 0 20px !important; }
           .pdp-details { grid-template-columns: 1fr !important; padding: 0 20px !important; }

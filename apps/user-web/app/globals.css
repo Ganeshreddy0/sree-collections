@@ -127,3 +127,42 @@ img {
 ::-webkit-scrollbar-thumb:hover {
   background: #5D2030;
 }
+
+/* =========================================================================
+   Mobile Global Responsive Polish (<= 768px)
+   Does not modify desktop layouts or typography.
+   ========================================================================= */
+@media (max-width: 768px) {
+  /* Prevent any logo from pushing header content off-screen on mobile */
+  header img[alt="Sree Collections"],
+  header img[src*="logo"] {
+    height: 46px !important;
+    max-width: 195px !important;
+    width: auto !important;
+  }
+
+  /* Make sure header accommodates logo and action buttons comfortably */
+  header {
+    min-height: 68px !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  /* Universal hamburger button visibility on all subpages */
+  .mobile-hamburger {
+    display: flex !important;
+    align-items: center;
+    justifyContent: center;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 6px;
+    color: #2F2C24;
+    flex-shrink: 0;
+  }
+
+  /* Flexible inputs in form groups prevent container busting */
+  input, select, textarea {
+    max-width: 100% !important;
+  }
+}

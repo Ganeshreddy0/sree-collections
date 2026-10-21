@@ -1279,21 +1279,81 @@ export default function CategoriesPage() {
             </a>
           </nav>
 
-          {/* Mobile Hamburger */}
-          <button
-            className="cat-hamburger mobile-hamburger"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          {/* Mobile Actions: Search + Cart + Hamburger */}
+          <div
+            className="mobile-header-actions"
             style={{
               display: "none",
-              padding: "8px",
-              color: "#2F2C24",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
+              alignItems: "center",
+              gap: "8px",
             }}
           >
-            {mobileMenuOpen ? <FiX size={26} /> : <FiMenu size={26} />}
-          </button>
+            <a
+              href="/search"
+              aria-label="Search"
+              style={{
+                color: "#5A2035",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "6px",
+              }}
+            >
+              <FiSearch size={21} strokeWidth={2} />
+            </a>
+
+            <a
+              href="/cart"
+              aria-label="Cart"
+              style={{
+                color: "#5A2035",
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "6px",
+              }}
+            >
+              <FiShoppingCart size={21} strokeWidth={2} />
+              {cartCount > 0 && (
+                <span
+                  style={{
+                    position: "absolute",
+                    top: "-2px",
+                    right: "-2px",
+                    backgroundColor: "#BB8E43",
+                    color: "#FFFFFF",
+                    fontSize: "10px",
+                    fontWeight: 700,
+                    width: "17px",
+                    height: "17px",
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontFamily: "var(--font-serif)",
+                  }}
+                >
+                  {cartCount > 9 ? "9+" : cartCount}
+                </span>
+              )}
+            </a>
+
+            <button
+              className="cat-hamburger mobile-hamburger"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+              style={{
+                padding: "6px",
+                color: "#2F2C24",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              {mobileMenuOpen ? <FiX size={25} /> : <FiMenu size={25} />}
+            </button>
+          </div>
         </header>
       </div>
 
@@ -2231,10 +2291,15 @@ export default function CategoriesPage() {
 
       {/* STYLES */}
       <style>{`
-        @media (min-width: 992px) { .cat-desktop-nav { display: flex !important; } }
+        @media (min-width: 992px) {
+          .cat-desktop-nav { display: flex !important; }
+          .mobile-header-actions { display: none !important; }
+        }
         @media (max-width: 991px) {
+          .cat-desktop-nav { display: none !important; }
+          .mobile-header-actions { display: flex !important; }
           .cat-hamburger { display: flex !important; }
-          .cat-main-layout { flex-direction: column !important; padding: 0 20px !important; }
+          .cat-main-layout { flex-direction: column !important; padding: 0 16px !important; }
           .cat-sidebar { width: 100% !important; min-width: 100% !important; max-width: 100% !important; position: static !important; }
           .cat-product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
         }

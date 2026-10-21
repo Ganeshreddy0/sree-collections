@@ -702,22 +702,67 @@ function SearchPageInner() {
           </a>
         </nav>
 
-        {/* Mobile hamburger */}
-        <button
-          className="srch-hamburger"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Toggle navigation"
+        {/* Mobile Right Actions: Cart + Hamburger */}
+        <div
+          className="mobile-header-actions"
           style={{
             display: "none",
-            color: "#5A2035",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            padding: "6px",
+            alignItems: "center",
+            gap: "8px",
           }}
         >
-          {mobileMenuOpen ? <FiX size={26} /> : <FiMenu size={26} />}
-        </button>
+          <a
+            href="/cart"
+            aria-label="Cart"
+            style={{
+              color: "#5A2035",
+              display: "flex",
+              alignItems: "center",
+              padding: "6px",
+              position: "relative",
+              textDecoration: "none",
+            }}
+          >
+            <FiShoppingCart size={21} />
+            {cartCount > 0 && (
+              <span
+                style={{
+                  position: "absolute",
+                  top: "-2px",
+                  right: "-4px",
+                  backgroundColor: "#BB8E43",
+                  color: "#FFFFFF",
+                  fontSize: "10px",
+                  fontWeight: 700,
+                  width: "17px",
+                  height: "17px",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 2px 6px rgba(187,142,67,0.4)",
+                }}
+              >
+                {cartCount}
+              </span>
+            )}
+          </a>
+
+          <button
+            className="srch-hamburger mobile-hamburger"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle navigation"
+            style={{
+              color: "#5A2035",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: "6px",
+            }}
+          >
+            {mobileMenuOpen ? <FiX size={25} /> : <FiMenu size={25} />}
+          </button>
+        </div>
       </header>
 
       {/* Mobile Nav Overlay */}
@@ -1143,8 +1188,11 @@ function SearchPageInner() {
       <style>{`
         @media (min-width: 992px) {
           .srch-desktop-nav { display: flex !important; }
+          .mobile-header-actions { display: none !important; }
         }
         @media (max-width: 991px) {
+          .srch-desktop-nav { display: none !important; }
+          .mobile-header-actions { display: flex !important; }
           .srch-hamburger { display: flex !important; }
           .srch-footer-contact { align-items: flex-start !important; }
         }

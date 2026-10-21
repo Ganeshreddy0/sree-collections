@@ -2,17 +2,19 @@
 
 import React from "react";
 import Link from "next/link";
-import { FiMapPin, FiPhone, FiMail } from "react-icons/fi";
 import {
+  FaMapMarkerAlt,
+  FaPhoneAlt,
+  FaEnvelope,
   FaFacebookF,
   FaYoutube,
   FaInstagram,
-  FaWhatsapp,
   FaGoogle,
+  FaWhatsapp,
 } from "react-icons/fa";
 
 const FOOTER_LINKS = [
-  { label: "ABOUT US", href: "/#about" },
+  { label: "ABOUT US", href: "/about" },
   { label: "CONTACT US", href: "/contact" },
   { label: "CATEGORY", href: "/categories" },
   { label: "PRIVACY POLICY", href: "#" },
@@ -24,7 +26,7 @@ const SOCIAL = [
   { label: "YouTube", icon: FaYoutube, href: "#" },
   { label: "Instagram", icon: FaInstagram, href: "#" },
   { label: "Google", icon: FaGoogle, href: "#" },
-  { label: "WhatsApp", icon: FaWhatsapp, href: "#" },
+  { label: "WhatsApp", icon: FaWhatsapp, href: "https://wa.me/?text=Hello%20Sree%20Collections" },
 ];
 
 export default function SiteFooter() {
@@ -36,21 +38,31 @@ export default function SiteFooter() {
         width: "100%",
         backgroundColor: "#FCF8F2",
         color: "#5D2030",
+        paddingTop: "50px",
+        boxSizing: "border-box",
       }}
     >
-      {/* Top rule */}
-      <div style={{ borderTop: "1.5px solid #5D2030" }} />
-
       <div
         style={{
           width: "100%",
-          maxWidth: 1240,
+          maxWidth: "1140px",
           margin: "0 auto",
-          padding: "42px 40px 28px",
+          padding: "0 24px",
           boxSizing: "border-box",
         }}
       >
-        {/* Main row: logo | contact */}
+        {/* Top rule matching container width */}
+        <div
+          style={{
+            width: "100%",
+            height: "1.5px",
+            backgroundColor: "#5D2030",
+            opacity: 0.8,
+            marginBottom: "48px",
+          }}
+        />
+
+        {/* Main Row: Brand Logo | Contact Info */}
         <div
           className="site-footer-main"
           style={{
@@ -58,16 +70,17 @@ export default function SiteFooter() {
             alignItems: "center",
             justifyContent: "space-between",
             flexWrap: "wrap",
-            gap: 32,
-            marginBottom: 36,
+            gap: "36px",
+            marginBottom: "36px",
           }}
         >
+          {/* Logo on Left */}
           <Link href="/" style={{ display: "inline-block", flexShrink: 0 }}>
             <img
               src="/homepage/logo2_trans.png"
               alt="Sree Collections"
               style={{
-                height: 78,
+                height: "82px",
                 width: "auto",
                 objectFit: "contain",
                 display: "block",
@@ -75,37 +88,45 @@ export default function SiteFooter() {
             />
           </Link>
 
+          {/* Contact Details on Right */}
           <div
             className="site-footer-contact"
             style={{
               display: "flex",
               flexDirection: "column",
               alignItems: "flex-end",
-              gap: 12,
+              gap: "14px",
               textAlign: "right",
             }}
           >
+            {/* Address Row */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 8,
-                fontSize: 14,
+                gap: "8px",
+                fontSize: "14px",
                 color: "#5D2030",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', var(--font-sans), sans-serif",
+                fontWeight: 400,
               }}
             >
-              <FiMapPin size={15} style={{ flexShrink: 0 }} />
+              <FaMapMarkerAlt size={15} color="#5D2030" style={{ flexShrink: 0 }} />
               <span>345 Faulconer Drive, Suite 4 • Charlottesville, CA, 12345</span>
             </div>
 
+            {/* Phone & Email Row */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 22,
+                gap: "24px",
                 flexWrap: "wrap",
                 justifyContent: "flex-end",
+                fontSize: "14px",
+                color: "#5D2030",
+                fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', var(--font-sans), sans-serif",
+                fontWeight: 400,
               }}
             >
               <a
@@ -113,73 +134,73 @@ export default function SiteFooter() {
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 7,
-                  fontSize: 14,
+                  gap: "8px",
                   color: "#5D2030",
                   textDecoration: "none",
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  transition: "opacity 0.2s ease",
                 }}
+                className="site-footer-link"
               >
-                <FiPhone size={14} />
+                <FaPhoneAlt size={13} color="#5D2030" style={{ flexShrink: 0 }} />
                 <span>+19526830741</span>
               </a>
+
               <a
                 href="mailto:Sreecollections007@gmail.com"
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 7,
-                  fontSize: 14,
+                  gap: "8px",
                   color: "#5D2030",
                   textDecoration: "none",
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  transition: "opacity 0.2s ease",
                 }}
+                className="site-footer-link"
               >
-                <FiMail size={14} />
+                <FaEnvelope size={14} color="#5D2030" style={{ flexShrink: 0 }} />
                 <span>Sreecollections007@gmail.com</span>
               </a>
             </div>
 
+            {/* Social Media Row */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 12,
+                gap: "16px",
                 flexWrap: "wrap",
                 justifyContent: "flex-end",
               }}
             >
               <span
                 style={{
-                  fontSize: 13,
-                  fontWeight: 600,
+                  fontSize: "13.5px",
+                  fontWeight: 500,
                   color: "#5D2030",
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', var(--font-sans), sans-serif",
                 }}
               >
                 Social Media
               </span>
-              <div style={{ display: "flex", gap: 8 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
                 {SOCIAL.map(({ label, icon: Icon, href }) => (
                   <a
                     key={label}
                     href={href}
                     aria-label={label}
-                    className="site-footer-social"
+                    className="site-footer-social-icon"
+                    target="_blank"
+                    rel="noreferrer"
                     style={{
-                      width: 28,
-                      height: 28,
-                      borderRadius: "50%",
-                      border: "1.2px solid #5D2030",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       color: "#5D2030",
                       textDecoration: "none",
-                      transition: "all 0.2s ease",
+                      transition: "transform 0.2s ease, opacity 0.2s ease",
                     }}
                   >
-                    <Icon size={12} />
+                    <Icon size={16} />
                   </a>
                 ))}
               </div>
@@ -187,16 +208,26 @@ export default function SiteFooter() {
           </div>
         </div>
 
-        {/* Bottom rule + links */}
+        {/* Middle divider rule */}
         <div
           style={{
-            borderTop: "1.5px solid #5D2030",
-            paddingTop: 18,
+            width: "100%",
+            height: "1px",
+            backgroundColor: "#DECDBE",
+            opacity: 0.8,
+            margin: "36px 0 22px 0",
+          }}
+        />
+
+        {/* Bottom row: links | copyright */}
+        <div
+          style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             flexWrap: "wrap",
-            gap: 14,
+            gap: "20px",
+            paddingBottom: "36px",
           }}
         >
           <nav
@@ -204,7 +235,7 @@ export default function SiteFooter() {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 22,
+              gap: "32px",
               flexWrap: "wrap",
             }}
           >
@@ -214,13 +245,14 @@ export default function SiteFooter() {
                 href={href}
                 className="site-footer-link"
                 style={{
-                  fontSize: 11,
+                  fontSize: "12px",
                   fontWeight: 600,
-                  letterSpacing: "0.6px",
+                  letterSpacing: "0.8px",
                   textTransform: "uppercase",
                   color: "#5D2030",
                   textDecoration: "none",
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', var(--font-sans), sans-serif",
+                  transition: "color 0.2s ease",
                 }}
               >
                 {label}
@@ -230,9 +262,10 @@ export default function SiteFooter() {
 
           <span
             style={{
-              fontSize: 12,
+              fontSize: "12.5px",
               color: "#5D2030",
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
+              fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', var(--font-sans), sans-serif",
+              fontWeight: 400,
             }}
           >
             Copyright © {year} • kitsacitsolutions
@@ -241,9 +274,9 @@ export default function SiteFooter() {
       </div>
 
       <style>{`
-        .site-footer-social:hover {
-          background-color: #5D2030 !important;
-          color: #FFFFFF !important;
+        .site-footer-social-icon:hover {
+          color: #BB8E43 !important;
+          transform: translateY(-2px);
         }
         .site-footer-link:hover {
           color: #BB8E43 !important;
@@ -259,6 +292,9 @@ export default function SiteFooter() {
           }
           .site-footer-contact > div {
             justify-content: flex-start !important;
+          }
+          .site-footer-links {
+            gap: 18px !important;
           }
         }
       `}</style>
