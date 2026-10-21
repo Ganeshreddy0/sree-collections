@@ -101,7 +101,22 @@ function readUrlFilters() {
   const sp = new URLSearchParams(window.location.search);
   const prices = sp.get("price");
   const subCategory = sp.get("subCategory") || "";
-  let category = sp.get("category") || "All Products";
+  const rawCat = sp.get("category") || sp.get("slug") || "";
+  let category = "All Products";
+
+  if (rawCat && rawCat !== "All Products") {
+    const lower = rawCat.toLowerCase().trim();
+    if (lower === "casual-wear" || lower === "casual wear" || lower === "casual") category = "Casual Wear";
+    else if (lower === "decorative-items" || lower === "decorative items" || lower === "decorative") category = "Decorative Items";
+    else if (lower === "ethnic-lehengas" || lower === "ethnic lehengas" || lower === "lehenga" || lower === "lehengas") category = "Ethnic Lehengas";
+    else if (lower === "jewellery" || lower === "jewelry") category = "Jewellery";
+    else if (lower === "saree" || lower === "sarees") category = "Saree";
+    else if (lower === "watches" || lower === "watch") category = "watches";
+    else if (lower === "shades" || lower === "premium shades") category = "premium shades";
+    else {
+      category = rawCat.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    }
+  }
 
   // If subCategory was passed without a category, infer parent category
   if (category === "All Products" && subCategory) {
@@ -655,20 +670,27 @@ export default function CategoriesPage() {
 
   // Read URL params after mount to avoid hydration mismatch
   useEffect(() => {
-    const urlState = readUrlFilters();
-    setSelectedCategory(urlState.category);
-    setSelectedSubCategory(urlState.subCategory);
-    setSelectedSize(urlState.size);
-    setSelectedColour(urlState.colour);
-    setSelectedBrand(urlState.brand);
-    setSelectedFabric(urlState.fabric);
-    setInStockOnly(urlState.inStock);
-    setCheckedPrices(urlState.prices);
-    setSortBy(urlState.sort);
-    setSearchQuery(urlState.search);
-    setSearchInput(urlState.search);
-    setSearchOpen(Boolean(urlState.search));
+    const handleUrlChange = () => {
+      const urlState = readUrlFilters();
+      setSelectedCategory(urlState.category);
+      setSelectedSubCategory(urlState.subCategory);
+      setSelectedSize(urlState.size);
+      setSelectedColour(urlState.colour);
+      setSelectedBrand(urlState.brand);
+      setSelectedFabric(urlState.fabric);
+      setInStockOnly(urlState.inStock);
+      setCheckedPrices(urlState.prices);
+      setSortBy(urlState.sort);
+      setSearchQuery(urlState.search);
+      setSearchInput(urlState.search);
+      setSearchOpen(Boolean(urlState.search));
+    };
+
+    handleUrlChange();
     setMounted(true);
+
+    window.addEventListener("popstate", handleUrlChange);
+    return () => window.removeEventListener("popstate", handleUrlChange);
   }, []);
 
   const [products, setProducts] = useState<Product[]>([]);
@@ -683,6 +705,7 @@ export default function CategoriesPage() {
   const [priceBuckets, setPriceBuckets] = useState(DEFAULT_PRICE_BUCKETS);
 
   const syncUrl = useCallback(() => {
+    if (!mounted) return;
     writeUrlFilters({
       category: selectedCategory,
       size: selectedSize,
@@ -696,6 +719,7 @@ export default function CategoriesPage() {
       inStock: inStockOnly,
     });
   }, [
+    mounted,
     selectedCategory,
     selectedSize,
     selectedColour,

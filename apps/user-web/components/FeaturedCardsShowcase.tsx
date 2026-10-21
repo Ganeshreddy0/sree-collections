@@ -241,6 +241,7 @@ export default function FeaturedCardsShowcase() {
         boxShadow: "0 22px 50px rgba(93, 32, 48, 0.32)",
         opacity: 1,
         isCenter: true,
+        isLeft: false,
         pointerEvents: "auto" as const,
       };
     } else if (absOffset === 1) {
@@ -255,6 +256,7 @@ export default function FeaturedCardsShowcase() {
         boxShadow: "0 14px 30px rgba(0, 0, 0, 0.14)",
         opacity: 0.96,
         isCenter: false,
+        isLeft: offset < 0,
         pointerEvents: "auto" as const,
       };
     } else if (absOffset === 2) {
@@ -269,6 +271,7 @@ export default function FeaturedCardsShowcase() {
         boxShadow: "0 10px 24px rgba(0, 0, 0, 0.1)",
         opacity: 0.9,
         isCenter: false,
+        isLeft: offset < 0,
         pointerEvents: isMobile ? ("none" as const) : ("auto" as const),
       };
     } else if (absOffset === 3) {
@@ -283,6 +286,7 @@ export default function FeaturedCardsShowcase() {
         boxShadow: "0 6px 18px rgba(0, 0, 0, 0.08)",
         opacity: isMobile ? 0 : 0.85,
         isCenter: false,
+        isLeft: offset < 0,
         pointerEvents: isMobile ? ("none" as const) : ("auto" as const),
       };
     } else {
@@ -297,6 +301,7 @@ export default function FeaturedCardsShowcase() {
         boxShadow: "none",
         opacity: 0,
         isCenter: false,
+        isLeft: offset < 0,
         pointerEvents: "none" as const,
       };
     }
@@ -304,6 +309,7 @@ export default function FeaturedCardsShowcase() {
 
   return (
     <div
+      id="featured-cards-carousel"
       ref={containerRef}
       style={{
         width: "100%",
@@ -343,6 +349,8 @@ export default function FeaturedCardsShowcase() {
               onClick={() => {
                 if (!isCenter) {
                   setActiveIndex(idx);
+                } else {
+                  window.location.href = `/categories?category=${encodeURIComponent(item.name)}&slug=${item.slug}`;
                 }
               }}
               style={{
@@ -360,7 +368,7 @@ export default function FeaturedCardsShowcase() {
                 pointerEvents: slot.pointerEvents,
                 transition: "transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), width 0.5s ease, height 0.5s ease, opacity 0.5s ease, box-shadow 0.5s ease",
                 backgroundColor: "#2C1810",
-                cursor: isCenter ? "default" : "pointer",
+                cursor: "pointer",
               }}
             >
               {/* Inner Masked Container for Image */}
@@ -393,8 +401,8 @@ export default function FeaturedCardsShowcase() {
                     position: "absolute",
                     inset: 0,
                     background: isCenter
-                      ? "linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.02) 40%, rgba(0,0,0,0.7) 100%)"
-                      : "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.0) 50%, rgba(0,0,0,0.4) 100%)",
+                      ? "linear-gradient(180deg, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0.02) 40%, rgba(0,0,0,0.7) 100%)"
+                      : "linear-gradient(180deg, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.08) 45%, rgba(0,0,0,0.55) 100%)",
                     pointerEvents: "none",
                   }}
                 />
@@ -422,72 +430,73 @@ export default function FeaturedCardsShowcase() {
                   </div>
                 )}
 
+                {/* Top-Right Vertical / Rotated Category Title - Center & Right Cards Only (no category name for cards left of middle card) */}
+                {item.name && !slot.isLeft && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: `${(isCenter ? 18 : 14) * scaleRatio}px`,
+                      right: `${(isCenter ? 16 : 12) * scaleRatio}px`,
+                      writingMode: "vertical-rl",
+                      transform: "rotate(180deg)",
+                      color: "#FFFFFF",
+                      fontSize: `${(isCenter ? 17 : 13) * scaleRatio}px`,
+                      fontWeight: 700,
+                      letterSpacing: "0.8px",
+                      textShadow: "0 2px 8px rgba(0,0,0,0.95), 0 1px 4px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,1)",
+                      zIndex: 4,
+                      opacity: isCenter ? 0.98 : 0.95,
+                      pointerEvents: "none",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {item.name}
+                  </div>
+                )}
+
                 {/* Center Hero Labels */}
                 {isCenter && (
-                  <>
-                    {/* Top-Right Vertical / Rotated Category Title */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: `${20 * scaleRatio}px`,
+                      right: `${16 * scaleRatio}px`,
+                      backgroundColor: "#FFFFFF",
+                      borderRadius: "12px",
+                      padding: `${6 * scaleRatio}px ${12 * scaleRatio}px`,
+                      textAlign: "right",
+                      boxShadow: "0 6px 16px rgba(0,0,0,0.25)",
+                      zIndex: 3,
+                    }}
+                  >
                     <div
                       style={{
-                        position: "absolute",
-                        top: `${18 * scaleRatio}px`,
-                        right: `${16 * scaleRatio}px`,
-                        writingMode: "vertical-rl",
-                        transform: "rotate(180deg)",
-                        color: "#FFFFFF",
-                        fontSize: `${12 * scaleRatio}px`,
+                        fontSize: `${10 * scaleRatio}px`,
+                        color: "#6B7280",
                         fontWeight: 600,
-                        letterSpacing: "1.2px",
-                        textShadow: "0 2px 4px rgba(0,0,0,0.8)",
-                        zIndex: 3,
-                        opacity: 0.95,
+                        marginBottom: "1px",
                       }}
                     >
-                      {item.name}
+                      Start From
                     </div>
-
-                    {/* Bottom-Right Price / Start From Pill */}
                     <div
                       style={{
-                        position: "absolute",
-                        bottom: `${20 * scaleRatio}px`,
-                        right: `${16 * scaleRatio}px`,
-                        backgroundColor: "#FFFFFF",
-                        borderRadius: "12px",
-                        padding: `${6 * scaleRatio}px ${12 * scaleRatio}px`,
-                        textAlign: "right",
-                        boxShadow: "0 6px 16px rgba(0,0,0,0.25)",
-                        zIndex: 3,
+                        fontSize: `${13 * scaleRatio}px`,
+                        color: "#5D2030",
+                        fontWeight: 700,
+                        lineHeight: "1.1",
                       }}
                     >
-                      <div
-                        style={{
-                          fontSize: `${10 * scaleRatio}px`,
-                          color: "#6B7280",
-                          fontWeight: 600,
-                          marginBottom: "1px",
-                        }}
-                      >
-                        Start From
-                      </div>
-                      <div
-                        style={{
-                          fontSize: `${13 * scaleRatio}px`,
-                          color: "#5D2030",
-                          fontWeight: 700,
-                          lineHeight: "1.1",
-                        }}
-                      >
-                        {item.price || "120.25USD"}
-                      </div>
+                      {item.price || "120.25USD"}
                     </div>
-                  </>
+                  </div>
                 )}
               </div>
 
               {/* Center Card Overlapping Floating Cart Button */}
               {isCenter && (
                 <Link
-                  href={`/categories?slug=${item.slug}`}
+                  href={`/categories?category=${encodeURIComponent(item.name)}&slug=${item.slug}`}
                   title={`Shop ${item.name}`}
                   onClick={(e) => e.stopPropagation()}
                   style={{
