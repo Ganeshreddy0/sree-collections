@@ -269,22 +269,43 @@ export default function CartPage() {
             </Link>
           </nav>
 
-          {/* Mobile Hamburger */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
+          {/* Mobile Right Actions: Search + Hamburger */}
+          <div
             style={{
               display: "none",
-              padding: "8px",
-              color: "#2F2C24",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
+              alignItems: "center",
+              gap: "8px",
             }}
-            className="cart-hamburger mobile-hamburger"
+            className="mobile-header-actions"
           >
-            {mobileMenuOpen ? <FiX size={26} /> : <FiMenu size={26} />}
-          </button>
+            <a
+              href="/search"
+              aria-label="Search"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#5A2035",
+                padding: "6px",
+              }}
+            >
+              <FiSearch size={21} strokeWidth={2} />
+            </a>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+              style={{
+                padding: "6px",
+                color: "#2F2C24",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+              }}
+              className="cart-hamburger mobile-hamburger"
+            >
+              {mobileMenuOpen ? <FiX size={25} /> : <FiMenu size={25} />}
+            </button>
+          </div>
         </header>
       </div>
 
@@ -417,7 +438,7 @@ export default function CartPage() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
               gap: "36px",
               alignItems: "start",
             }}
@@ -438,6 +459,7 @@ export default function CartPage() {
               {items.map((item, idx) => (
                 <div
                   key={idx}
+                  className="cart-item-row"
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -678,6 +700,9 @@ export default function CartPage() {
           .cart-desktop-nav {
             display: flex !important;
           }
+          .mobile-header-actions {
+            display: none !important;
+          }
           .cart-hamburger {
             display: none !important;
           }
@@ -686,8 +711,17 @@ export default function CartPage() {
           .cart-desktop-nav {
             display: none !important;
           }
+          .mobile-header-actions {
+            display: flex !important;
+          }
           .cart-hamburger {
             display: flex !important;
+          }
+        }
+        @media (max-width: 600px) {
+          .cart-item-row {
+            flex-wrap: wrap !important;
+            gap: 12px !important;
           }
         }
         .cart-nav-link:hover {

@@ -232,6 +232,8 @@ export default function CheckoutPage() {
     }
   };
 
+  const cartCount = cartItems.reduce((acc, it) => acc + (it.quantity || 1), 0);
+
   return (
     <div
       style={{
@@ -368,22 +370,66 @@ export default function CheckoutPage() {
             </Link>
           </nav>
 
-          {/* Mobile Hamburger */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
+          {/* Mobile Right Actions: Cart + Hamburger */}
+          <div
             style={{
               display: "none",
-              padding: "8px",
-              color: "#2F2C24",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
+              alignItems: "center",
+              gap: "8px",
             }}
-            className="checkout-hamburger mobile-hamburger"
+            className="mobile-header-actions"
           >
-            {mobileMenuOpen ? <FiX size={26} /> : <FiMenu size={26} />}
-          </button>
+            <Link
+              href="/cart"
+              aria-label="Shopping Cart"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#5A2035",
+                padding: "6px",
+                position: "relative",
+              }}
+            >
+              <FiShoppingCart size={21} strokeWidth={2} />
+              {cartCount > 0 && (
+                <span
+                  style={{
+                    position: "absolute",
+                    top: "-2px",
+                    right: "-2px",
+                    backgroundColor: "#BB8E43",
+                    color: "#FFFFFF",
+                    fontSize: "10px",
+                    fontWeight: 700,
+                    width: "17px",
+                    height: "17px",
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontFamily: "var(--font-serif)",
+                  }}
+                >
+                  {cartCount > 9 ? "9+" : cartCount}
+                </span>
+              )}
+            </Link>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+              style={{
+                padding: "6px",
+                color: "#2F2C24",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+              }}
+              className="checkout-hamburger mobile-hamburger"
+            >
+              {mobileMenuOpen ? <FiX size={25} /> : <FiMenu size={25} />}
+            </button>
+          </div>
         </header>
       </div>
 
@@ -510,7 +556,7 @@ export default function CheckoutPage() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
             gap: "36px",
             alignItems: "start",
           }}
@@ -622,17 +668,18 @@ export default function CheckoutPage() {
                   >
                     WhatsApp Mobile Number <span style={{ color: "#E53935" }}>*</span>
                   </label>
-                  <div style={{ display: "flex", gap: "10px" }}>
+                  <div style={{ display: "flex", gap: "10px", width: "100%" }}>
                     <select
                       value={countryCode}
                       onChange={(e) => setCountryCode(e.target.value)}
                       style={{
                         height: "46px",
-                        width: "90px",
+                        width: "88px",
+                        flexShrink: 0,
                         borderRadius: "10px",
                         border: "1px solid #D8CAB8",
-                        padding: "0 10px",
-                        fontSize: "14px",
+                        padding: "0 8px",
+                        fontSize: "13.5px",
                         fontWeight: 600,
                         backgroundColor: "#FDFAF5",
                         color: "#5D2030",
@@ -651,16 +698,17 @@ export default function CheckoutPage() {
                     <input
                       type="tel"
                       required
-                      placeholder="10-digit WhatsApp number (e.g. 9876543210)"
+                      placeholder="10-digit mobile number"
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value)}
                       maxLength={15}
                       style={{
                         flex: 1,
+                        minWidth: 0,
                         height: "46px",
                         borderRadius: "10px",
                         border: "1px solid #D8CAB8",
-                        padding: "0 16px",
+                        padding: "0 14px",
                         fontSize: "14px",
                         outline: "none",
                         backgroundColor: "#FDFAF5",
@@ -1381,6 +1429,9 @@ export default function CheckoutPage() {
           .checkout-desktop-nav {
             display: flex !important;
           }
+          .mobile-header-actions {
+            display: none !important;
+          }
           .checkout-hamburger {
             display: none !important;
           }
@@ -1388,6 +1439,9 @@ export default function CheckoutPage() {
         @media (max-width: 991px) {
           .checkout-desktop-nav {
             display: none !important;
+          }
+          .mobile-header-actions {
+            display: flex !important;
           }
           .checkout-hamburger {
             display: flex !important;

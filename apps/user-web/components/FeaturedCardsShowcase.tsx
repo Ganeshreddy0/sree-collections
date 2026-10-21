@@ -319,6 +319,7 @@ export default function FeaturedCardsShowcase() {
         padding: "20px 0 60px 0",
         boxSizing: "border-box",
         userSelect: "none",
+        overflow: "hidden",
       }}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}

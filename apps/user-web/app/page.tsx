@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import {
   FiSearch,
@@ -35,7 +35,7 @@ const FALLBACK_CMS: CMSData = {
   "spotlight-saree": { sectionId: "spotlight-saree", title: "Saree", subtitle: "Collections", description: "We provide the largest collection sarees. You can choose trendy or classy design according to your preferences. Our services are super fast and we update within 24 hours.", badgeText: "We consider your look and comfort on cold weather.", mediaUrl: "/homepage/saree_models.jpg", mediaAlt: "Royal Silk Sarees", secondaryMediaUrl: "/homepage/saree_green.jpg", secondaryMediaAlt: "Handcrafted Silk Sarees", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "Explore", ctaLink: "/categories?category=Saree", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: { layout: "left-overlapping", secondaryDescription: "Our main aim is to serve our customer with better quality product. We try to understand their needs and provide them within a short period of time. We provide the largest clothing collection for any season. You can choose trendy or classy design according to your preferences. Our services are super fast and we update within 24 hours." }, items: [] },
   "spotlight-decor": { sectionId: "spotlight-decor", title: "Decorative Item", subtitle: "Collections", description: "We provide the largest clothing collection for any season. You can choose trendy or classy design according to your preferences. Our services are super fast and we update within 24 hours.", badgeText: "We consider your look and comfort on cold weather.", mediaUrl: "/about/stars.jpg", mediaAlt: "Festive Star Lanterns", secondaryMediaUrl: "/about/party.jpg", secondaryMediaAlt: "Festive Party Decor", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "Explore", ctaLink: "/categories?category=Decorative+Items", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: { layout: "right-overlapping", secondaryDescription: "Our main aim is to serve our customer with better quality product. We try to understand their needs and provide them within a short period of time. We provide the largest clothing collection for any season. You can choose trendy or classy design according to your preferences. Our services are super fast and we update within 24 hours." }, items: [] },
   "whatsapp-banner": { sectionId: "whatsapp-banner", title: "Curate your cart.", subtitle: "Complete on WhatsApp.", description: "", badgeText: "🛍 Shopping Made Personal", mediaUrl: "/homepage/img5.png", mediaAlt: "Sree Collections WhatsApp Shopping Bag", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "Chat on WhatsApp", ctaLink: "https://wa.me/?text=Hello%20Sree%20Collections%2C%20I%20want%20to%20shop!", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{ itemId: "wa-step-1", title: "Added Cart", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: {} }, { itemId: "wa-step-2", title: "WhatsApp", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: {} }, { itemId: "wa-step-3", title: "Order Confirmed", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 3, isActive: true, metadata: {} }] },
-  testimonials: { sectionId: "testimonials", title: "Why our Customer says", subtitle: "", description: "", badgeText: "", mediaUrl: "", mediaAlt: "", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "", ctaLink: "#", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{ itemId: "t1", title: "Priya Sundaram", subtitle: "Verified Bride", description: "The silk saree and the temple necklace set I ordered for my sister's wedding completely surpassed my expectations.", badge: "Chennai, India", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: { rating: 5 } }, { itemId: "t2", title: "Ananya Deshmukh", subtitle: "Verified Buyer", description: "Shopping via WhatsApp concierge was the smoothest experience ever. They shared detailed 4K close-up videos of the Banarasi weaves.", badge: "Mumbai, India", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: { rating: 5 } }, { itemId: "t3", title: "Radhika Patel", subtitle: "International Client", description: "Ordered from the US and my parcel arrived in just 4 days with pristine packing. The fabric is so soft, breathable, and authentic.", badge: "San Jose, USA", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 3, isActive: true, metadata: { rating: 5 } }] },
+  testimonials: { sectionId: "testimonials", title: "What our Customer says", subtitle: "", description: "", badgeText: "", mediaUrl: "", mediaAlt: "", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "", ctaLink: "#", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{ itemId: "t1", title: "Jane Bennet", subtitle: "Fashion Model", description: "Ladies vibe provided me the exact quality product I wanted. I'm very much satisfied by their quick delivery process. They delivered my dress within a day. Ladies vibe provided me the exact quality product I wanted. I'm very much satisfied by their quick delivery process. They delivered my dress within a day. Ladies vibe provided me the exact quality product I wanted. I'm very much satisfied by their quick delivery process. They delivered my dress within a day. Ladies vibe provided me the exact quality product I wanted. I'm very much satisfied by their quick delivery process. They delivered my dress within a day. Ladies vibe provided me the exact quality product I wanted. I'm very much satisfied by their quick delivery process. They delivered my dress within a day.", badge: "Fashion Model", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: { rating: 5 } }, { itemId: "t2", title: "Priya Sundaram", subtitle: "Verified Bride", description: "The silk saree and the temple necklace set I ordered for my sister's wedding completely surpassed my expectations. The zari craftsmanship is truly heirloom quality.", badge: "Chennai, India", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: { rating: 5 } }, { itemId: "t3", title: "Ananya Deshmukh", subtitle: "Verified Buyer", description: "Shopping via WhatsApp concierge was the smoothest experience ever. They shared detailed 4K close-up videos of the Banarasi weaves.", badge: "Mumbai, India", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 3, isActive: true, metadata: { rating: 5 } }] },
   footer: { sectionId: "footer", title: "", subtitle: "", description: "Celebrating timeless Indian royalty with handpicked silk sarees, designer ethnic sets, and authentic temple jewellery crafted for extraordinary celebrations.", badgeText: "", mediaUrl: "/homepage/logo2.png", mediaAlt: "Sree Collections", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "", ctaLink: "#", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: { phone: "+91 98765 43210", email: "support@sreecollections.com", copyright: "Sree Collections. All Rights Reserved." }, items: [{ itemId: "footer-col-1", title: "Kanjeevaram Pure Silk", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-col-2", title: "Banarasi Heritage Weaves", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-col-3", title: "Bridal Lehengas & Kurtas", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 3, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-col-4", title: "Temple Jewellery Sets", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 4, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-col-5", title: "Everyday Casuals & Denims", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 5, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-col-6", title: "Festive Home Decor", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 6, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-care-1", title: "Track Your Order", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: { group: "customer-care" } }, { itemId: "footer-care-2", title: "Shipping & Global Delivery", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: { group: "customer-care" } }, { itemId: "footer-care-3", title: "Custom Blouse Stitching", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 3, isActive: true, metadata: { group: "customer-care" } }, { itemId: "footer-care-4", title: "WhatsApp Live Video Call", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 4, isActive: true, metadata: { group: "customer-care" } }, { itemId: "footer-care-5", title: "Returns & Exchanges", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 5, isActive: true, metadata: { group: "customer-care" } }, { itemId: "footer-care-6", title: "Authenticity Certificate", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 6, isActive: true, metadata: { group: "customer-care" } }] },
 };
 
@@ -104,7 +104,19 @@ export default function HomePage() {
   // Convenience helpers
   const S = (id: string): CMSSection => cms[id] || FALLBACK_CMS[id] || {} as CMSSection;
   const items = (id: string) => (S(id).items || []).filter(i => i.isActive !== false);
-  const testimonials = items("testimonials");
+  const rawTestimonials = items("testimonials");
+  const testimonials = useMemo(() => {
+    const jane = FALLBACK_CMS.testimonials.items[0];
+    if (!rawTestimonials.length) return [jane];
+    const janeIndex = rawTestimonials.findIndex(t => t.title?.toLowerCase().includes("jane"));
+    if (janeIndex > 0) {
+      const copy = [...rawTestimonials];
+      const [j] = copy.splice(janeIndex, 1);
+      return [j, ...copy];
+    }
+    if (janeIndex === 0) return rawTestimonials;
+    return [jane, ...rawTestimonials];
+  }, [rawTestimonials]);
   const casualCards = items("spotlight-casual");
   const sareeCards = items("spotlight-saree");
   const decorCards = items("spotlight-decor");
@@ -256,19 +268,57 @@ export default function HomePage() {
             </Link>
           </nav>
 
-          {/* Mobile Hamburger */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
+          {/* Mobile Right Actions: Search + Cart + Hamburger */}
+          <div
             style={{
               display: "none",
-              padding: "8px",
-              color: "#2F2C24",
+              alignItems: "center",
+              gap: "8px",
             }}
-            className="mobile-hamburger"
+            className="mobile-header-actions"
           >
-            {mobileMenuOpen ? <FiX size={26} /> : <FiMenu size={26} />}
-          </button>
+            <a
+              href="/search"
+              aria-label="Search"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#5A2035",
+                padding: "6px",
+              }}
+            >
+              <FiSearch size={21} strokeWidth={2} />
+            </a>
+            <Link
+              href="/cart"
+              aria-label="Shopping Cart"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#5A2035",
+                padding: "6px",
+                position: "relative",
+              }}
+            >
+              <FiShoppingCart size={21} strokeWidth={2} />
+            </Link>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+              style={{
+                padding: "6px",
+                color: "#2F2C24",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+              }}
+              className="mobile-hamburger"
+            >
+              {mobileMenuOpen ? <FiX size={25} /> : <FiMenu size={25} />}
+            </button>
+          </div>
         </header>
       </div>
 
@@ -402,36 +452,40 @@ export default function HomePage() {
               margin: "0 0 6px 0",
             }}
           >
-            Dive Into A W
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                verticalAlign: "middle",
-                margin: "0 4px",
-                width: "0.8em",
-                height: "0.8em",
-                transform: "translateY(-0.06em)",
-              }}
-            >
-              <svg viewBox="0 0 100 100" style={{ width: "100%", height: "100%", display: "block" }}>
-                <circle cx="50" cy="50" r="48" fill="#BA8E43" />
-                <circle cx="50" cy="50" r="44" fill="#B3863B" stroke="#DFC487" strokeWidth="1.2" />
-                <g fill="#FFFDF8">
-                  {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
-                    <path
-                      key={i}
-                      d="M 50 16 C 54.5 16, 55 35, 50 41 C 45 35, 45.5 16, 50 16 Z"
-                      transform={`rotate(${angle} 50 50)`}
-                    />
-                  ))}
-                </g>
-                <circle cx="50" cy="50" r="7.5" fill="#BA8E43" stroke="#FFFDF8" strokeWidth="2" />
-                <circle cx="50" cy="50" r="2.5" fill="#FFFDF8" />
-              </svg>
-            </span>
-            Rld Of Endless
+            Dive Into A{" "}
+            <span style={{ display: "inline-flex", alignItems: "center", whiteSpace: "nowrap" }}>
+              W
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  verticalAlign: "middle",
+                  margin: "0 4px",
+                  width: "0.8em",
+                  height: "0.8em",
+                  transform: "translateY(-0.06em)",
+                }}
+              >
+                <svg viewBox="0 0 100 100" style={{ width: "100%", height: "100%", display: "block" }}>
+                  <circle cx="50" cy="50" r="48" fill="#BA8E43" />
+                  <circle cx="50" cy="50" r="44" fill="#B3863B" stroke="#DFC487" strokeWidth="1.2" />
+                  <g fill="#FFFDF8">
+                    {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
+                      <path
+                        key={i}
+                        d="M 50 16 C 54.5 16, 55 35, 50 41 C 45 35, 45.5 16, 50 16 Z"
+                        transform={`rotate(${angle} 50 50)`}
+                      />
+                    ))}
+                  </g>
+                  <circle cx="50" cy="50" r="7.5" fill="#BA8E43" stroke="#FFFDF8" strokeWidth="2" />
+                  <circle cx="50" cy="50" r="2.5" fill="#FFFDF8" />
+                </svg>
+              </span>
+              Rld
+            </span>{" "}
+            Of Endless
           </h1>
 
           {/* Line 2: Fashion Possibilities + Subtitle */}
@@ -598,9 +652,11 @@ export default function HomePage() {
                     alignItems: "center",
                     justifyContent: "center",
                     gap: "12px",
-                    fontSize: "12.5px",
-                    fontWeight: 600,
-                    letterSpacing: "1px",
+                    fontFamily: "'Blacker Display', Georgia, serif",
+                    fontSize: "14px",
+                    fontWeight: 700,
+                    lineHeight: "100%",
+                    letterSpacing: "-0.03em",
                     textTransform: "uppercase",
                     boxShadow: "0 3px 12px rgba(186, 142, 67, 0.22)",
                     transition: "all 0.25s ease",
@@ -1091,50 +1147,57 @@ export default function HomePage() {
 
           {/* Line 4: Button */}
           <div style={{ marginTop: "36px" }}>
-            <button
-              className="editorial-shop-btn"
-              style={{
-                width: "416px",
-                maxWidth: "100%",
-                height: "56px",
-                borderRadius: "77px",
-                opacity: 1,
-                gap: "10px",
-                padding: "20px 99px",
-                background: "#BB8E43",
-                border: "none",
-                cursor: "pointer",
-                boxSizing: "border-box",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transition: "all 0.3s ease",
-              }}
+            <Link
+              href={S("editorial-banner").ctaLink || "#featured"}
+              style={{ textDecoration: "none" }}
             >
-              <span
+              <button
+                className="editorial-shop-btn"
                 style={{
-                  fontFamily: "'Blacker Display', var(--font-serif)",
-                  fontSize: "14px",
-                  fontWeight: 500,
-                  letterSpacing: "0.14em",
-                  color: "#FFFFFF",
-                  textTransform: "uppercase",
-                  whiteSpace: "nowrap",
+                  width: "416px",
+                  maxWidth: "100%",
+                  height: "56px",
+                  borderRadius: "77px",
+                  opacity: 1,
+                  gap: "10px",
+                  padding: "20px 99px",
+                  background: "#BB8E43",
+                  border: "none",
+                  cursor: "pointer",
+                  boxSizing: "border-box",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "all 0.3s ease",
                 }}
               >
-                {S("editorial-banner").ctaText || "SHOP NOW"}
-              </span>
-              <svg
-                width="46"
-                height="12"
-                viewBox="0 0 46 12"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                style={{ stroke: "#FFFFFF", strokeWidth: "1.2px", overflow: "visible", flexShrink: 0 }}
-              >
-                <path d="M0 6H44M38 1.5L44 6L38 10.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
+                <span
+                  style={{
+                    fontFamily: "'Blacker Display', Georgia, serif",
+                    fontWeight: 700,
+                    fontStyle: "normal",
+                    fontSize: "14px",
+                    lineHeight: "100%",
+                    letterSpacing: "-0.03em",
+                    color: "#FFFFFF",
+                    textTransform: "uppercase",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {S("editorial-banner").ctaText || "SHOP NOW"}
+                </span>
+                <svg
+                  width="46"
+                  height="12"
+                  viewBox="0 0 46 12"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  style={{ stroke: "#FFFFFF", strokeWidth: "1.2px", overflow: "visible", flexShrink: 0 }}
+                >
+                  <path d="M0 6H44M38 1.5L44 6L38 10.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            </Link>
           </div>
         </div>
       </section>
@@ -1145,6 +1208,7 @@ export default function HomePage() {
       {spotlightSections.map((section) => (
         <CategorySpotlightSection key={section.sectionId} section={section as any} />
       ))}
+
 
       {/* =========================================================================
           10. WHATSAPP SHOPPING BANNER — "Shopping Made Personal"
@@ -1176,7 +1240,7 @@ export default function HomePage() {
           className="whatsapp-banner"
         >
           {/* Left: text content */}
-          <div style={{ flex: "1 1 420px", zIndex: 2 }}>
+          <div style={{ flex: "1 1 580px", maxWidth: "640px", zIndex: 2 }}>
             {/* "Shopping Made Personal" label */}
             <div
               style={{
@@ -1217,54 +1281,102 @@ export default function HomePage() {
               target="_blank"
               rel="noreferrer"
               style={{
-                background: "#25D366",
-                color: "#FFFFFF",
-                padding: "13px 32px",
-                borderRadius: "28px",
-                fontSize: "15px",
-                fontWeight: 700,
+                width: "100%",
+                maxWidth: "416px",
+                height: "72px",
+                borderRadius: "77px",
+                padding: "24px 32px",
+                gap: "10px",
                 display: "inline-flex",
                 alignItems: "center",
-                gap: "10px",
-                boxShadow: "0 6px 20px rgba(37, 211, 102, 0.35)",
+                justifyContent: "center",
+                backgroundColor: "#BA8E43",
+                backgroundImage: "linear-gradient(180deg, #BA8E43 0%, #A97C33 100%)",
+                boxShadow: "0 8px 24px rgba(186, 142, 67, 0.3)",
+                color: "#FFFFFF",
+                textDecoration: "none",
                 transition: "all 0.3s ease",
-                marginBottom: "28px",
+                marginBottom: "32px",
+                boxSizing: "border-box",
+                cursor: "pointer",
               }}
-              className="primary-btn"
+              className="whatsapp-cta-btn"
             >
-              <FaWhatsapp size={20} /> {S("whatsapp-banner").ctaText || "Chat on WhatsApp"}
+              <div
+                style={{
+                  width: "26px",
+                  height: "26px",
+                  borderRadius: "50%",
+                  backgroundColor: "#25D366",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <FaWhatsapp size={16} color="#FFFFFF" />
+              </div>
+              <span
+                style={{
+                  fontFamily: "'Blacker Display', Georgia, serif",
+                  fontWeight: 700,
+                  fontSize: "16px",
+                  lineHeight: "100%",
+                  letterSpacing: "0%",
+                  textTransform: "uppercase",
+                  color: "#FFFFFF",
+                }}
+              >
+                CHECKOUT ON WHATSAPP
+              </span>
             </a>
 
-            {/* Step indicators: Added Cart → WhatsApp → Order Confirmed */}
+            {/* Step indicators: Add to Cart → WhatsApp → Order Confirmed */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "8px",
-                flexWrap: "wrap",
+                gap: "12px",
+                flexWrap: "nowrap",
+                fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', var(--font-sans), sans-serif",
+                fontWeight: 400,
+                fontSize: "clamp(14px, 1.35vw, 22px)",
+                lineHeight: "100%",
+                letterSpacing: "0%",
+                color: "#2F2C24",
               }}
+              className="whatsapp-steps-flow"
             >
-              {(waSteps.length > 0 ? waSteps : [{ itemId: "s1", title: "Added Cart" }, { itemId: "s2", title: "WhatsApp" }, { itemId: "s3", title: "Order Confirmed" }]).map((step, i, arr) => (
-                <React.Fragment key={step.itemId}>
-                  <span
-                    style={{
-                      backgroundColor: "rgba(255,255,255,0.75)",
-                      border: "1px solid rgba(187,142,67,0.35)",
-                      padding: "5px 14px",
-                      borderRadius: "20px",
-                      fontSize: "12.5px",
-                      fontWeight: 600,
-                      color: "#5D2030",
-                      backdropFilter: "blur(4px)",
-                    }}
-                  >
-                    {step.title}
-                  </span>
-                  {i < arr.length - 1 && (
-                    <span style={{ color: "#BB8E43", fontSize: "14px", fontWeight: 700 }}>→</span>
-                  )}
-                </React.Fragment>
-              ))}
+              <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", whiteSpace: "nowrap" }}>
+                <img
+                  src="/homepage/step_cart.png"
+                  alt="Cart"
+                  style={{ width: "24px", height: "24px", objectFit: "contain", flexShrink: 0 }}
+                />
+                <span>Add to Cart</span>
+              </div>
+
+              <span style={{ color: "#BA8E43", fontSize: "1.1em", fontWeight: 400, margin: "0 2px" }}>→</span>
+
+              <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", whiteSpace: "nowrap" }}>
+                <img
+                  src="/homepage/step_whatsapp.png"
+                  alt="WhatsApp"
+                  style={{ width: "22px", height: "22px", objectFit: "contain", flexShrink: 0 }}
+                />
+                <span>WhatsApp</span>
+              </div>
+
+              <span style={{ color: "#BA8E43", fontSize: "1.1em", fontWeight: 400, margin: "0 2px" }}>→</span>
+
+              <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", whiteSpace: "nowrap" }}>
+                <img
+                  src="/homepage/step_check.png"
+                  alt="Order Confirmed"
+                  style={{ width: "20px", height: "16px", objectFit: "contain", flexShrink: 0 }}
+                />
+                <span>Order Confirmed</span>
+              </div>
             </div>
           </div>
 
@@ -1301,88 +1413,155 @@ export default function HomePage() {
       <section
         style={{
           width: "100%",
-          maxWidth: "1280px",
+          maxWidth: "1140px",
           margin: "0 auto 100px auto",
-          padding: "0 40px",
+          padding: "0 24px",
           boxSizing: "border-box",
         }}
       >
-        <div style={{ textAlign: "center", marginBottom: "36px" }}>
-          <h2
-            style={{
-              fontFamily: "var(--font-serif)",
-              fontWeight: 700,
-              fontSize: "clamp(28px, 3.2vw, 40px)",
-              color: "#2F2C24",
-              margin: 0,
-            }}
-          >
-            {S("testimonials").title || "Why our"}{" "}
-            <span style={{ color: "#5D2030" }}>Customer</span>
-            {" "}says
-          </h2>
-        </div>
-
+        {/* Header Block (right-aligned) */}
         <div
           style={{
-            maxWidth: "960px",
-            margin: "0 auto",
-            backgroundColor: "#FFFFFF",
-            borderRadius: "32px",
-            padding: "50px 60px",
-            border: "1px solid #EFE4D5",
-            boxShadow: "0 14px 40px rgba(93, 32, 48, 0.06)",
-            position: "relative",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end",
+            marginBottom: "52px",
+            width: "100%",
           }}
-          className="testimonial-card"
+          className="testimonials-header"
         >
           <div
             style={{
+              display: "inline-flex",
+              alignItems: "baseline",
+              gap: "10px",
+              flexWrap: "wrap",
+              justifyContent: "flex-end",
+            }}
+          >
+            <span
+              style={{
+                fontFamily: "'Blacker Display', Georgia, serif",
+                fontWeight: 500,
+                fontSize: "clamp(24px, 2.8vw, 36px)",
+                lineHeight: "100%",
+                letterSpacing: "0%",
+                color: "#5D2030",
+              }}
+            >
+              What our
+            </span>
+            <span
+              style={{
+                fontFamily: "'Blacker Display', Georgia, serif",
+                fontWeight: 500,
+                fontSize: "clamp(38px, 4.8vw, 64px)",
+                lineHeight: "100%",
+                letterSpacing: "0%",
+                color: "#5D2030",
+              }}
+            >
+              Customer says
+            </span>
+          </div>
+
+          <div
+            style={{
+              width: "480px",
+              maxWidth: "100%",
+              height: "1.5px",
+              backgroundColor: "#A6858C",
+              margin: "12px 0 14px auto",
+            }}
+          />
+
+          <p
+            style={{
+              fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', var(--font-sans), sans-serif",
+              fontWeight: 400,
+              fontStyle: "normal",
+              fontSize: "16px",
+              color: "#2F2C24",
+              margin: 0,
+              textAlign: "right",
+              lineHeight: "100%",
+              letterSpacing: "0%",
+            }}
+          >
+            We value our customer's feedback to provide the best service.
+          </p>
+        </div>
+
+        {/* Testimonial Content (Direct on background, no white card, matching mockup) */}
+        <div style={{ width: "100%", boxSizing: "border-box" }}>
+          {/* Deep Maroon Quotation Mark */}
+          <div
+            style={{
               fontFamily: "Georgia, serif",
-              fontSize: "72px",
-              lineHeight: "1",
-              color: "#BB8E43",
-              opacity: 0.4,
-              marginBottom: "10px",
+              fontSize: "56px",
+              lineHeight: 1,
+              color: "#5D2030",
+              fontWeight: 700,
+              marginBottom: "16px",
             }}
           >
             “
           </div>
 
+          {/* Review Text */}
           <p
+            className="testimonial-review-text"
             style={{
-              fontFamily: "var(--font-serif)",
-              fontSize: "clamp(18px, 1.8vw, 22px)",
-              fontStyle: "italic",
+              fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', var(--font-sans), sans-serif",
+              fontWeight: 400,
+              fontStyle: "normal",
+              fontSize: "16px",
               color: "#2F2C24",
-              lineHeight: 1.6,
-              marginBottom: "32px",
+              lineHeight: "100%",
+              letterSpacing: "0%",
+              maxWidth: "calc(100% - 156px)",
+              margin: "0 0 32px 0",
             }}
           >
             {testimonials.length > 0 ? (testimonials[activeTestimonial]?.description || "") : ""}
           </p>
 
+          {/* Author info + Navigation arrows on same row */}
           <div
             style={{
               display: "flex",
-              alignItems: "center",
+              alignItems: "flex-end",
               justifyContent: "space-between",
-              borderTop: "1px solid #F1E7DA",
-              paddingTop: "24px",
               flexWrap: "wrap",
-              gap: "16px",
+              gap: "20px",
             }}
           >
             <div>
-              <h4 style={{ fontFamily: "var(--font-sans)", fontSize: "17px", fontWeight: 700, color: "#5D2030", margin: 0 }}>
+              <h4
+                style={{
+                  fontFamily: "'Blacker Display', Georgia, serif",
+                  fontSize: "20px",
+                  fontWeight: 700,
+                  color: "#5D2030",
+                  margin: "0 0 4px 0",
+                  lineHeight: 1.2,
+                }}
+              >
                 {testimonials.length > 0 ? (testimonials[activeTestimonial]?.title || "") : ""}
               </h4>
-              <span style={{ fontSize: "13.5px", color: "#7A7062" }}>
-                {testimonials.length > 0 ? `${testimonials[activeTestimonial]?.badge || ""} • ${testimonials[activeTestimonial]?.subtitle || ""}` : ""}
+              <span
+                style={{
+                  fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', var(--font-sans), sans-serif",
+                  fontSize: "13px",
+                  color: "#7A7062",
+                }}
+              >
+                {testimonials.length > 0 ? (testimonials[activeTestimonial]?.subtitle || testimonials[activeTestimonial]?.badge || "") : ""}
               </span>
             </div>
 
-            <div style={{ display: "flex", gap: "12px" }}>
+            {/* Navigation Arrows (60x60 squircle outline buttons with gold border, matching Figma) */}
+            <div style={{ display: "flex", gap: "16px" }}>
               <button
                 onClick={() =>
                   setActiveTestimonial(
@@ -1391,40 +1570,48 @@ export default function HomePage() {
                 }
                 aria-label="Previous review"
                 style={{
-                  width: "44px",
-                  height: "44px",
-                  borderRadius: "50%",
-                  border: "1.5px solid #BB8E43",
-                  color: "#BB8E43",
-                  backgroundColor: "#FFFFFF",
+                  width: "60px",
+                  height: "60px",
+                  borderRadius: "14px",
+                  border: "1.5px solid #BA8E43",
+                  color: "#BA8E43",
+                  backgroundColor: "transparent",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
+                  cursor: "pointer",
                   transition: "all 0.2s ease",
                 }}
-                className="icon-btn"
+                className="icon-btn float-hover"
               >
-                <FiArrowLeft size={18} />
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
               </button>
+
               <button
                 onClick={() =>
                   setActiveTestimonial((prev) => (prev + 1) % testimonials.length)
                 }
                 aria-label="Next review"
                 style={{
-                  width: "44px",
-                  height: "44px",
-                  borderRadius: "50%",
-                  backgroundColor: "#BB8E43",
-                  color: "#FFFFFF",
+                  width: "60px",
+                  height: "60px",
+                  borderRadius: "14px",
+                  border: "1.5px solid #BA8E43",
+                  color: "#BA8E43",
+                  backgroundColor: "transparent",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
+                  cursor: "pointer",
                   transition: "all 0.2s ease",
                 }}
-                className="icon-btn"
+                className="icon-btn float-hover"
               >
-                <FiArrowRight size={18} />
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
               </button>
             </div>
           </div>
@@ -1442,10 +1629,19 @@ export default function HomePage() {
           .desktop-nav {
             display: flex !important;
           }
+          .mobile-header-actions {
+            display: none !important;
+          }
         }
         @media (max-width: 991px) {
+          .desktop-nav {
+            display: none !important;
+          }
+          .mobile-header-actions {
+            display: flex !important;
+          }
           .mobile-hamburger {
-            display: block !important;
+            display: flex !important;
           }
           .hero-frame-svg {
             display: none !important;
@@ -1570,6 +1766,78 @@ export default function HomePage() {
             grid-template-columns: 1fr !important;
             gap: 32px !important;
           }
+          .spotlight-grid {
+            grid-template-columns: 1fr !important;
+            gap: 40px !important;
+          }
+          .saree-grid .spotlight-right-col {
+            order: 1 !important;
+          }
+          .saree-grid .spotlight-offset-col {
+            order: 2 !important;
+          }
+          .spotlight-right-col {
+            align-items: flex-start !important;
+          }
+          .spotlight-header-right {
+            align-items: flex-start !important;
+            text-align: left !important;
+          }
+          .spotlight-header-right p {
+            text-align: left !important;
+          }
+          .spotlight-offset-col {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+          }
+          .saree-line {
+            margin-left: 0 !important;
+          }
+          .testimonial-review-text {
+            max-width: 100% !important;
+            line-height: 1.5 !important;
+          }
+          .testimonials-header {
+            align-items: flex-start !important;
+          }
+          .testimonials-header > div {
+            justify-content: flex-start !important;
+          }
+          .testimonials-header p {
+            text-align: left !important;
+          }
+          .mosaic-split-card {
+            height: auto !important;
+            min-height: 240px !important;
+            flex-direction: column !important;
+          }
+          .mosaic-split-card .mosaic-card-text-wrap {
+            width: 100% !important;
+            padding: 24px 20px !important;
+          }
+          .mosaic-split-card .mosaic-card-img-wrap {
+            width: 100% !important;
+            height: 190px !important;
+          }
+          .mosaic-right-tall {
+            height: 380px !important;
+          }
+          .mosaic-bottom-wide {
+            height: auto !important;
+            min-height: 260px !important;
+            flex-direction: column !important;
+          }
+          .mosaic-bottom-wide .mosaic-bottom-text-wrap {
+            width: 100% !important;
+            padding: 24px 20px !important;
+          }
+          .mosaic-bottom-wide .mosaic-bottom-img-wrap {
+            width: 100% !important;
+            height: 200px !important;
+          }
+          .mosaic-bottom-small {
+            height: 300px !important;
+          }
         }
 
         @keyframes marquee {
@@ -1585,21 +1853,32 @@ export default function HomePage() {
 
         @media (max-width: 640px) {
           .editorial-banner-text {
-            font-size: 28px !important;
-            line-height: 130% !important;
+            font-size: clamp(22px, 5.5vw, 28px) !important;
+            line-height: 125% !important;
           }
           .editorial-banner-img {
-            width: 120px !important;
-            height: 36px !important;
-            border-radius: 30px !important;
+            width: 96px !important;
+            height: 30px !important;
+            border-radius: 20px !important;
           }
           .editorial-banner-row {
-            gap: 10px !important;
+            gap: 8px !important;
           }
           .editorial-shop-btn {
-            width: 300px !important;
-            height: 50px !important;
-            padding: 14px 30px !important;
+            width: min(320px, 92%) !important;
+            height: 52px !important;
+            padding: 12px 24px !important;
+          }
+          .whatsapp-cta-btn {
+            height: 60px !important;
+            padding: 16px 20px !important;
+            max-width: 100% !important;
+          }
+          .whatsapp-steps-flow {
+            flex-wrap: wrap !important;
+            justify-content: center !important;
+            font-size: 13px !important;
+            gap: 8px !important;
           }
         }
 
