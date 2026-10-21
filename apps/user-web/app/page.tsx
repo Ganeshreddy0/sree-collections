@@ -34,7 +34,7 @@ const FALLBACK_CMS: CMSData = {
   "spotlight-casual": { sectionId: "spotlight-casual", title: "Casual Wear", subtitle: "Collections", description: "We provide the largest clothing collection for your comfort. You can choose trendy or classy design according to your preferences. Our services are super fast and we update within 24 hours.", badgeText: "We consider your look and comfort on scorching weather.", mediaUrl: "/homepage/casual_model1.jpg", mediaAlt: "Casual Wear Model", secondaryMediaUrl: "/homepage/casual_model2.jpg", secondaryMediaAlt: "Casual Pink Outfit", tertiaryMediaUrl: "/homepage/casual_model3.jpg", tertiaryMediaAlt: "Denim and Sneakers", ctaText: "Explore", ctaLink: "/categories?category=Casual+Wear", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: { layout: "left-tall", secondaryDescription: "Our main aim is to serve our customer with better quality product. We try to understand their needs and provide them within a short period of time." }, items: [] },
   "spotlight-saree": { sectionId: "spotlight-saree", title: "Saree", subtitle: "Collections", description: "We provide the largest collection sarees. You can choose trendy or classy design according to your preferences. Our services are super fast and we update within 24 hours.", badgeText: "We consider your look and comfort on cold weather.", mediaUrl: "/homepage/saree_models.jpg", mediaAlt: "Royal Silk Sarees", secondaryMediaUrl: "/homepage/saree_green.jpg", secondaryMediaAlt: "Handcrafted Silk Sarees", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "Explore", ctaLink: "/categories?category=Saree", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: { layout: "left-overlapping", secondaryDescription: "Our main aim is to serve our customer with better quality product. We try to understand their needs and provide them within a short period of time. We provide the largest clothing collection for any season. You can choose trendy or classy design according to your preferences. Our services are super fast and we update within 24 hours." }, items: [] },
   "whatsapp-banner": { sectionId: "whatsapp-banner", title: "Curate your cart.", subtitle: "Complete on WhatsApp.", description: "", badgeText: "🛍 Shopping Made Personal", mediaUrl: "/homepage/img5.png", mediaAlt: "Sree Collections WhatsApp Shopping Bag", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "Chat on WhatsApp", ctaLink: "https://wa.me/?text=Hello%20Sree%20Collections%2C%20I%20want%20to%20shop!", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{ itemId: "wa-step-1", title: "Added Cart", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: {} }, { itemId: "wa-step-2", title: "WhatsApp", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: {} }, { itemId: "wa-step-3", title: "Order Confirmed", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 3, isActive: true, metadata: {} }] },
-  testimonials: { sectionId: "testimonials", title: "What our Customer says", subtitle: "", description: "", badgeText: "", mediaUrl: "", mediaAlt: "", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "", ctaLink: "#", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{ itemId: "t1", title: "Jane Bennet", subtitle: "Fashion Model", description: "Ladies vibe provided me the exact quality product I wanted. I'm very much satisfied by their quick delivery process. They delivered my dress within a day. Ladies vibe provided me the exact quality product I wanted. I'm very much satisfied by their quick delivery process. They delivered my dress within a day. Ladies vibe provided me the exact quality product I wanted. I'm very much satisfied by their quick delivery process. They delivered my dress within a day. Ladies vibe provided me the exact quality product I wanted. I'm very much satisfied by their quick delivery process. They delivered my dress within a day. Ladies vibe provided me the exact quality product I wanted. I'm very much satisfied by their quick delivery process. They delivered my dress within a day.", badge: "Fashion Model", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: { rating: 5 } }, { itemId: "t2", title: "Priya Sundaram", subtitle: "Verified Bride", description: "The silk saree and the temple necklace set I ordered for my sister's wedding completely surpassed my expectations. The zari craftsmanship is truly heirloom quality.", badge: "Chennai, India", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: { rating: 5 } }, { itemId: "t3", title: "Ananya Deshmukh", subtitle: "Verified Buyer", description: "Shopping via WhatsApp concierge was the smoothest experience ever. They shared detailed 4K close-up videos of the Banarasi weaves.", badge: "Mumbai, India", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 3, isActive: true, metadata: { rating: 5 } }] },
+  testimonials: { sectionId: "testimonials", title: "What our Customer says", subtitle: "", description: "", badgeText: "", mediaUrl: "", mediaAlt: "", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "", ctaLink: "#", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{ itemId: "t1", title: "Jane Bennet", subtitle: "Fashion Model", description: "Sree Collections provided me the exact quality product I wanted. I'm very much satisfied by their quick delivery process and attention to detail. The silk saree and royal jewellery exceeded all my expectations. Highly recommended!", badge: "Fashion Model", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: { rating: 5 } }, { itemId: "t2", title: "Priya Sundaram", subtitle: "Verified Bride", description: "The silk saree and the temple necklace set I ordered for my sister's wedding completely surpassed my expectations. The zari craftsmanship is truly heirloom quality.", badge: "Chennai, India", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: { rating: 5 } }, { itemId: "t3", title: "Ananya Deshmukh", subtitle: "Verified Buyer", description: "Shopping via WhatsApp concierge was the smoothest experience ever. They shared detailed 4K close-up videos of the Banarasi weaves.", badge: "Mumbai, India", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 3, isActive: true, metadata: { rating: 5 } }] },
   footer: { sectionId: "footer", title: "", subtitle: "", description: "Celebrating timeless Indian royalty with handpicked silk sarees, designer ethnic sets, and authentic temple jewellery crafted for extraordinary celebrations.", badgeText: "", mediaUrl: "/homepage/logo2.png", mediaAlt: "Sree Collections", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "", ctaLink: "#", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: { phone: "+91 98765 43210", email: "support@sreecollections.com", copyright: "Sree Collections. All Rights Reserved." }, items: [{ itemId: "footer-col-1", title: "Kanjeevaram Pure Silk", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-col-2", title: "Banarasi Heritage Weaves", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-col-3", title: "Bridal Lehengas & Kurtas", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 3, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-col-4", title: "Temple Jewellery Sets", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 4, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-col-5", title: "Everyday Casuals & Denims", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 5, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-col-6", title: "Festive Home Decor", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 6, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-care-1", title: "Track Your Order", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: { group: "customer-care" } }, { itemId: "footer-care-2", title: "Shipping & Global Delivery", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: { group: "customer-care" } }, { itemId: "footer-care-3", title: "Custom Blouse Stitching", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 3, isActive: true, metadata: { group: "customer-care" } }, { itemId: "footer-care-4", title: "WhatsApp Live Video Call", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 4, isActive: true, metadata: { group: "customer-care" } }, { itemId: "footer-care-5", title: "Returns & Exchanges", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 5, isActive: true, metadata: { group: "customer-care" } }, { itemId: "footer-care-6", title: "Authenticity Certificate", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 6, isActive: true, metadata: { group: "customer-care" } }] },
 };
 
@@ -1422,7 +1422,7 @@ export default function HomePage() {
       </section>
 
       {/* =========================================================================
-          11. TESTIMONIALS SECTION — "Why our Customer says"
+          11. TESTIMONIALS SECTION — "What our Customer says"
          ========================================================================= */}
       <section
         style={{
@@ -1433,13 +1433,14 @@ export default function HomePage() {
           boxSizing: "border-box",
         }}
       >
-        {/* Header Block (right-aligned) */}
+        {/* Header Block (Centered, Balanced Luxury Design) */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            alignItems: "flex-end",
-            marginBottom: "52px",
+            alignItems: "center",
+            textAlign: "center",
+            marginBottom: "44px",
             width: "100%",
           }}
           className="testimonials-header"
@@ -1450,16 +1451,15 @@ export default function HomePage() {
               alignItems: "baseline",
               gap: "10px",
               flexWrap: "wrap",
-              justifyContent: "flex-end",
+              justifyContent: "center",
             }}
           >
             <span
               style={{
                 fontFamily: "'Blacker Display', Georgia, serif",
                 fontWeight: 500,
-                fontSize: "clamp(24px, 2.8vw, 36px)",
-                lineHeight: "100%",
-                letterSpacing: "0%",
+                fontSize: "clamp(26px, 3vw, 38px)",
+                lineHeight: "1.2",
                 color: "#5D2030",
               }}
             >
@@ -1468,10 +1468,9 @@ export default function HomePage() {
             <span
               style={{
                 fontFamily: "'Blacker Display', Georgia, serif",
-                fontWeight: 500,
-                fontSize: "clamp(38px, 4.8vw, 64px)",
-                lineHeight: "100%",
-                letterSpacing: "0%",
+                fontWeight: 700,
+                fontSize: "clamp(36px, 4.2vw, 56px)",
+                lineHeight: "1.2",
                 color: "#5D2030",
               }}
             >
@@ -1481,11 +1480,11 @@ export default function HomePage() {
 
           <div
             style={{
-              width: "480px",
+              width: "140px",
               maxWidth: "100%",
-              height: "1.5px",
-              backgroundColor: "#A6858C",
-              margin: "12px 0 14px auto",
+              height: "2px",
+              backgroundColor: "#BA8E43",
+              margin: "12px auto 14px auto",
             }}
           />
 
@@ -1493,47 +1492,59 @@ export default function HomePage() {
             style={{
               fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', var(--font-sans), sans-serif",
               fontWeight: 400,
-              fontStyle: "normal",
-              fontSize: "16px",
-              color: "#2F2C24",
+              fontSize: "15px",
+              color: "#685F53",
               margin: 0,
-              textAlign: "right",
-              lineHeight: "100%",
-              letterSpacing: "0%",
+              lineHeight: 1.5,
             }}
           >
-            We value our customer's feedback to provide the best service.
+            We value our customer&apos;s feedback to provide the best service.
           </p>
         </div>
 
-        {/* Testimonial Content (Direct on background, no white card, matching mockup) */}
-        <div style={{ width: "100%", boxSizing: "border-box" }}>
+        {/* Testimonial Luxury White Card */}
+        <div
+          style={{
+            width: "100%",
+            maxWidth: "960px",
+            margin: "0 auto",
+            backgroundColor: "#FFFFFF",
+            borderRadius: "28px",
+            padding: "48px 56px",
+            border: "1.5px solid #EFE4D5",
+            boxShadow: "0 14px 40px rgba(93, 32, 48, 0.06)",
+            boxSizing: "border-box",
+            position: "relative",
+          }}
+          className="testimonial-card"
+        >
           {/* Deep Maroon Quotation Mark */}
           <div
             style={{
               fontFamily: "Georgia, serif",
               fontSize: "56px",
               lineHeight: 1,
-              color: "#5D2030",
+              color: "#BA8E43",
               fontWeight: 700,
               marginBottom: "16px",
+              opacity: 0.85,
             }}
           >
             “
           </div>
 
-          {/* Review Text */}
+          {/* Review Text with proper line-height so it never overlaps! */}
           <p
             className="testimonial-review-text"
             style={{
-              fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', var(--font-sans), sans-serif",
+              fontFamily: "'Playfair Display', Georgia, serif",
               fontWeight: 400,
               fontStyle: "normal",
-              fontSize: "16px",
+              fontSize: "17.5px",
               color: "#2F2C24",
-              lineHeight: "100%",
-              letterSpacing: "0%",
-              maxWidth: "calc(100% - 156px)",
+              lineHeight: 1.75,
+              letterSpacing: "0.2px",
+              maxWidth: "100%",
               margin: "0 0 32px 0",
             }}
           >
@@ -1544,8 +1555,10 @@ export default function HomePage() {
           <div
             style={{
               display: "flex",
-              alignItems: "flex-end",
+              alignItems: "center",
               justifyContent: "space-between",
+              borderTop: "1px solid #F1E7DA",
+              paddingTop: "24px",
               flexWrap: "wrap",
               gap: "20px",
             }}
@@ -1566,7 +1579,7 @@ export default function HomePage() {
               <span
                 style={{
                   fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', var(--font-sans), sans-serif",
-                  fontSize: "13px",
+                  fontSize: "13.5px",
                   color: "#7A7062",
                 }}
               >
@@ -1574,8 +1587,8 @@ export default function HomePage() {
               </span>
             </div>
 
-            {/* Navigation Arrows (60x60 squircle outline buttons with gold border, matching Figma) */}
-            <div style={{ display: "flex", gap: "16px" }}>
+            {/* Navigation Arrows */}
+            <div style={{ display: "flex", gap: "14px" }}>
               <button
                 onClick={() =>
                   setActiveTestimonial(
@@ -1584,21 +1597,22 @@ export default function HomePage() {
                 }
                 aria-label="Previous review"
                 style={{
-                  width: "60px",
-                  height: "60px",
+                  width: "50px",
+                  height: "50px",
                   borderRadius: "14px",
                   border: "1.5px solid #BA8E43",
                   color: "#BA8E43",
-                  backgroundColor: "transparent",
+                  backgroundColor: "#FFFFFF",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   cursor: "pointer",
-                  transition: "all 0.2s ease",
+                  transition: "all 0.25s ease",
+                  boxShadow: "0 2px 8px rgba(186, 142, 67, 0.12)",
                 }}
                 className="icon-btn float-hover"
               >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="15 18 9 12 15 6" />
                 </svg>
               </button>
@@ -1609,21 +1623,22 @@ export default function HomePage() {
                 }
                 aria-label="Next review"
                 style={{
-                  width: "60px",
-                  height: "60px",
+                  width: "50px",
+                  height: "50px",
                   borderRadius: "14px",
                   border: "1.5px solid #BA8E43",
-                  color: "#BA8E43",
-                  backgroundColor: "transparent",
+                  color: "#FFFFFF",
+                  backgroundColor: "#BA8E43",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   cursor: "pointer",
-                  transition: "all 0.2s ease",
+                  transition: "all 0.25s ease",
+                  boxShadow: "0 3px 12px rgba(186, 142, 67, 0.25)",
                 }}
                 className="icon-btn float-hover"
               >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="9 18 15 12 9 6" />
                 </svg>
               </button>
