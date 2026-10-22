@@ -1,0 +1,168 @@
+@import url('https://fonts.cdnfonts.com/css/blacker-display');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+@font-face {
+  font-family: 'Blacker Display';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/Blacker-Display-Regular.woff') format('woff'),
+       url('https://fonts.cdnfonts.com/s/28160/Blacker-Display-Regular-trial.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Blacker Display';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/Blacker-Display-Medium.woff') format('woff'),
+       url('https://fonts.cdnfonts.com/s/28160/Blacker-Display-Medium-trial.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Blacker Display';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/Blacker-Display-Bold.woff') format('woff'),
+       url('https://fonts.cdnfonts.com/s/28160/Blacker-Display-Bold-trial.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Blacker Display';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/Blacker-Display-Bold.woff') format('woff'),
+       url('https://fonts.cdnfonts.com/s/28160/Blacker-Display-Bold-trial.woff') format('woff');
+}
+
+:root {
+  --font-serif: 'Blacker Display', 'Playfair Display', 'Cinzel Decorative', Georgia, serif;
+  --font-sans: 'Turnkey Lite', 'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif;
+  --maroon: #5D2030;
+  --gold: #BB8E43;
+  --gold-light: #DFBE7E;
+  --gold-dark: #8F6627;
+  --dark: #2F2C24;
+  --cream-bg: #FCF8F2;
+  --ivory-white: #FFFFFF;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--cream-bg);
+  color: var(--dark);
+  font-family: var(--font-sans);
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  outline: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes gentleFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 4px 20px rgba(187, 142, 67, 0.25); }
+  50% { box-shadow: 0 8px 30px rgba(187, 142, 67, 0.45); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.float-hover {
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.float-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 32px rgba(93, 32, 48, 0.12);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1ede5;
+}
+::-webkit-scrollbar-thumb {
+  background: #BB8E43;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #5D2030;
+}
+
+/* =========================================================================
+   Mobile Global Responsive Polish (<= 768px)
+   Does not modify desktop layouts or typography.
+   ========================================================================= */
+@media (max-width: 768px) {
+  /* Prevent any logo from pushing header content off-screen on mobile */
+  header img[alt="Sree Collections"],
+  header img[src*="logo"] {
+    height: 46px !important;
+    max-width: 195px !important;
+    width: auto !important;
+  }
+
+  /* Make sure header accommodates logo and action buttons comfortably */
+  header {
+    min-height: 68px !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  /* Universal hamburger button visibility on all subpages */
+  .mobile-hamburger {
+    display: flex !important;
+    align-items: center;
+    justifyContent: center;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 6px;
+    color: #2F2C24;
+    flex-shrink: 0;
+  }
+
+  /* Flexible inputs in form groups prevent container busting */
+  input, select, textarea {
+    max-width: 100% !important;
+  }
+}
