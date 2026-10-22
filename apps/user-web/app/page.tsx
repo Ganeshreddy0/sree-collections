@@ -179,6 +179,7 @@ export default function HomePage() {
           <div style={{ display: "flex", alignItems: "center" }}>
             <a href="#" style={{ display: "inline-block" }}>
               <img
+                className="home-logo"
                 src={S("header").mediaUrl || "/homepage/logo2_trans.png"}
                 alt={S("header").mediaAlt || "Sree Collections"}
                 style={{
@@ -865,6 +866,7 @@ export default function HomePage() {
       >
         <div style={{ marginBottom: "26px" }}>
           <h2
+            className="home-section-title"
             style={{
               fontFamily: "var(--font-serif)",
               fontWeight: 700,
@@ -972,6 +974,7 @@ export default function HomePage() {
             }}
           >
             <div
+              className="delivery-title"
               style={{
                 fontFamily: "var(--font-serif)",
                 fontWeight: 700,
@@ -987,6 +990,7 @@ export default function HomePage() {
             </div>
 
             <div
+              className="delivery-subtitle"
               style={{
                 fontFamily: "var(--font-sans)",
                 fontWeight: 500,
@@ -1455,6 +1459,7 @@ export default function HomePage() {
             }}
           >
             <span
+              className="testimonial-title-sm"
               style={{
                 fontFamily: "'Blacker Display', Georgia, serif",
                 fontWeight: 500,
@@ -1466,6 +1471,7 @@ export default function HomePage() {
               What our
             </span>
             <span
+              className="testimonial-title-lg"
               style={{
                 fontFamily: "'Blacker Display', Georgia, serif",
                 fontWeight: 700,
@@ -1662,6 +1668,7 @@ export default function HomePage() {
             display: none !important;
           }
         }
+        /* Tablet — compress text/images; laptop (≥992) unchanged */
         @media (max-width: 991px) {
           .desktop-nav {
             display: none !important;
@@ -1672,12 +1679,44 @@ export default function HomePage() {
           .mobile-hamburger {
             display: flex !important;
           }
+          .home-logo {
+            height: 52px !important;
+            max-width: 220px !important;
+          }
+          .hero-main-title,
+          .hero-second-title {
+            font-size: 36px !important;
+            line-height: 1.15 !important;
+          }
+          .home-section-title {
+            font-size: 28px !important;
+          }
+          .delivery-title {
+            font-size: 36px !important;
+          }
+          .delivery-subtitle {
+            font-size: 20px !important;
+          }
+          .editorial-banner-text {
+            font-size: 30px !important;
+            line-height: 130% !important;
+          }
+          .editorial-banner-img {
+            width: 140px !important;
+            height: 40px !important;
+          }
+          .testimonial-title-sm {
+            font-size: 24px !important;
+          }
+          .testimonial-title-lg {
+            font-size: 32px !important;
+          }
           .hero-frame-svg {
             display: none !important;
           }
           .hero-grid-outer {
             border: 1.5px solid #DECDBE;
-            border-radius: 28px;
+            border-radius: 20px;
           }
           .hero-three-cols {
             grid-template-columns: 1fr !important;
@@ -1689,15 +1728,44 @@ export default function HomePage() {
             grid-template-columns: 1fr !important;
           }
           .delivery-banner {
-            padding: 30px 20px !important;
+            padding: 28px 18px !important;
             text-align: center;
           }
           .whatsapp-banner {
-            padding: 30px 20px !important;
+            padding: 28px 18px !important;
             text-align: center;
           }
           .testimonial-card {
-            padding: 32px 20px !important;
+            padding: 28px 18px !important;
+            border-radius: 20px !important;
+          }
+          .delivery-truck {
+            max-width: 220px !important;
+            height: auto !important;
+          }
+          .mosaic-left-column > a.mosaic-split-card {
+            height: auto !important;
+            min-height: 0 !important;
+            flex-direction: column !important;
+          }
+          .mosaic-split-card .mosaic-card-text-wrap {
+            width: 100% !important;
+            flex: none !important;
+            padding: 18px 16px 14px !important;
+          }
+          .mosaic-split-card .mosaic-card-img-wrap {
+            width: 100% !important;
+            height: 200px !important;
+            order: -1 !important;
+          }
+          .mosaic-split-card .mosaic-card-title {
+            font-size: 22px !important;
+          }
+          .mosaic-split-card .mosaic-card-badge {
+            font-size: 12px !important;
+          }
+          .mosaic-split-card .mosaic-card-cta {
+            font-size: 13px !important;
           }
         }
 
@@ -1736,10 +1804,13 @@ export default function HomePage() {
 
         .mosaic-bottom-small {
           width: 271.95px;
-          height: 357px;
+          height: auto;
+          min-height: 357px;
           border-radius: 24px;
           overflow: hidden;
           position: relative;
+          display: flex;
+          flex-direction: column;
           box-shadow: 0 10px 24px rgba(0,0,0,0.04);
           transition: all 0.35s ease;
         }
@@ -1784,6 +1855,40 @@ export default function HomePage() {
         }
 
         @media (max-width: 768px) {
+          .home-logo {
+            height: 46px !important;
+            max-width: 190px !important;
+          }
+          .hero-main-title,
+          .hero-second-title {
+            font-size: 28px !important;
+            line-height: 1.2 !important;
+          }
+          .home-section-title {
+            font-size: 24px !important;
+          }
+          .delivery-title {
+            font-size: 28px !important;
+          }
+          .delivery-subtitle {
+            font-size: 16px !important;
+            flex-wrap: wrap !important;
+            justify-content: center !important;
+          }
+          .editorial-banner-text {
+            font-size: 24px !important;
+            line-height: 125% !important;
+          }
+          .editorial-banner-img {
+            width: 110px !important;
+            height: 34px !important;
+          }
+          .testimonial-title-sm {
+            font-size: 20px !important;
+          }
+          .testimonial-title-lg {
+            font-size: 26px !important;
+          }
           .category-section-header {
             flex-direction: column !important;
             gap: 16px !important;
@@ -1825,6 +1930,7 @@ export default function HomePage() {
           .testimonial-review-text {
             max-width: 100% !important;
             line-height: 1.5 !important;
+            font-size: 15px !important;
           }
           .testimonials-header {
             align-items: flex-start !important;
@@ -1837,35 +1943,56 @@ export default function HomePage() {
           }
           .mosaic-split-card {
             height: auto !important;
-            min-height: 240px !important;
+            min-height: 0 !important;
             flex-direction: column !important;
           }
           .mosaic-split-card .mosaic-card-text-wrap {
             width: 100% !important;
-            padding: 24px 20px !important;
+            flex: none !important;
+            padding: 16px 14px 12px !important;
+            gap: 10px !important;
           }
           .mosaic-split-card .mosaic-card-img-wrap {
             width: 100% !important;
-            height: 190px !important;
+            height: 170px !important;
+            order: -1 !important;
+          }
+          .mosaic-split-card .mosaic-card-title {
+            font-size: 20px !important;
+          }
+          .mosaic-split-card .mosaic-card-badge {
+            font-size: 11px !important;
+            margin-bottom: 6px !important;
+          }
+          .mosaic-split-card .mosaic-card-cta {
+            font-size: 12px !important;
+          }
+          .mosaic-split-card .mosaic-card-desc {
+            font-size: 12px !important;
+            margin-bottom: 10px !important;
           }
           .mosaic-right-tall {
-            height: 380px !important;
+            height: 300px !important;
           }
           .mosaic-bottom-wide {
             height: auto !important;
-            min-height: 260px !important;
+            min-height: 220px !important;
             flex-direction: column !important;
           }
           .mosaic-bottom-wide .mosaic-bottom-text-wrap {
             width: 100% !important;
-            padding: 24px 20px !important;
+            padding: 20px 16px !important;
           }
           .mosaic-bottom-wide .mosaic-bottom-img-wrap {
             width: 100% !important;
-            height: 200px !important;
+            height: 160px !important;
           }
           .mosaic-bottom-small {
-            height: 300px !important;
+            height: auto !important;
+            min-height: 330px !important;
+          }
+          .delivery-truck {
+            max-width: 160px !important;
           }
         }
 
@@ -1881,33 +2008,83 @@ export default function HomePage() {
         }
 
         @media (max-width: 640px) {
+          .home-logo {
+            height: 42px !important;
+            max-width: 170px !important;
+          }
+          .hero-main-title,
+          .hero-second-title {
+            font-size: 24px !important;
+            line-height: 1.25 !important;
+          }
+          .home-section-title {
+            font-size: 22px !important;
+          }
+          .delivery-title {
+            font-size: 24px !important;
+          }
+          .delivery-subtitle {
+            font-size: 14px !important;
+          }
           .editorial-banner-text {
-            font-size: clamp(22px, 5.5vw, 28px) !important;
+            font-size: 20px !important;
             line-height: 125% !important;
           }
           .editorial-banner-img {
-            width: 96px !important;
-            height: 30px !important;
+            width: 88px !important;
+            height: 28px !important;
             border-radius: 20px !important;
           }
           .editorial-banner-row {
             gap: 8px !important;
           }
           .editorial-shop-btn {
-            width: min(320px, 92%) !important;
-            height: 52px !important;
-            padding: 12px 24px !important;
+            width: min(300px, 92%) !important;
+            height: 48px !important;
+            padding: 10px 20px !important;
+            font-size: 13px !important;
+          }
+          .testimonial-title-sm {
+            font-size: 18px !important;
+          }
+          .testimonial-title-lg {
+            font-size: 22px !important;
+          }
+          .testimonial-card {
+            padding: 22px 14px !important;
+            border-radius: 16px !important;
+          }
+          .mosaic-right-tall {
+            height: 240px !important;
+          }
+          .mosaic-bottom-small {
+            height: auto !important;
+            min-height: 320px !important;
+          }
+          .mosaic-split-card .mosaic-card-img-wrap,
+          .mosaic-bottom-wide .mosaic-bottom-img-wrap {
+            height: 150px !important;
+          }
+          .mosaic-split-card .mosaic-card-title {
+            font-size: 18px !important;
+          }
+          .mosaic-left-column > a {
+            height: auto !important;
           }
           .whatsapp-cta-btn {
-            height: 60px !important;
-            padding: 16px 20px !important;
+            height: 52px !important;
+            padding: 12px 16px !important;
             max-width: 100% !important;
+            font-size: 14px !important;
           }
           .whatsapp-steps-flow {
             flex-wrap: wrap !important;
             justify-content: center !important;
-            font-size: 13px !important;
-            gap: 8px !important;
+            font-size: 12px !important;
+            gap: 6px !important;
+          }
+          .delivery-truck {
+            max-width: 130px !important;
           }
         }
 

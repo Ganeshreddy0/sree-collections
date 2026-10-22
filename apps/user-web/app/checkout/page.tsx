@@ -9,7 +9,6 @@ import {
   FiTruck,
   FiCheckCircle,
   FiAlertCircle,
-  FiLock,
   FiShoppingBag,
   FiSearch,
   FiShoppingCart,
@@ -481,10 +480,19 @@ export default function CheckoutPage() {
 
       {/* Main Container */}
       <main style={{ maxWidth: "1200px", margin: "28px auto 0 auto", padding: "0 24px" }}>
-        {/* Navigation / Security Bar */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
+        {/* Navigation Bar */}
+        <div
+          className="checkout-nav-bar"
+          style={{
+            display: "flex",
+            justifyContent: "flex-start",
+            alignItems: "center",
+            marginBottom: "24px",
+          }}
+        >
           <Link
             href="/cart"
+            className="checkout-back-link"
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -493,24 +501,12 @@ export default function CheckoutPage() {
               fontSize: "14px",
               fontWeight: 600,
               textDecoration: "none",
+              whiteSpace: "nowrap",
             }}
           >
-            <FiArrowLeft size={18} />
+            <FiArrowLeft size={16} />
             <span>Back to Cart</span>
           </Link>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              fontSize: "13px",
-              color: "#5D2030",
-              fontWeight: 600,
-            }}
-          >
-            <FiLock size={16} color="#BB8E43" />
-            <span>Secure 256-bit Checkout</span>
-          </div>
         </div>
         {/* Breadcrumb / Title */}
         <div style={{ marginBottom: "32px" }}>
@@ -1445,6 +1441,25 @@ export default function CheckoutPage() {
           }
           .checkout-hamburger {
             display: flex !important;
+          }
+          .checkout-back-link {
+            font-size: 13px !important;
+            gap: 6px !important;
+          }
+          main h2 {
+            font-size: 24px !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .checkout-back-link {
+            font-size: 12px !important;
+          }
+          main h2 {
+            font-size: 20px !important;
+          }
+          main {
+            padding: 0 16px !important;
+            margin-top: 16px !important;
           }
         }
         .checkout-nav-link:hover {
