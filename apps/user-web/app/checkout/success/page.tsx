@@ -20,8 +20,7 @@ import {
   FiX,
 } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
-
-const API_BASE = "http://localhost:5000/api";
+import { API_BASE } from "@/lib/config";
 
 function NavLink({
   href,

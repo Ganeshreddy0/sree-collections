@@ -19,8 +19,7 @@ import {
   FaInstagram,
   FaWhatsapp,
 } from "react-icons/fa";
-
-const API_BASE = "http://localhost:5000/api";
+import { API_BASE } from "@/lib/config";
 
 /* ─────────────────────────────────────────────
    Product Interface

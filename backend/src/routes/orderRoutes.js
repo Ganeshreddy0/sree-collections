@@ -6,6 +6,7 @@ import {
   getAllOrders,
   updateOrderStatus,
   retryWhatsAppNotification,
+  triggerOwnerAlert,
 } from '../controllers/orderController.js';
 import { protect, requireAdmin, optionalProtect } from '../middleware/auth.js';
 
@@ -20,5 +21,6 @@ router.get('/:id', optionalProtect, getOrderById);
 router.get('/', protect, requireAdmin, getAllOrders);
 router.patch('/:id/status', protect, requireAdmin, updateOrderStatus);
 router.post('/:id/retry-whatsapp', protect, requireAdmin, retryWhatsAppNotification);
+router.post('/:id/owner-alert', protect, requireAdmin, triggerOwnerAlert);
 
 export default router;

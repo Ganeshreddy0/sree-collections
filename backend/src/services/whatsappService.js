@@ -257,7 +257,166 @@ async function sendFallbackTextMessage(order, cleanedPhone, itemsSummary, format
 }
 
 /**
+ * Send WhatsApp notification to the Store Owner when a new order is placed.
+ * @param {Object} order - Order document
+ * @returns {Promise<Object>}
+ */
+export async function sendOwnerOrderAlert(order) {
+  const rawOwnerPhone = ENV.OWNER_WHATSAPP_PHONE || '919948469132';
+  const cleanedOwnerPhone = formatPhoneNumber(rawOwnerPhone);
+
+  if (!cleanedOwnerPhone) {
+    console.warn('[WhatsApp Owner Alert] Invalid owner phone number:', rawOwnerPhone);
+    return { success: false, status: 'failed', error: 'Invalid owner phone number' };
+  }
+
+  if (!isWhatsAppConfigured()) {
+    console.warn('[WhatsApp Owner Alert] WhatsApp API credentials not configured');
+    return { success: false, status: 'not_configured', error: 'WhatsApp not configured' };
+  }
+
+  const apiUrl = `https://graph.facebook.com/${ENV.WHATSAPP_API_VERSION}/${ENV.WHATSAPP_PHONE_NUMBER_ID}/messages`;
+
+  // Build the detailed items list and address for follow-up freeform message
+  const itemsList = (order.items || [])
+    .map(
+      (it, idx) =>
+        `${idx + 1}. ${it.title}${it.colour ? ' (' + it.colour + ')' : ''}${
+          it.size && it.size !== 'Free Size' ? ' [' + it.size + ']' : ''
+        } x${it.quantity} = Rs.${it.price * it.quantity}`
+    )
+    .join('\n');
+
+  const address = order.shippingAddress || {};
+  const addressLine = [address.street, address.city, address.state, address.pincode]
+    .filter(Boolean)
+    .join(', ');
+
+  const fullDetailsText =
+    `NEW ORDER RECEIVED - Sree Collections\n\n` +
+    `Order ID: #${order.orderNumber}\n` +
+    `Customer: ${order.customerName}\n` +
+    `Phone: +${order.customerPhone}\n` +
+    `WhatsApp: +${order.whatsappNumber || order.customerPhone}\n` +
+    `Amount: Rs.${Number(order.totalAmount || 0).toLocaleString('en-IN')} (${order.paymentMethod || 'COD'})\n\n` +
+    `Items Ordered:\n${itemsList}\n\n` +
+    `Delivery Address:\n${address.fullName || order.customerName}\n${addressLine}\n\n` +
+    `Placed At: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}`;
+
+  // STEP 1: Send template FIRST (guaranteed delivery — works even outside 24hr window)
+  // Pack the most important owner info into the 3 template parameters
+  const templatePayload = {
+    messaging_product: 'whatsapp',
+    recipient_type: 'individual',
+    to: cleanedOwnerPhone,
+    type: 'template',
+    template: {
+      name: ENV.WHATSAPP_TEMPLATE_NAME,
+      language: { code: ENV.WHATSAPP_TEMPLATE_LANG || 'en' },
+      components: [
+        {
+          type: 'body',
+          parameters: [
+            {
+              type: 'text',
+              text: `OWNER ALERT - ${String(order.customerName || 'Customer').replace(/[\r\n\t]/g, ' ').trim()}`.slice(0, 60),
+            },
+            {
+              type: 'text',
+              text: `#${order.orderNumber} | +${order.customerPhone || ''}`.replace(/[\r\n\t]/g, ' ').trim().slice(0, 60),
+            },
+            {
+              type: 'text',
+              text: `Rs.${Number(order.totalAmount || 0).toLocaleString('en-IN')} (${order.paymentMethod || 'COD'}) | ${order.items?.length || 0} item(s)`.replace(/[\r\n\t]/g, ' ').trim().slice(0, 60),
+            },
+          ],
+        },
+      ],
+    },
+  };
+
+  let templateResult = null;
+  try {
+    const tmplRes = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${ENV.WHATSAPP_API_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(templatePayload),
+    });
+    const tmplData = await tmplRes.json();
+
+    if (tmplRes.ok && tmplData.messages && tmplData.messages.length > 0) {
+      console.log(`[WhatsApp Owner Alert] Template alert sent to owner ${cleanedOwnerPhone} - MessageID: ${tmplData.messages[0].id}`);
+      templateResult = {
+        success: true,
+        status: 'sent',
+        messageId: tmplData.messages[0].id,
+        recipient: cleanedOwnerPhone,
+        sentAt: new Date(),
+        method: 'template',
+      };
+    } else {
+      console.warn('[WhatsApp Owner Alert] Template failed:', tmplData.error?.message || JSON.stringify(tmplData));
+      templateResult = {
+        success: false,
+        status: 'failed',
+        error: tmplData.error?.message || 'Template delivery failed',
+        recipient: cleanedOwnerPhone,
+      };
+    }
+  } catch (tmplErr) {
+    console.error('[WhatsApp Owner Alert] Template network error:', tmplErr.message);
+    templateResult = { success: false, status: 'failed', error: tmplErr.message, recipient: cleanedOwnerPhone };
+  }
+
+  // STEP 2: After template (which opens a conversation context), try sending the FULL DETAILS as freeform text
+  // This works when the template message opens the conversation or if 24hr window is already open
+  if (templateResult.success) {
+    // Small delay to allow template to register before follow-up
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    try {
+      const textRes = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${ENV.WHATSAPP_API_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messaging_product: 'whatsapp',
+          recipient_type: 'individual',
+          to: cleanedOwnerPhone,
+          type: 'text',
+          text: { preview_url: false, body: fullDetailsText },
+        }),
+      });
+      const textData = await textRes.json();
+      if (textRes.ok && textData.messages && textData.messages.length > 0) {
+        console.log(`[WhatsApp Owner Alert] Full details text also sent to owner ${cleanedOwnerPhone}`);
+        return {
+          ...templateResult,
+          fullDetailsSent: true,
+          fullDetailsMessageId: textData.messages[0].id,
+        };
+      } else {
+        // Freeform failed (e.g., outside 24hr window) but template was already sent
+        console.log(`[WhatsApp Owner Alert] Full details text blocked (outside 24hr window) — template was already delivered.`);
+        return { ...templateResult, fullDetailsSent: false, fullDetailsError: textData.error?.message };
+      }
+    } catch (textErr) {
+      console.log(`[WhatsApp Owner Alert] Full details text error: ${textErr.message} — template was already delivered.`);
+      return { ...templateResult, fullDetailsSent: false, fullDetailsError: textErr.message };
+    }
+  }
+
+  return templateResult;
+}
+
+/**
  * Send WhatsApp status update message when order status changes (Shipped, Delivered, etc.).
+ * Supports both rich text (inside 24h window) and approved template fallback (outside 24h window).
  */
 export async function sendOrderStatusUpdate(order, newStatus) {
   const rawPhone = order.whatsappNumber || order.customerPhone;
@@ -282,26 +441,18 @@ export async function sendOrderStatusUpdate(order, newStatus) {
   const apiUrl = `https://graph.facebook.com/${ENV.WHATSAPP_API_VERSION}/${ENV.WHATSAPP_PHONE_NUMBER_ID}/messages`;
 
   // Status update message body
+  const statusEmoji = newStatus.toLowerCase().includes('ship') ? '🚚' : newStatus.toLowerCase().includes('deliver') ? '🎁' : '✨';
   const textBody =
     `*🌸 Sree Collections - Order Status Update*\n\n` +
     `Hello *${order.customerName}*,\n` +
-    `The status of your order *${order.orderNumber}* has been updated to: *${newStatus.toUpperCase()}*.\n\n` +
+    `The status of your saree order *#${order.orderNumber}* has been updated to: *${newStatus.toUpperCase()}* ${statusEmoji}\n\n` +
     `*Order ID:* ${order.orderNumber}\n` +
+    `*Updated Status:* *${newStatus.toUpperCase()}*\n` +
     `*Total Amount:* ₹${Number(order.totalAmount || 0).toLocaleString('en-IN')}\n\n` +
     `Thank you for shopping with Sree Collections! ✨\n` +
-    `For any assistance, reply to this chat.`;
+    `For any assistance or courier inquiries, reply directly to this chat.`;
 
-  const payload = {
-    messaging_product: 'whatsapp',
-    recipient_type: 'individual',
-    to: cleanedPhone,
-    type: 'text',
-    text: {
-      preview_url: false,
-      body: textBody,
-    },
-  };
-
+  // 1. Attempt sending rich text message
   try {
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -309,7 +460,16 @@ export async function sendOrderStatusUpdate(order, newStatus) {
         Authorization: `Bearer ${ENV.WHATSAPP_API_TOKEN}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: cleanedPhone,
+        type: 'text',
+        text: {
+          preview_url: false,
+          body: textBody,
+        },
+      }),
     });
 
     const data = await response.json();
@@ -324,10 +484,57 @@ export async function sendOrderStatusUpdate(order, newStatus) {
       };
     }
 
+    console.warn(`[WhatsApp Status Update] Text send failed (${data.error?.message}), attempting template delivery...`);
+
+    // 2. Fallback to approved template if freeform text was rejected (e.g. outside 24h window)
+    const templatePayload = {
+      messaging_product: 'whatsapp',
+      recipient_type: 'individual',
+      to: cleanedPhone,
+      type: 'template',
+      template: {
+        name: ENV.WHATSAPP_TEMPLATE_NAME,
+        language: {
+          code: ENV.WHATSAPP_TEMPLATE_LANG || 'en',
+        },
+        components: [
+          {
+            type: 'body',
+            parameters: [
+              { type: 'text', text: String(order.customerName || 'Valued Customer').replace(/[\r\n\t]/g, ' ').trim().slice(0, 50) },
+              { type: 'text', text: `#${order.orderNumber} Status: ${newStatus.toUpperCase()}`.replace(/[\r\n\t]/g, ' ').trim().slice(0, 50) },
+              { type: 'text', text: `₹${Number(order.totalAmount || 0).toLocaleString('en-IN')} [${newStatus.toUpperCase()}]`.replace(/[\r\n\t]/g, ' ').trim().slice(0, 50) },
+            ],
+          },
+        ],
+      },
+    };
+
+    const tmplRes = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${ENV.WHATSAPP_API_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(templatePayload),
+    });
+
+    const tmplData = await tmplRes.json();
+    if (tmplRes.ok && tmplData.messages && tmplData.messages.length > 0) {
+      return {
+        success: true,
+        status: 'sent',
+        messageId: tmplData.messages[0].id,
+        recipient: cleanedPhone,
+        isTemplateFallback: true,
+        sentAt: new Date(),
+      };
+    }
+
     return {
       success: false,
       status: 'failed',
-      error: data.error?.message || 'Status update delivery failed',
+      error: tmplData.error?.message || data.error?.message || 'Status update delivery failed',
       recipient: cleanedPhone,
     };
   } catch (error) {
@@ -339,3 +546,4 @@ export async function sendOrderStatusUpdate(order, newStatus) {
     };
   }
 }
+

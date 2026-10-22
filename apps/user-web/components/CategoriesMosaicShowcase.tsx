@@ -3,8 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { FiArrowRight, FiChevronRight } from "react-icons/fi";
-
-const API_BASE = "http://localhost:5000/api";
+import { API_BASE, BACKEND_URL } from "@/lib/config";
 
 interface CategoryDoc {
   _id?: string;
@@ -125,7 +124,7 @@ function normalizeImageUrl(src?: string, fallback = ""): string {
     return trimmed;
   }
   if (trimmed.startsWith("/uploads/")) {
-    return `http://localhost:5000${trimmed}`;
+    return `${BACKEND_URL}${trimmed}`;
   }
   if (trimmed.startsWith("/")) {
     return trimmed;
