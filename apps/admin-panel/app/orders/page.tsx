@@ -17,10 +17,11 @@ import {
   FiTruck,
   FiCreditCard,
   FiSend,
+  FiExternalLink,
 } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
 interface OrderItem {
   title: string;
@@ -128,6 +129,76 @@ export default function AdminOrdersPage() {
     setActionMessage(null);
   };
 
+  // Helper to open direct WhatsApp conversation
+  const getCustomerWhatsAppLink = (order: Order) => {
+    const rawPhone = order.whatsappNumber || order.customerPhone || "";
+    const cleanPhone = rawPhone.replace(/\D/g, "");
+    const formattedPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
+    const msg = `Hello ${order.customerName},\nThis is Sree Collections regarding your order #${order.orderNumber}.\nStatus: *${order.orderStatus.toUpperCase()}*.\nTotal: ₹${order.totalAmount.toLocaleString("en-IN")}.\nThank you for shopping with us! ✨`;
+    return `https://wa.me/${formattedPhone}?text=${encodeURIComponent(msg)}`;
+  };
+
+  const getOwnerWhatsAppLink = (order: Order) => {
+    const ownerPhone = "919948469132";
+    const itemsList = order.items.map((it, idx) => `${idx + 1}. ${it.title} x${it.quantity} (₹${it.price * it.quantity})`).join("\n");
+    const addr = order.shippingAddress ? `${order.shippingAddress.street}, ${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.pincode}` : "Not specified";
+    const msg = `🚨 *SREE COLLECTIONS - ORDER ALERT*\nOrder ID: #${order.orderNumber}\nCustomer: ${order.customerName}\nPhone: +${order.customerPhone}\nTotal: ₹${order.totalAmount.toLocaleString("en-IN")} (${order.paymentMethod})\n\nItems:\n${itemsList}\n\nDelivery Address:\n${addr}`;
+    return `https://wa.me/${ownerPhone}?text=${encodeURIComponent(msg)}`;
+  };
+
+  // Quick status update direct from table
+  const handleQuickStatusChange = async (orderId: string, statusVal: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/orders/${orderId}/status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer demo_token",
+        },
+        body: JSON.stringify({
+          orderStatus: statusVal,
+          sendWhatsAppNotification: true,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setActionMessage({
+          type: "success",
+          text: data.message || `Order status updated to "${statusVal}". WhatsApp status update triggered.`,
+        });
+        fetchOrders();
+      } else {
+        setActionMessage({ type: "error", text: data.message || "Failed to update status" });
+      }
+    } catch (err: any) {
+      setActionMessage({ type: "error", text: err.message || "Status update network error" });
+    }
+  };
+
+  // Trigger owner WhatsApp alert manually
+  const handleSendOwnerAlert = async (orderId: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/orders/${orderId}/owner-alert`, {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer demo_token",
+        },
+      });
+      const data = await res.json();
+      if (data.success) {
+        setActionMessage({
+          type: "success",
+          text: data.message || "WhatsApp alert sent to Store Owner (+919948469132)!",
+        });
+        fetchOrders();
+      } else {
+        setActionMessage({ type: "error", text: data.message || "Failed to send owner alert" });
+      }
+    } catch (err: any) {
+      setActionMessage({ type: "error", text: err.message || "Owner alert network error" });
+    }
+  };
+
   // Update order status with optional WhatsApp status notification
   const handleUpdateStatus = async () => {
     if (!selectedOrder) return;
@@ -152,9 +223,7 @@ export default function AdminOrdersPage() {
         setSelectedOrder(data.data);
         setActionMessage({
           type: "success",
-          text: `Order status updated to "${newStatus}".${
-            notifyWhatsApp ? " WhatsApp notification triggered." : ""
-          }`,
+          text: data.message || `Order status updated to "${newStatus}". WhatsApp notification triggered.`,
         });
         fetchOrders();
       } else {
@@ -539,39 +608,54 @@ export default function AdminOrdersPage() {
                         ₹{ord.totalAmount.toLocaleString("en-IN")}
                       </td>
 
-                      {/* Order Status */}
+                      {/* Order Status with Quick Change Dropdown */}
                       <td style={{ padding: "12px 16px" }}>
-                        <span
-                          style={{
-                            display: "inline-block",
-                            padding: "3px 10px",
-                            borderRadius: "999px",
-                            fontSize: "12px",
-                            fontWeight: 600,
-                            backgroundColor:
-                              ord.orderStatus === "Delivered"
-                                ? "#DEF7EC"
-                                : ord.orderStatus === "Shipped"
-                                ? "#E1EFFE"
-                                : ord.orderStatus === "Processing" || ord.orderStatus === "Confirmed"
-                                ? "#FEF3C7"
-                                : ord.orderStatus === "Cancelled"
-                                ? "#FDE8E8"
-                                : "#F3F4F6",
-                            color:
-                              ord.orderStatus === "Delivered"
-                                ? "#03543F"
-                                : ord.orderStatus === "Shipped"
-                                ? "#1E429F"
-                                : ord.orderStatus === "Processing" || ord.orderStatus === "Confirmed"
-                                ? "#92400E"
-                                : ord.orderStatus === "Cancelled"
-                                ? "#9B1C1C"
-                                : "#374151",
-                          }}
-                        >
-                          {ord.orderStatus}
-                        </span>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                          <select
+                            value={ord.orderStatus}
+                            onChange={(e) => handleQuickStatusChange(ord._id, e.target.value)}
+                            style={{
+                              padding: "4px 8px",
+                              borderRadius: "6px",
+                              fontSize: "12px",
+                              fontWeight: 700,
+                              cursor: "pointer",
+                              border: "1.5px solid",
+                              borderColor:
+                                ord.orderStatus === "Delivered"
+                                  ? "#059669"
+                                  : ord.orderStatus === "Shipped"
+                                  ? "#2563EB"
+                                  : ord.orderStatus === "Processing" || ord.orderStatus === "Confirmed"
+                                  ? "#D97706"
+                                  : "#DC2626",
+                              backgroundColor:
+                                ord.orderStatus === "Delivered"
+                                  ? "#ECFDF5"
+                                  : ord.orderStatus === "Shipped"
+                                  ? "#EFF6FF"
+                                  : ord.orderStatus === "Processing" || ord.orderStatus === "Confirmed"
+                                  ? "#FFFBEB"
+                                  : "#FEF2F2",
+                              color:
+                                ord.orderStatus === "Delivered"
+                                  ? "#065F46"
+                                  : ord.orderStatus === "Shipped"
+                                  ? "#1E40AF"
+                                  : ord.orderStatus === "Processing" || ord.orderStatus === "Confirmed"
+                                  ? "#92400E"
+                                  : "#991B1B",
+                            }}
+                            title="Change status and automatically notify customer on WhatsApp"
+                          >
+                            <option value="Confirmed">Confirmed</option>
+                            <option value="Processing">Processing</option>
+                            <option value="Shipped">Shipped 🚚</option>
+                            <option value="Delivered">Delivered 🎁</option>
+                            <option value="Cancelled">Cancelled</option>
+                          </select>
+                          <span style={{ fontSize: "10px", color: "#6B7280" }}>Auto-notifies on change</span>
+                        </div>
                       </td>
 
                       {/* WhatsApp Status Badge */}
@@ -615,12 +699,12 @@ export default function AdminOrdersPage() {
 
                       {/* Action buttons */}
                       <td style={{ padding: "12px 16px", textAlign: "center" }}>
-                        <div style={{ display: "flex", justifyContent: "center", gap: "8px" }}>
+                        <div style={{ display: "flex", justifyContent: "center", gap: "6px", alignItems: "center" }}>
                           <button
                             onClick={() => handleOpenModal(ord)}
-                            title="View & Manage Order"
+                            title="View full order details & audit log"
                             style={{
-                              padding: "6px 10px",
+                              padding: "6px 9px",
                               borderRadius: "6px",
                               backgroundColor: "#F3F4F6",
                               color: "#374151",
@@ -630,25 +714,53 @@ export default function AdminOrdersPage() {
                               display: "inline-flex",
                               alignItems: "center",
                               gap: "4px",
+                              border: "1px solid #E5E7EB",
                             }}
                           >
-                            <FiEye size={14} />
+                            <FiEye size={13} />
                             <span>Manage</span>
                           </button>
 
-                          <button
-                            onClick={() => handleRetryWhatsApp(ord._id)}
-                            title="Retry WhatsApp Notification"
+                          <a
+                            href={getCustomerWhatsAppLink(ord)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Chat with Customer on WhatsApp"
                             style={{
                               padding: "6px 8px",
                               borderRadius: "6px",
-                              backgroundColor: "rgba(37,211,102,0.12)",
+                              backgroundColor: "rgba(37,211,102,0.14)",
                               color: "#128C7E",
                               fontSize: "12px",
                               cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              textDecoration: "none",
+                              border: "1px solid rgba(37,211,102,0.25)",
                             }}
                           >
                             <FaWhatsapp size={14} color="#25D366" />
+                          </a>
+
+                          <button
+                            onClick={() => handleSendOwnerAlert(ord._id)}
+                            title="Send WhatsApp alert to Sree Collections Owner (+919948469132)"
+                            style={{
+                              padding: "6px 8px",
+                              borderRadius: "6px",
+                              backgroundColor: "#FEF3C7",
+                              color: "#92400E",
+                              fontSize: "11.5px",
+                              fontWeight: 600,
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "3px",
+                              border: "1px solid #FDE68A",
+                            }}
+                          >
+                            <FiSend size={12} />
+                            <span>Owner</span>
                           </button>
                         </div>
                       </td>
@@ -856,34 +968,58 @@ export default function AdminOrdersPage() {
                 marginBottom: "24px",
               }}
             >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", flexWrap: "wrap", gap: "8px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <FaWhatsapp size={20} color="#25D366" />
                   <strong style={{ color: "#128C7E", fontSize: "15px" }}>Meta WhatsApp Cloud API Delivery</strong>
                 </div>
 
-                <button
-                  onClick={() => handleRetryWhatsApp(selectedOrder._id)}
-                  disabled={retryingWa}
-                  style={{
-                    backgroundColor: "#128C7E",
-                    color: "#FFFFFF",
-                    padding: "6px 14px",
-                    borderRadius: "6px",
-                    fontSize: "12px",
-                    fontWeight: 600,
-                    cursor: retryingWa ? "not-allowed" : "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
-                  }}
-                >
-                  <FiRefreshCw size={12} className={retryingWa ? "spin" : ""} />
-                  <span>{retryingWa ? "Sending..." : "Resend / Retry Message"}</span>
-                </button>
+                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                  <button
+                    onClick={() => handleRetryWhatsApp(selectedOrder._id)}
+                    disabled={retryingWa}
+                    style={{
+                      backgroundColor: "#128C7E",
+                      color: "#FFFFFF",
+                      padding: "6px 14px",
+                      borderRadius: "6px",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      cursor: retryingWa ? "not-allowed" : "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      border: "none",
+                    }}
+                  >
+                    <FiRefreshCw size={12} className={retryingWa ? "spin" : ""} />
+                    <span>{retryingWa ? "Sending..." : "Notify Customer"}</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleSendOwnerAlert(selectedOrder._id)}
+                    style={{
+                      backgroundColor: "#B45309",
+                      color: "#FFFFFF",
+                      padding: "6px 14px",
+                      borderRadius: "6px",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      border: "none",
+                    }}
+                    title="Send WhatsApp alert to Owner (+919948469132)"
+                  >
+                    <FiSend size={12} />
+                    <span>Alert Owner</span>
+                  </button>
+                </div>
               </div>
 
-              <div style={{ fontSize: "13px", color: "#374151", lineHeight: 1.5 }}>
+              <div style={{ fontSize: "13px", color: "#374151", lineHeight: 1.6 }}>
                 <div>
                   <strong>Status: </strong>
                   <span
@@ -903,8 +1039,41 @@ export default function AdminOrdersPage() {
                 </div>
 
                 <div>
-                  <strong>Recipient: </strong>
+                  <strong>Customer WhatsApp: </strong>
                   <span>+{selectedOrder.whatsappNumber || selectedOrder.customerPhone}</span>
+                  <a
+                    href={getCustomerWhatsAppLink(selectedOrder)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      marginLeft: "10px",
+                      color: "#059669",
+                      textDecoration: "underline",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Open Chat with Customer ↗
+                  </a>
+                </div>
+
+                <div>
+                  <strong>Owner WhatsApp: </strong>
+                  <span>+919948469132 (Sree Collections Owner)</span>
+                  <a
+                    href={getOwnerWhatsAppLink(selectedOrder)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      marginLeft: "10px",
+                      color: "#B45309",
+                      textDecoration: "underline",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Open Chat with Owner ↗
+                  </a>
                 </div>
 
                 {selectedOrder.whatsappNotification.messageId && (
