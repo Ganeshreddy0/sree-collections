@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { FiArrowRight } from "react-icons/fi";
+import { BACKEND_URL } from "@/lib/config";
 
 export interface SpotlightSectionData {
   _id?: string;
@@ -44,7 +45,7 @@ function normalizeSrc(src?: string, fallback = ""): string {
     return trimmed;
   }
   if (trimmed.startsWith("/uploads/")) {
-    return `http://localhost:5000${trimmed}`;
+    return `${BACKEND_URL}${trimmed}`;
   }
   if (trimmed.startsWith("/")) {
     return trimmed;

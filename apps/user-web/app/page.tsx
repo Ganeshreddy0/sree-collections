@@ -16,9 +16,7 @@ import { FaWhatsapp } from "react-icons/fa";
 import FeaturedCardsShowcase from "@/components/FeaturedCardsShowcase";
 import CategoriesMosaicShowcase from "@/components/CategoriesMosaicShowcase";
 import CategorySpotlightSection from "@/components/CategorySpotlightSection";
-
-// ─── CMS API types & defaults ────────────────────────────────────────────────
-const API_BASE = "http://localhost:5000/api";
+import { API_BASE } from "@/lib/config";
 
 type CMSItem = { itemId: string; title: string; subtitle: string; description: string; badge: string; imageUrl: string; imageAlt: string; linkUrl: string; ctaText: string; bgColor: string; displayOrder: number; isActive: boolean; metadata: Record<string, unknown> };
 type CMSSection = { sectionId: string; title: string; subtitle: string; description: string; badgeText: string; mediaUrl: string; mediaAlt: string; secondaryMediaUrl: string; secondaryMediaAlt: string; tertiaryMediaUrl: string; tertiaryMediaAlt: string; ctaText: string; ctaLink: string; secondaryCtaText: string; secondaryCtaLink: string; isActive: boolean; settings: Record<string, unknown>; items: CMSItem[] };

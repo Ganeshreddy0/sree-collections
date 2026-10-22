@@ -13,7 +13,7 @@ import {
   FiTag,
 } from "react-icons/fi";
 
-const API = "http://localhost:5000/api";
+import { API_BASE as API } from "@/lib/config";
 const AUTH = "Bearer super_admin_authenticated";
 
 export interface CategoryData {

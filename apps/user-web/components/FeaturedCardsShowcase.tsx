@@ -4,8 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FiShoppingCart, FiChevronLeft, FiChevronRight } from "react-icons/fi";
-
-const API_BASE = "http://localhost:5000/api";
+import { API_BASE } from "@/lib/config";
 
 export interface FeaturedCardItem {
   id: string;

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import AdminShell from "@/components/AdminShell";
 import { FiPlus, FiMinus, FiChevronDown } from "react-icons/fi";
 
-const API = "http://localhost:5000/api";
+import { API_BASE as API } from "@/lib/config";
 const AUTH = "Bearer super_admin_authenticated";
 
 export default function AddVariantPage() {

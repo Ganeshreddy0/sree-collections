@@ -3,6 +3,7 @@ import Product from '../models/Product.js';
 import {
   sendOrderConfirmation,
   sendOrderStatusUpdate,
+  sendOwnerOrderAlert,
   formatPhoneNumber,
   isWhatsAppConfigured,
 } from '../services/whatsappService.js';
@@ -270,11 +271,52 @@ export const createOrder = async (req, res, next) => {
       };
     }
 
+    // 6. Send immediate WhatsApp Alert to Store Owner (contains customer details, items, address, total)
+    let ownerWhatsappResult = {
+      sent: false,
+      status: 'pending',
+      messageId: '',
+      error: '',
+    };
+    try {
+      const ownerRes = await sendOwnerOrderAlert(order);
+      console.log(`[Order #${order.orderNumber}] Owner WhatsApp alert result:`, ownerRes);
+
+      if (order.whatsappNotification && Array.isArray(order.whatsappNotification.logs)) {
+        order.whatsappNotification.logs.push({
+          timestamp: new Date(),
+          type: 'owner_alert',
+          status: ownerRes.status,
+          recipient: ownerRes.recipient || ENV.OWNER_WHATSAPP_PHONE || '919948469132',
+          messageId: ownerRes.messageId || '',
+          error: ownerRes.error || '',
+          details: ownerRes,
+        });
+        await order.save();
+      }
+
+      ownerWhatsappResult = {
+        sent: ownerRes.success === true,
+        status: ownerRes.status,
+        messageId: ownerRes.messageId || '',
+        error: ownerRes.error || '',
+        recipient: ownerRes.recipient,
+      };
+    } catch (ownerAlertErr) {
+      console.error('[Order] Error sending owner WhatsApp alert:', ownerAlertErr);
+      ownerWhatsappResult = {
+        sent: false,
+        status: 'failed',
+        error: ownerAlertErr.message,
+      };
+    }
+
     res.status(201).json({
       success: true,
       message: 'Order created and saved successfully',
       data: order,
       whatsapp: whatsappResult,
+      ownerWhatsapp: ownerWhatsappResult,
     });
   } catch (error) {
     next(error);
@@ -418,11 +460,11 @@ export const getAllOrders = async (req, res, next) => {
   }
 };
 
-// @desc    Update order status (Admin) & optionally trigger WhatsApp update
+// @desc    Update order status (Admin) & trigger WhatsApp update to customer
 // @route   PATCH /api/orders/:id/status
 export const updateOrderStatus = async (req, res, next) => {
   try {
-    const { orderStatus, paymentStatus, sendWhatsAppNotification = false } = req.body;
+    const { orderStatus, paymentStatus, sendWhatsAppNotification = true } = req.body;
     const order = await Order.findById(req.params.id);
 
     if (!order) {
@@ -433,22 +475,40 @@ export const updateOrderStatus = async (req, res, next) => {
     if (orderStatus) order.orderStatus = orderStatus;
     if (paymentStatus) order.paymentStatus = paymentStatus;
 
-    // Send WhatsApp status notification if requested and status changed
+    // Send WhatsApp status notification to customer if requested
     let statusWaResult = null;
-    if (sendWhatsAppNotification && orderStatus && orderStatus !== previousStatus && order.whatsappConsent) {
+    if (sendWhatsAppNotification && (orderStatus || paymentStatus)) {
       try {
-        statusWaResult = await sendOrderStatusUpdate(order, orderStatus);
+        const targetStatus = orderStatus || order.orderStatus;
+        statusWaResult = await sendOrderStatusUpdate(order, targetStatus);
+
+        if (!order.whatsappNotification) {
+          order.whatsappNotification = { attempts: 0, logs: [] };
+        }
+        if (!Array.isArray(order.whatsappNotification.logs)) {
+          order.whatsappNotification.logs = [];
+        }
+
         order.whatsappNotification.logs.push({
           timestamp: new Date(),
           type: 'status_update',
-          status: statusWaResult.status,
-          recipient: statusWaResult.recipient || order.whatsappNumber || order.customerPhone,
-          messageId: statusWaResult.messageId || '',
-          error: statusWaResult.error || '',
-          details: { previousStatus, newStatus: orderStatus, ...statusWaResult },
+          status: statusWaResult?.status || 'unknown',
+          recipient: statusWaResult?.recipient || order.whatsappNumber || order.customerPhone,
+          messageId: statusWaResult?.messageId || '',
+          error: statusWaResult?.error || '',
+          details: { previousStatus, newStatus: targetStatus, ...statusWaResult },
         });
+
+        if (statusWaResult?.status === 'sent') {
+          order.whatsappNotification.status = 'sent';
+          order.whatsappNotification.sentAt = new Date();
+          order.whatsappNotification.error = '';
+        } else if (statusWaResult?.error) {
+          order.whatsappNotification.error = statusWaResult.error;
+        }
       } catch (err) {
         console.error('[Order] Status update WhatsApp notification error:', err);
+        statusWaResult = { success: false, status: 'failed', error: err.message };
       }
     }
 
@@ -456,9 +516,56 @@ export const updateOrderStatus = async (req, res, next) => {
 
     res.json({
       success: true,
-      message: 'Order updated successfully',
+      message: statusWaResult?.success
+        ? `Order status updated to "${order.orderStatus}" and WhatsApp notification delivered to customer.`
+        : statusWaResult?.error
+        ? `Order status updated to "${order.orderStatus}". WhatsApp note: ${statusWaResult.error}`
+        : `Order status updated to "${order.orderStatus}".`,
       data: order,
       whatsappUpdate: statusWaResult,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Manually trigger WhatsApp Alert to Store Owner for an order
+// @route   POST /api/orders/:id/owner-alert
+export const triggerOwnerAlert = async (req, res, next) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    const ownerRes = await sendOwnerOrderAlert(order);
+
+    if (!order.whatsappNotification) {
+      order.whatsappNotification = { attempts: 0, logs: [] };
+    }
+    if (!Array.isArray(order.whatsappNotification.logs)) {
+      order.whatsappNotification.logs = [];
+    }
+
+    order.whatsappNotification.logs.push({
+      timestamp: new Date(),
+      type: 'manual_owner_alert',
+      status: ownerRes.status,
+      recipient: ownerRes.recipient || ENV.OWNER_WHATSAPP_PHONE || '919948469132',
+      messageId: ownerRes.messageId || '',
+      error: ownerRes.error || '',
+      details: ownerRes,
+    });
+
+    await order.save();
+
+    res.json({
+      success: ownerRes.success === true,
+      message: ownerRes.success
+        ? 'Owner WhatsApp alert sent successfully!'
+        : `Owner WhatsApp attempt: ${ownerRes.status} - ${ownerRes.error}`,
+      data: order,
+      ownerWhatsappResult: ownerRes,
     });
   } catch (error) {
     next(error);
