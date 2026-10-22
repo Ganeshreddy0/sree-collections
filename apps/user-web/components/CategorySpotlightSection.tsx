@@ -82,11 +82,44 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
     else layout = "left-tall";
   }
 
-  // Resolve 3 images
+  const isCasual = section.sectionId.includes("casual") || layout === "left-tall";
+  const isSaree = section.sectionId.includes("saree") || layout === "left-overlapping";
+  const isDecor = section.sectionId.includes("decor") || layout === "right-overlapping";
+
   const items = section.items || [];
-  const img1 = normalizeSrc(section.mediaUrl || items[0]?.imageUrl, "/homepage/casual_model1.jpg");
-  const img2 = normalizeSrc(section.secondaryMediaUrl || items[1]?.imageUrl || items[0]?.imageUrl, "/homepage/casual_model2.jpg");
-  const img3 = normalizeSrc(section.tertiaryMediaUrl || items[2]?.imageUrl || items[1]?.imageUrl, "/homepage/casual_model3.jpg");
+
+  let defaultImg1 = "/homepage/casual_model1.jpg";
+  let defaultImg2 = "/homepage/casual_model2.jpg";
+  let defaultImg3 = "/homepage/casual_model3.jpg";
+
+  if (isSaree) {
+    defaultImg1 = "/homepage/saree_dual_cards.png";
+    defaultImg2 = "/homepage/saree_green.jpg";
+  } else if (isDecor) {
+    defaultImg1 = "/about/stars.jpg";
+    defaultImg2 = "/about/party.jpg";
+  }
+
+  let rawImg1 = section.mediaUrl || items[0]?.imageUrl || defaultImg1;
+  let rawImg2 = section.secondaryMediaUrl || items[1]?.imageUrl || defaultImg2;
+  let rawImg3 = section.tertiaryMediaUrl || items[2]?.imageUrl || defaultImg3;
+
+  // Sanitize any incorrect cross-category images
+  if (isCasual) {
+    if (!rawImg1 || rawImg1.includes("mosaic") || rawImg1.includes("saree")) rawImg1 = defaultImg1;
+    if (!rawImg2 || rawImg2.includes("mosaic") || rawImg2.includes("saree")) rawImg2 = defaultImg2;
+    if (!rawImg3 || rawImg3.includes("casual_model1") || rawImg3.includes("saree")) rawImg3 = defaultImg3;
+  } else if (isSaree) {
+    if (!rawImg1 || rawImg1.includes("casual") || rawImg1.includes("decor") || rawImg1.includes("saree_green")) rawImg1 = defaultImg1;
+    if (!rawImg2 || rawImg2.includes("casual") || rawImg2.includes("decor") || rawImg2.includes("saree_models")) rawImg2 = defaultImg2;
+  } else if (isDecor) {
+    if (!rawImg1 || rawImg1.includes("casual") || rawImg1.includes("saree") || rawImg1.includes("decor_lights")) rawImg1 = defaultImg1;
+    if (!rawImg2 || rawImg2.includes("casual") || rawImg2.includes("saree") || rawImg2.includes("decor_handicraft")) rawImg2 = defaultImg2;
+  }
+
+  const img1 = normalizeSrc(rawImg1, defaultImg1);
+  const img2 = normalizeSrc(rawImg2, defaultImg2);
+  const img3 = normalizeSrc(rawImg3, defaultImg3);
 
   // ── Layout A: Left Tall Image + Right Overlapping Images (e.g. Casual Wear) ──
   if (layout === "left-tall") {
@@ -385,19 +418,14 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
         >
           {/* Left Column: Overlapping Dual Cards */}
           <div>
-            <div style={{ position: "relative", width: "100%", maxWidth: "390px", height: "350px" }}>
-              {/* Back image */}
+            {img1.includes("saree_dual_cards") || img1.includes("saree_composite") || img1.includes("saree_spotlight_cards") ? (
               <div
                 style={{
-                  position: "absolute",
-                  top: 0,
-                  right: 0,
-                  width: "230px",
-                  height: "310px",
-                  borderRadius: "24px",
-                  overflow: "hidden",
-                  boxShadow: "0 16px 36px rgba(0,0,0,0.08)",
-                  backgroundColor: "#F5EFE5",
+                  width: "100%",
+                  maxWidth: "420px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
                 className="float-hover"
               >
@@ -405,34 +433,65 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
                 <img
                   src={img1}
                   alt={title}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    display: "block",
+                    objectFit: "contain",
+                    filter: "drop-shadow(0 14px 28px rgba(0,0,0,0.12))",
+                  }}
                 />
               </div>
+            ) : (
+              <div style={{ position: "relative", width: "100%", maxWidth: "390px", height: "350px" }}>
+                {/* Back image */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    right: 0,
+                    width: "230px",
+                    height: "310px",
+                    borderRadius: "24px",
+                    overflow: "hidden",
+                    boxShadow: "0 16px 36px rgba(0,0,0,0.08)",
+                    backgroundColor: "#F5EFE5",
+                  }}
+                  className="float-hover"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={img1}
+                    alt={title}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                </div>
 
-              {/* Front Overlapping image */}
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  width: "260px",
-                  height: "195px",
-                  borderRadius: "24px",
-                  overflow: "hidden",
-                  boxShadow: "0 14px 34px rgba(0,0,0,0.14)",
-                  backgroundColor: "#F5EFE5",
-                  zIndex: 2,
-                }}
-                className="float-hover"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={img2}
-                  alt={`${title} Detail`}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
+                {/* Front Overlapping image */}
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    width: "260px",
+                    height: "195px",
+                    borderRadius: "24px",
+                    overflow: "hidden",
+                    boxShadow: "0 14px 34px rgba(0,0,0,0.14)",
+                    backgroundColor: "#F5EFE5",
+                    zIndex: 2,
+                  }}
+                  className="float-hover"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={img2}
+                    alt={`${title} Detail`}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Right Column: Paragraph + Explore Button */}
