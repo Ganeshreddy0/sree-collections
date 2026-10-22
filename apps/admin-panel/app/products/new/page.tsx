@@ -20,8 +20,7 @@ import {
   FiInfo,
   FiCheck,
 } from "react-icons/fi";
-
-const API_BASE = "http://localhost:5000/api";
+import { API_BASE } from "@/lib/config";
 
 /* ─── Types ─────────────────────────────── */
 type ProductType = "Single Product" | "Variable Product";

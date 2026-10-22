@@ -16,8 +16,7 @@ import {
 import { FaFilePdf, FaFileExcel } from "react-icons/fa";
 import ProductDetailModal, { ProductDetailItem } from "@/components/ProductDetailModal";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
-
-const API_BASE = "http://localhost:5000/api";
+import { API_BASE } from "@/lib/config";
 
 type ProductItem = ProductDetailItem;
 
