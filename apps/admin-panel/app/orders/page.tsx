@@ -20,8 +20,7 @@ import {
   FiExternalLink,
 } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+import { API_BASE } from "@/lib/config";
 
 interface OrderItem {
   title: string;

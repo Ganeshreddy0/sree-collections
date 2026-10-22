@@ -7,7 +7,7 @@ import { FiSearch, FiChevronDown, FiChevronLeft, FiChevronRight, FiEdit, FiTrash
 import { FaFilePdf, FaFileExcel } from "react-icons/fa";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
 
-const API = "http://localhost:5000/api";
+import { API_BASE as API } from "@/lib/config";
 const AUTH = "Bearer super_admin_authenticated";
 
 interface VariantItem {

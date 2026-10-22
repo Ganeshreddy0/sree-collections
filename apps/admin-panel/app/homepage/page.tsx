@@ -56,7 +56,7 @@ function renderSocialOrCustomIcon(iconName: string, size = 18) {
   );
 }
 
-const API = "http://localhost:5000/api";
+import { API_BASE as API, STORE_URL } from "@/lib/config";
 const AUTH = "Bearer super_admin_authenticated";
 
 type HomepageItem = {
@@ -1040,7 +1040,7 @@ export default function HomepageCMSPage() {
         setError(data.message || "Failed to load homepage sections.");
       }
     } catch {
-      setError("Could not connect to the backend. Ensure the server is running on port 5000.");
+      setError("Could not connect to the backend. Ensure the server is running.");
     } finally {
       setLoading(false);
     }
@@ -1128,7 +1128,7 @@ export default function HomepageCMSPage() {
             {seeding ? <FiRefreshCw size={14} className="spinning" /> : <FiExternalLink size={14} />} Reset Defaults
           </button>
           <a
-            href="http://localhost:3000"
+            href={STORE_URL}
             target="_blank"
             rel="noreferrer"
             style={{ background: "#F7F1E8", color: "#5A2035", border: "1px solid #E5D7C5", borderRadius: 8, padding: "9px 16px", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, textDecoration: "none" }}
