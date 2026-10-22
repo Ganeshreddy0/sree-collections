@@ -380,9 +380,10 @@ export default function CategoriesMosaicShowcase({
                 textDecoration: "none",
                 cursor: "pointer",
               }}
-              className="float-hover"
+              className="float-hover mosaic-split-card"
             >
               <div
+                className="mosaic-card-text-wrap"
                 style={{
                   flex: "1",
                   padding: "40px 32px",
@@ -390,10 +391,12 @@ export default function CategoriesMosaicShowcase({
                   flexDirection: "column",
                   justifyContent: "space-between",
                   zIndex: 2,
+                  minWidth: 0,
                 }}
               >
                 <div>
                   <span
+                    className="mosaic-card-badge"
                     style={{
                       fontFamily: "var(--font-sans)",
                       fontWeight: 600,
@@ -409,6 +412,7 @@ export default function CategoriesMosaicShowcase({
                     {slot1.badge}
                   </span>
                   <h3
+                    className="mosaic-card-title"
                     style={{
                       fontFamily: "var(--font-serif)",
                       fontSize: "28px",
@@ -422,6 +426,7 @@ export default function CategoriesMosaicShowcase({
                   </h3>
                 </div>
                 <div
+                  className="mosaic-card-cta"
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
@@ -434,7 +439,10 @@ export default function CategoriesMosaicShowcase({
                   {slot1.ctaText} <FiArrowRight size={15} />
                 </div>
               </div>
-              <div style={{ width: "48%", height: "100%", position: "relative" }}>
+              <div
+                className="mosaic-card-img-wrap"
+                style={{ width: "48%", height: "100%", position: "relative", flexShrink: 0 }}
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={slot1.imageUrl}
@@ -443,6 +451,7 @@ export default function CategoriesMosaicShowcase({
                     width: "100%",
                     height: "100%",
                     objectFit: "cover",
+                    objectPosition: "center",
                     transition: "transform 0.5s ease",
                   }}
                   className="hover:scale-105"
@@ -468,9 +477,12 @@ export default function CategoriesMosaicShowcase({
                 textDecoration: "none",
                 cursor: "pointer",
               }}
-              className="float-hover"
+              className="float-hover mosaic-split-card"
             >
-              <div style={{ width: "48%", height: "100%", position: "relative" }}>
+              <div
+                className="mosaic-card-img-wrap"
+                style={{ width: "48%", height: "100%", position: "relative", flexShrink: 0 }}
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={slot2.imageUrl}
@@ -479,12 +491,14 @@ export default function CategoriesMosaicShowcase({
                     width: "100%",
                     height: "100%",
                     objectFit: "cover",
+                    objectPosition: "center",
                     transition: "transform 0.5s ease",
                   }}
                   className="hover:scale-105"
                 />
               </div>
               <div
+                className="mosaic-card-text-wrap"
                 style={{
                   flex: "1",
                   padding: "40px 32px",
@@ -492,10 +506,12 @@ export default function CategoriesMosaicShowcase({
                   flexDirection: "column",
                   justifyContent: "space-between",
                   zIndex: 2,
+                  minWidth: 0,
                 }}
               >
                 <div>
                   <span
+                    className="mosaic-card-badge"
                     style={{
                       fontFamily: "var(--font-sans)",
                       fontWeight: 600,
@@ -511,6 +527,7 @@ export default function CategoriesMosaicShowcase({
                     {slot2.badge}
                   </span>
                   <h3
+                    className="mosaic-card-title"
                     style={{
                       fontFamily: "var(--font-serif)",
                       fontSize: "28px",
@@ -524,6 +541,7 @@ export default function CategoriesMosaicShowcase({
                   </h3>
                 </div>
                 <div
+                  className="mosaic-card-cta"
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
@@ -631,32 +649,57 @@ export default function CategoriesMosaicShowcase({
             style={{
               backgroundColor: slot4.bgColor || "#F2EFE9",
               textDecoration: "none",
-              display: "block",
+              display: "flex",
+              flexDirection: "column",
               cursor: "pointer",
+              borderRadius: "24px",
+              overflow: "hidden",
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={slot4.imageUrl}
-              alt={slot4.imageAlt || slot4.title}
+            <div
               style={{
                 width: "100%",
                 height: "240px",
-                objectFit: "cover",
-                transition: "transform 0.5s ease",
+                flexShrink: 0,
+                position: "relative",
+                overflow: "hidden",
               }}
-              className="hover:scale-105"
-            />
-            <div style={{ padding: "18px 20px" }}>
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={slot4.imageUrl}
+                alt={slot4.imageAlt || slot4.title}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  display: "block",
+                  transition: "transform 0.5s ease",
+                }}
+                className="hover:scale-105"
+              />
+            </div>
+            <div
+              style={{
+                padding: "20px 22px 24px 22px",
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                backgroundColor: slot4.bgColor || "#F2EFE9",
+              }}
+            >
               <span
                 style={{
-                  fontSize: "12px",
-                  fontWeight: 600,
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "13px",
+                  fontWeight: 700,
                   color: slot4.badgeColor || "#BB8E43",
                   textTransform: "uppercase",
-                  letterSpacing: "1px",
+                  letterSpacing: "1.5px",
                   display: "block",
-                  marginBottom: "4px",
+                  marginBottom: "6px",
+                  lineHeight: 1.2,
                 }}
               >
                 {slot4.badge}
@@ -664,10 +707,11 @@ export default function CategoriesMosaicShowcase({
               <h4
                 style={{
                   fontFamily: "var(--font-serif)",
-                  fontSize: "18px",
+                  fontSize: "22px",
                   color: slot4.titleColor || "#2F2C24",
                   margin: 0,
                   fontWeight: 700,
+                  lineHeight: 1.25,
                 }}
               >
                 {slot4.title}
@@ -680,7 +724,7 @@ export default function CategoriesMosaicShowcase({
         {slot5 && (
           <Link
             href={slot5.linkUrl}
-            className="mosaic-bottom-wide float-hover"
+            className="mosaic-bottom-wide float-hover mosaic-split-card"
             style={{
               backgroundColor: slot5.bgColor || "#D8F0EC",
               textDecoration: "none",
@@ -688,6 +732,7 @@ export default function CategoriesMosaicShowcase({
             }}
           >
             <div
+              className="mosaic-card-text-wrap mosaic-bottom-text-wrap"
               style={{
                 flex: "1",
                 padding: "44px 36px",
@@ -695,9 +740,11 @@ export default function CategoriesMosaicShowcase({
                 flexDirection: "column",
                 justifyContent: "center",
                 zIndex: 2,
+                minWidth: 0,
               }}
             >
               <span
+                className="mosaic-card-badge"
                 style={{
                   fontFamily: "var(--font-sans)",
                   fontWeight: 600,
@@ -712,6 +759,7 @@ export default function CategoriesMosaicShowcase({
                 {slot5.badge}
               </span>
               <h3
+                className="mosaic-card-title"
                 style={{
                   fontFamily: "var(--font-serif)",
                   fontSize: "30px",
@@ -725,6 +773,7 @@ export default function CategoriesMosaicShowcase({
               </h3>
               {slot5.description && (
                 <p
+                  className="mosaic-card-desc"
                   style={{
                     fontSize: "14.5px",
                     color: "#546E6A",
@@ -736,6 +785,7 @@ export default function CategoriesMosaicShowcase({
                 </p>
               )}
               <div
+                className="mosaic-card-cta"
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
@@ -748,7 +798,10 @@ export default function CategoriesMosaicShowcase({
                 {slot5.ctaText} <FiArrowRight size={15} />
               </div>
             </div>
-            <div style={{ width: "45%", height: "100%", position: "relative" }}>
+            <div
+              className="mosaic-card-img-wrap mosaic-bottom-img-wrap"
+              style={{ width: "45%", height: "100%", position: "relative", flexShrink: 0 }}
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={slot5.imageUrl}
@@ -757,6 +810,7 @@ export default function CategoriesMosaicShowcase({
                   width: "100%",
                   height: "100%",
                   objectFit: "cover",
+                  objectPosition: "center",
                   transition: "transform 0.5s ease",
                 }}
                 className="hover:scale-105"
@@ -773,32 +827,57 @@ export default function CategoriesMosaicShowcase({
             style={{
               backgroundColor: slot6.bgColor || "#F7F2FA",
               textDecoration: "none",
-              display: "block",
+              display: "flex",
+              flexDirection: "column",
               cursor: "pointer",
+              borderRadius: "24px",
+              overflow: "hidden",
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={slot6.imageUrl}
-              alt={slot6.imageAlt || slot6.title}
+            <div
               style={{
                 width: "100%",
                 height: "240px",
-                objectFit: "cover",
-                transition: "transform 0.5s ease",
+                flexShrink: 0,
+                position: "relative",
+                overflow: "hidden",
               }}
-              className="hover:scale-105"
-            />
-            <div style={{ padding: "18px 20px" }}>
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={slot6.imageUrl}
+                alt={slot6.imageAlt || slot6.title}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  display: "block",
+                  transition: "transform 0.5s ease",
+                }}
+                className="hover:scale-105"
+              />
+            </div>
+            <div
+              style={{
+                padding: "20px 22px 24px 22px",
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                backgroundColor: slot6.bgColor || "#F7F2FA",
+              }}
+            >
               <span
                 style={{
-                  fontSize: "12px",
-                  fontWeight: 600,
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "13px",
+                  fontWeight: 700,
                   color: slot6.badgeColor || "#8E5BB0",
                   textTransform: "uppercase",
-                  letterSpacing: "1px",
+                  letterSpacing: "1.5px",
                   display: "block",
-                  marginBottom: "4px",
+                  marginBottom: "6px",
+                  lineHeight: 1.2,
                 }}
               >
                 {slot6.badge}
@@ -806,10 +885,11 @@ export default function CategoriesMosaicShowcase({
               <h4
                 style={{
                   fontFamily: "var(--font-serif)",
-                  fontSize: "18px",
+                  fontSize: "22px",
                   color: slot6.titleColor || "#2F2C24",
                   margin: 0,
                   fontWeight: 700,
+                  lineHeight: 1.25,
                 }}
               >
                 {slot6.title}
@@ -818,6 +898,57 @@ export default function CategoriesMosaicShowcase({
           </Link>
         )}
       </div>
+
+      <style>{`
+        .mosaic-bottom-small {
+          display: flex !important;
+          flex-direction: column !important;
+          height: auto !important;
+          min-height: 350px !important;
+        }
+        @media (max-width: 991px) {
+          .mosaic-bottom-small {
+            height: auto !important;
+            min-height: 330px !important;
+          }
+        }
+        @media (max-width: 991px) {
+          .mosaic-split-card {
+            flex-direction: column !important;
+            height: auto !important;
+          }
+          .mosaic-split-card .mosaic-card-img-wrap {
+            width: 100% !important;
+            height: 200px !important;
+            order: -1;
+          }
+          .mosaic-split-card .mosaic-card-text-wrap {
+            width: 100% !important;
+            padding: 16px 14px !important;
+          }
+          .mosaic-split-card .mosaic-card-title {
+            font-size: 20px !important;
+          }
+          .mosaic-split-card .mosaic-card-badge {
+            font-size: 11px !important;
+            letter-spacing: 1px !important;
+          }
+          .mosaic-split-card .mosaic-card-cta {
+            font-size: 12px !important;
+          }
+          .mosaic-split-card .mosaic-card-desc {
+            display: none !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .mosaic-split-card .mosaic-card-img-wrap {
+            height: 160px !important;
+          }
+          .mosaic-split-card .mosaic-card-title {
+            font-size: 17px !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }

@@ -226,7 +226,7 @@ function ProductCard({
 
   return (
     <div
-      className="cat-card-wrap"
+      className={`cat-card-wrap ${product.isTall ? "cat-card-tall" : "cat-card-short"}`}
       onClick={(e) => {
         const target = e.target as HTMLElement;
         if (!target.closest("button") && !target.closest("a")) {
@@ -307,6 +307,7 @@ function ProductCard({
 
       <a
         href={productUrl}
+        className="cat-card-img"
         style={{
           display: "block",
           width: "100%",
@@ -333,8 +334,9 @@ function ProductCard({
         />
       </a>
 
-      <div style={{ padding: "10px 2px 2px 2px" }}>
+      <div className="cat-card-body" style={{ padding: "10px 2px 2px 2px" }}>
         <h3
+          className="cat-card-title"
           style={{
             fontFamily: "'Blacker Display', 'Playfair Display', Georgia, serif",
             fontWeight: 600,
@@ -631,6 +633,7 @@ function CheckboxRow({
 function SidebarHeading({ children }: { children: React.ReactNode }) {
   return (
     <h2
+      className="cat-sidebar-heading"
       style={{
         fontFamily: "'Playfair Display', 'Blacker Display', Georgia, serif",
         fontWeight: 700,
@@ -1194,6 +1197,7 @@ export default function CategoriesPage() {
           <div style={{ display: "flex", alignItems: "center" }}>
             <a href="/" style={{ display: "inline-block" }}>
               <img
+                className="cat-logo"
                 src="/homepage/logo2_trans.png"
                 alt="Sree Collections"
                 style={{
@@ -1428,6 +1432,7 @@ export default function CategoriesPage() {
 
       {/* TOP BAR: Heading & Results inline */}
       <div
+        className="cat-top-bar"
         style={{
           width: "100%",
           maxWidth: "1440px",
@@ -1442,6 +1447,7 @@ export default function CategoriesPage() {
         }}
       >
         <div
+          className="cat-title-row"
           style={{
             display: "flex",
             alignItems: "baseline",
@@ -1450,6 +1456,7 @@ export default function CategoriesPage() {
           }}
         >
           <h1
+            className="cat-page-title"
             suppressHydrationWarning
             style={{
               fontFamily: "'Playfair Display', 'Blacker Display', Georgia, serif",
@@ -1463,6 +1470,7 @@ export default function CategoriesPage() {
             {selectedCategory}
           </h1>
           <span
+            className="cat-results-count"
             style={{
               fontFamily: "'Playfair Display', Georgia, serif",
               fontSize: "20px",
@@ -2239,49 +2247,60 @@ export default function CategoriesPage() {
       {/* FLOATING CART BAR */}
       {cartCount > 0 && (
         <div
+          className="cat-float-cart"
           style={{
             position: "fixed",
-            bottom: "28px",
+            bottom: "20px",
             left: "50%",
             transform: "translateX(-50%)",
             backgroundColor: "#5D2030",
             borderRadius: "999px",
             boxShadow: "0 8px 32px rgba(93,32,48,0.35)",
-            padding: "14px 28px",
+            padding: "12px 22px",
             display: "flex",
             alignItems: "center",
-            gap: "20px",
+            gap: "14px",
             zIndex: 998,
             border: "1.5px solid #BB8E43",
+            maxWidth: "calc(100vw - 24px)",
+            boxSizing: "border-box",
+            flexWrap: "nowrap",
           }}
         >
           <div
+            className="cat-float-cart-label"
             style={{
               display: "flex",
               alignItems: "center",
               gap: "8px",
               color: "#FFFFFF",
               fontFamily: "'Playfair Display', Georgia, serif",
-              fontSize: "15px",
+              fontSize: "14px",
               fontWeight: 600,
+              whiteSpace: "nowrap",
+              flexShrink: 0,
             }}
           >
-            <FiShoppingBag size={18} color="#BB8E43" />
+            <FiShoppingBag size={16} color="#BB8E43" />
             <span>
               {cartCount} item{cartCount !== 1 ? "s" : ""} in cart
             </span>
           </div>
-          <div style={{ display: "flex", gap: "10px" }}>
+          <div
+            className="cat-float-cart-actions"
+            style={{ display: "flex", gap: "8px", flexShrink: 0 }}
+          >
             <a
               href="/cart"
+              className="cat-float-cart-btn"
               style={{
                 backgroundColor: "transparent",
                 border: "1.5px solid #BB8E43",
                 color: "#BB8E43",
                 fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: "13px",
+                fontSize: "12px",
                 fontWeight: 700,
-                padding: "8px 20px",
+                padding: "7px 14px",
                 borderRadius: "999px",
                 textDecoration: "none",
                 whiteSpace: "nowrap",
@@ -2292,14 +2311,15 @@ export default function CategoriesPage() {
             </a>
             <a
               href="/checkout"
+              className="cat-float-cart-btn cat-float-cart-btn-primary"
               style={{
                 backgroundColor: "#BB8E43",
                 border: "none",
                 color: "#FFFFFF",
                 fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: "13px",
+                fontSize: "12px",
                 fontWeight: 700,
-                padding: "8px 20px",
+                padding: "7px 14px",
                 borderRadius: "999px",
                 textDecoration: "none",
                 whiteSpace: "nowrap",
@@ -2313,7 +2333,7 @@ export default function CategoriesPage() {
         </div>
       )}
 
-      {/* STYLES */}
+      {/* STYLES — desktop (≥992) unchanged; tablet/mobile compressed */}
       <style>{`
         @media (min-width: 992px) {
           .cat-desktop-nav { display: flex !important; }
@@ -2323,11 +2343,55 @@ export default function CategoriesPage() {
           .cat-desktop-nav { display: none !important; }
           .mobile-header-actions { display: flex !important; }
           .cat-hamburger { display: flex !important; }
-          .cat-main-layout { flex-direction: column !important; padding: 0 16px !important; }
-          .cat-sidebar { width: 100% !important; min-width: 100% !important; max-width: 100% !important; position: static !important; }
-          .cat-product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+          .cat-logo { height: 52px !important; max-width: 220px !important; }
+          .cat-top-bar { margin: 12px auto 18px !important; padding: 0 16px !important; gap: 12px !important; }
+          .cat-page-title { font-size: 32px !important; }
+          .cat-results-count { font-size: 15px !important; }
+          .cat-title-row { gap: 12px !important; }
+          .cat-sort-btn { width: 180px !important; height: 46px !important; border-radius: 12px !important; }
+          .cat-sort-btn span { font-size: 15px !important; }
+          .cat-main-layout { flex-direction: column !important; padding: 0 16px !important; gap: 24px !important; margin-bottom: 48px !important; }
+          .cat-sidebar { width: 100% !important; min-width: 100% !important; max-width: 100% !important; position: static !important; gap: 22px !important; }
+          .cat-sidebar-heading { font-size: 22px !important; margin-bottom: 12px !important; }
+          .cat-product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 14px !important; }
+          .cat-card-wrap { padding: 8px !important; border-radius: 12px !important; }
+          .cat-card-tall .cat-card-img { height: 280px !important; }
+          .cat-card-short .cat-card-img { height: 160px !important; }
+          .cat-card-title { font-size: 14px !important; line-height: 18px !important; height: 18px !important; }
+          .cat-card-body { padding: 8px 2px 2px !important; }
         }
-        @media (max-width: 600px) { .cat-product-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 640px) {
+          .cat-logo { height: 44px !important; max-width: 180px !important; }
+          .cat-top-bar { margin: 8px auto 14px !important; padding: 0 12px !important; }
+          .cat-page-title { font-size: 26px !important; }
+          .cat-results-count { font-size: 13px !important; }
+          .cat-sort-btn { width: 100% !important; max-width: 100% !important; height: 44px !important; }
+          .cat-main-layout { padding: 0 12px !important; gap: 18px !important; }
+          .cat-sidebar-heading { font-size: 18px !important; margin-bottom: 10px !important; }
+          .cat-product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important; }
+          .cat-card-wrap { padding: 6px !important; border-radius: 10px !important; }
+          .cat-card-tall .cat-card-img { height: 200px !important; }
+          .cat-card-short .cat-card-img { height: 130px !important; }
+          .cat-card-title { font-size: 12px !important; line-height: 16px !important; height: 16px !important; }
+          .cat-card-img { border-radius: 8px !important; }
+          .cat-float-cart {
+            bottom: 14px !important;
+            padding: 8px 12px !important;
+            gap: 8px !important;
+            width: calc(100vw - 20px) !important;
+            max-width: 420px !important;
+            justify-content: space-between !important;
+          }
+          .cat-float-cart-label { font-size: 11px !important; gap: 5px !important; }
+          .cat-float-cart-label svg { width: 14px !important; height: 14px !important; }
+          .cat-float-cart-btn { font-size: 11px !important; padding: 6px 10px !important; }
+        }
+        @media (max-width: 380px) {
+          .cat-product-grid { grid-template-columns: 1fr !important; }
+          .cat-card-tall .cat-card-img,
+          .cat-card-short .cat-card-img { height: 220px !important; }
+          .cat-card-title { font-size: 14px !important; line-height: 18px !important; height: 18px !important; }
+        }
         .cat-nav-link:hover { opacity: 0.75; }
         .cat-contact-btn:hover { filter: brightness(1.08); transform: translateY(-2px); }
         .cat-sort-btn:hover { background-color: #FBF5EC !important; }
