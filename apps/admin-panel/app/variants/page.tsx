@@ -6,6 +6,7 @@ import AdminShell from "@/components/AdminShell";
 import { FiSearch, FiChevronDown, FiChevronLeft, FiChevronRight, FiEdit, FiTrash2 } from "react-icons/fi";
 import { FaFilePdf, FaFileExcel } from "react-icons/fa";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
+import EditVariantModal, { VariantData } from "@/components/EditVariantModal";
 
 import { API_BASE as API } from "@/lib/config";
 const AUTH = "Bearer super_admin_authenticated";
@@ -31,6 +32,7 @@ export default function VariantsPage() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(1);
   const [deletingVariant, setDeletingVariant] = useState<{ id: string; name: string } | null>(null);
+  const [editingVariant, setEditingVariant] = useState<VariantItem | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -55,6 +57,21 @@ export default function VariantsPage() {
     if (!deletingVariant) return;
     const res = await fetch(`${API}/variants/${deletingVariant.id}`, { method: "DELETE", headers: { Authorization: AUTH } });
     if (res.ok) setRows((prev) => prev.filter((r) => r.id !== deletingVariant.id));
+  };
+
+  const handleSaveVariant = (updated: VariantData) => {
+    setRows((prev) =>
+      prev.map((r) =>
+        r.id === updated.id
+          ? {
+              ...r,
+              name: updated.name,
+              value: updated.value,
+              status: updated.status,
+            }
+          : r
+      )
+    );
   };
 
   const toggleAll = (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -108,8 +125,14 @@ export default function VariantsPage() {
                 <td><StatusBadge status={v.status} onClick={() => toggleStatus(v.id)} /></td>
                 <td>
                   <div className="sc-action-2">
-                    <button className="sc-row-btn"><FiEdit size={12} /></button>
-                    <button className="sc-row-btn delete" onClick={() => setDeletingVariant({ id: v.id, name: v.name })}><FiTrash2 size={12} /></button>
+                    <button
+                      className="sc-row-btn"
+                      title="Edit"
+                      onClick={() => setEditingVariant(v)}
+                    >
+                      <FiEdit size={12} />
+                    </button>
+                    <button className="sc-row-btn delete" title="Delete" onClick={() => setDeletingVariant({ id: v.id, name: v.name })}><FiTrash2 size={12} /></button>
                   </div>
                 </td>
               </tr>
@@ -139,6 +162,13 @@ export default function VariantsPage() {
         itemType="variant attribute"
         onConfirm={confirmDeleteVariant}
         onClose={() => setDeletingVariant(null)}
+      />
+
+      <EditVariantModal
+        isOpen={!!editingVariant}
+        variant={editingVariant}
+        onClose={() => setEditingVariant(null)}
+        onSaveSuccess={handleSaveVariant}
       />
     </AdminShell>
   );
