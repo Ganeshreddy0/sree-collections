@@ -2208,7 +2208,10 @@ function MockProductDetailPage() {
         @media (max-width: 480px) {
           .prod-showcase-grid { padding: 0 12px !important; }
           .prod-details-grid { padding: 0 12px !important; }
-          .prod-related-grid { grid-template-columns: 1fr !important; }
+          .prod-related-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+          .prod-related-card { padding: 8px !important; border-radius: 12px !important; }
+          .prod-related-card > div:first-child { height: 140px !important; border-radius: 8px !important; }
+          .prod-related-card h3 { font-size: 13px !important; }
         }
         .cat-nav-link:hover { opacity: 0.75; }
         .prod-contact-btn:hover { filter: brightness(1.08); transform: translateY(-2px); }

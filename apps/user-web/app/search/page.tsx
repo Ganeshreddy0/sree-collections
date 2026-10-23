@@ -1196,13 +1196,23 @@ function SearchPageInner() {
           .srch-footer-contact { align-items: flex-start !important; }
         }
         @media (max-width: 640px) {
-          .srch-masonry-grid { columns: 2 !important; column-gap: 14px !important; }
-          main { padding: 0 16px 60px !important; }
-          section { padding: 0 16px !important; }
-          .srch-chip { font-size: 12px !important; padding: 7px 14px !important; }
+          .srch-masonry-grid { columns: 2 !important; column-gap: 10px !important; }
+          main { padding: 0 12px 60px !important; }
+          section { padding: 0 12px !important; }
+          .srch-chip { font-size: 11px !important; padding: 6px 12px !important; }
+          .srch-card { margin-bottom: 10px !important; border-radius: 12px !important; }
+          .srch-card > div:last-child { padding: 8px 8px 10px !important; }
+          .srch-card h3 { font-size: 12px !important; min-height: 30px !important; line-height: 1.25 !important; margin-bottom: 5px !important; }
+          .srch-add-btn { padding: 5px 8px !important; font-size: 10px !important; gap: 3px !important; }
+          .srch-wish-btn { width: 26px !important; height: 26px !important; top: 5px !important; right: 5px !important; }
         }
         @media (max-width: 420px) {
-          .srch-masonry-grid { columns: 1 !important; }
+          .srch-masonry-grid { columns: 2 !important; column-gap: 8px !important; }
+          main { padding: 0 10px 60px !important; }
+          .srch-card { margin-bottom: 8px !important; }
+          .srch-card > div:last-child { padding: 6px 6px 8px !important; }
+          .srch-card h3 { font-size: 11px !important; }
+          .srch-add-btn { padding: 4px 6px !important; font-size: 9px !important; }
         }
 
         .srch-nav-link:hover { opacity: 0.72; }

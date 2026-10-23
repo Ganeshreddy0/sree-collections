@@ -1720,8 +1720,12 @@ export default function ProductDetailPage() {
         }
         @media (max-width: 480px) {
           .pdp-showcase { padding: 0 12px !important; }
-          .pdp-main-img-box { height: clamp(240px, 90vw, 360px) !important; }
-          .pdp-related { grid-template-columns: 1fr !important; }
+          .pdp-main-img-box { height: clamp(220px, 75vw, 320px) !important; }
+          .pdp-related { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+          .pdp-related > a { padding: 8px !important; border-radius: 12px !important; }
+          .pdp-related > a > div:first-child { height: 140px !important; border-radius: 8px !important; margin-bottom: 6px !important; }
+          .pdp-related > a > div:nth-child(2) { font-size: 12px !important; }
+          .pdp-related > a > div:nth-child(3) { font-size: 12px !important; }
         }
       `}</style>
     </div>
