@@ -200,10 +200,13 @@ export default function FeaturedCardsShowcase() {
   };
 
   // Smooth responsive scaling factor: ensures cards + side arrows fit comfortably on any screen width
+  const isSmallMobile = containerWidth < 480;
   const isMobile = containerWidth < 768;
   const isTablet = containerWidth >= 768 && containerWidth < 1100;
-  const scaleRatio = isMobile
-    ? 0.62
+  const scaleRatio = isSmallMobile
+    ? Math.max(0.48, Math.min(0.56, (containerWidth - 20) / 640))
+    : isMobile
+    ? 0.58
     : Math.min(1, Math.max(0.7, (containerWidth - 140) / 1380));
 
   // Dynamic distance for navigation arrows (places them with comfortable breathing room outside outer cards)
@@ -216,8 +219,12 @@ export default function FeaturedCardsShowcase() {
     while (offset > total / 2) offset -= total;
     while (offset < -total / 2) offset += total;
 
-    // X positions matching the curved diamond silhouette in Image 1 (adjusted for wider cards)
-    const xBase = [0, 235, 435, 605];
+    // X positions matching the curved diamond silhouette, tuned for mobile
+    const xBase = isSmallMobile
+      ? [0, 160, 310, 450]
+      : isMobile
+      ? [0, 195, 360, 520]
+      : [0, 235, 435, 605];
     const absOffset = Math.abs(offset);
     const sign = offset < 0 ? -1 : 1;
 
@@ -235,7 +242,7 @@ export default function FeaturedCardsShowcase() {
         width: 305 * scaleRatio,
         height: 560 * scaleRatio,
         borderWidth: "3px",
-        borderRadius: "24px",
+        borderRadius: isSmallMobile ? "18px" : "24px",
         zIndex: 10,
         boxShadow: "0 22px 50px rgba(93, 32, 48, 0.32)",
         opacity: 1,
@@ -244,22 +251,22 @@ export default function FeaturedCardsShowcase() {
         pointerEvents: "auto" as const,
       };
     } else if (absOffset === 1) {
-      // Inner Adjacent Cards (wider)
+      // Inner Adjacent Cards (peeking on mobile, fully visible on desktop)
       return {
         x,
         width: 232 * scaleRatio,
         height: 490 * scaleRatio,
         borderWidth: "2.5px",
-        borderRadius: "22px",
+        borderRadius: isSmallMobile ? "16px" : "22px",
         zIndex: 6,
         boxShadow: "0 14px 30px rgba(0, 0, 0, 0.14)",
-        opacity: 0.96,
+        opacity: isSmallMobile ? 0.65 : 0.96,
         isCenter: false,
         isLeft: offset < 0,
         pointerEvents: "auto" as const,
       };
     } else if (absOffset === 2) {
-      // Mid Cards (wider)
+      // Mid Cards (hidden on mobile to eliminate clutter)
       return {
         x,
         width: 196 * scaleRatio,
@@ -268,7 +275,7 @@ export default function FeaturedCardsShowcase() {
         borderRadius: "20px",
         zIndex: 4,
         boxShadow: "0 10px 24px rgba(0, 0, 0, 0.1)",
-        opacity: 0.9,
+        opacity: isMobile ? 0 : 0.9,
         isCenter: false,
         isLeft: offset < 0,
         pointerEvents: isMobile ? ("none" as const) : ("auto" as const),
@@ -315,10 +322,11 @@ export default function FeaturedCardsShowcase() {
         maxWidth: "1480px",
         margin: "0 auto",
         position: "relative",
-        padding: "20px 0 60px 0",
+        padding: isMobile ? "10px 0 40px 0" : "20px 0 60px 0",
         boxSizing: "border-box",
         userSelect: "none",
         overflow: "hidden",
+        touchAction: "pan-y",
       }}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
@@ -547,8 +555,8 @@ export default function FeaturedCardsShowcase() {
             top: "50%",
             transform: "translateY(-50%)",
             zIndex: 50,
-            width: isMobile ? "38px" : "48px",
-            height: isMobile ? "38px" : "48px",
+            width: isSmallMobile ? "34px" : isMobile ? "38px" : "48px",
+            height: isSmallMobile ? "34px" : isMobile ? "38px" : "48px",
             borderRadius: "50%",
             backgroundColor: "#FFFDF9",
             border: "2px solid #C4A482",
@@ -571,7 +579,7 @@ export default function FeaturedCardsShowcase() {
             e.currentTarget.style.transform = "translateY(-50%) scale(1)";
           }}
         >
-          <FiChevronLeft size={isMobile ? 18 : 22} />
+          <FiChevronLeft size={isSmallMobile ? 16 : isMobile ? 18 : 22} />
         </button>
 
         {/* Navigation Arrow Right (Positioned with clear spacing outside outer cards) */}
@@ -587,8 +595,8 @@ export default function FeaturedCardsShowcase() {
             top: "50%",
             transform: "translateY(-50%)",
             zIndex: 50,
-            width: isMobile ? "38px" : "48px",
-            height: isMobile ? "38px" : "48px",
+            width: isSmallMobile ? "34px" : isMobile ? "38px" : "48px",
+            height: isSmallMobile ? "34px" : isMobile ? "38px" : "48px",
             borderRadius: "50%",
             backgroundColor: "#FFFDF9",
             border: "2px solid #C4A482",
@@ -611,7 +619,7 @@ export default function FeaturedCardsShowcase() {
             e.currentTarget.style.transform = "translateY(-50%) scale(1)";
           }}
         >
-          <FiChevronRight size={isMobile ? 18 : 22} />
+          <FiChevronRight size={isSmallMobile ? 16 : isMobile ? 18 : 22} />
         </button>
       </div>
     </div>

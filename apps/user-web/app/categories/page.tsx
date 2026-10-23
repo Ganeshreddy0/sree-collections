@@ -14,6 +14,7 @@ import {
   FiShoppingBag,
   FiPlus,
   FiMinus,
+  FiFilter,
 } from "react-icons/fi";
 import { FaFacebookF, FaYoutube, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { API_BASE } from "@/lib/config";
@@ -669,6 +670,7 @@ export default function CategoriesPage() {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   // Read URL params after mount to avoid hydration mismatch
   useEffect(() => {
@@ -1481,88 +1483,169 @@ export default function CategoriesPage() {
           </span>
         </div>
 
-        <div style={{ position: "relative" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", width: "100%", justifyContent: "flex-end" }}>
           <button
-            id="sort-dropdown-btn"
-            onClick={() => setSortOpen(!sortOpen)}
-            className="cat-sort-btn"
+            type="button"
+            onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
+            className="cat-mobile-filter-btn"
             style={{
-              width: "224px",
-              height: "60px",
-              borderRadius: "16px",
-              border: "2px solid #BB8E43",
-              backgroundColor: "transparent",
-              padding: "0 18px",
-              display: "flex",
+              display: "none",
               alignItems: "center",
-              justifyContent: "space-between",
+              gap: "8px",
+              height: "46px",
+              padding: "0 18px",
+              borderRadius: "14px",
+              border: "1.5px solid #BB8E43",
+              backgroundColor: mobileFiltersOpen ? "#BB8E43" : "transparent",
+              color: mobileFiltersOpen ? "#FFFFFF" : "#5D2030",
+              fontFamily: "'Playfair Display', Georgia, serif",
+              fontWeight: 700,
+              fontSize: "14px",
               cursor: "pointer",
-              boxSizing: "border-box",
             }}
           >
-            <span
-              style={{
-                fontFamily:
-                  "'Playfair Display', 'Blacker Display', Georgia, serif",
-                fontSize: "18px",
-                fontWeight: 600,
-                color: "#5D2030",
-              }}
-            >
-              {sortBy}
-            </span>
-            <FiChevronDown
-              size={20}
-              color="#BB8E43"
-              style={{
-                transform: sortOpen ? "rotate(180deg)" : "rotate(0deg)",
-                transition: "transform 0.2s",
-              }}
-            />
+            <FiFilter size={16} />
+            <span>{mobileFiltersOpen ? "Hide Filters" : "Filter & Refine"}</span>
+            {hasActiveFilters && (
+              <span
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: "50%",
+                  backgroundColor: mobileFiltersOpen ? "#FFFFFF" : "#BB8E43",
+                }}
+              />
+            )}
           </button>
-          {sortOpen && (
-            <div
+
+          <div style={{ position: "relative" }}>
+            <button
+              id="sort-dropdown-btn"
+              onClick={() => setSortOpen(!sortOpen)}
+              className="cat-sort-btn"
               style={{
-                position: "absolute",
-                top: "68px",
-                right: 0,
                 width: "224px",
-                backgroundColor: "#FFFFFF",
+                height: "60px",
                 borderRadius: "16px",
-                border: "1.5px solid #BB8E43",
-                boxShadow: "0 12px 30px rgba(0,0,0,0.1)",
-                zIndex: 80,
-                overflow: "hidden",
-                padding: "8px 0",
+                border: "2px solid #BB8E43",
+                backgroundColor: "transparent",
+                padding: "0 18px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                cursor: "pointer",
+                boxSizing: "border-box",
               }}
             >
-              {SORT_OPTIONS.map((opt) => (
-                <div
-                  key={opt}
-                  onClick={() => {
-                    setSortBy(opt);
-                    setSortOpen(false);
-                  }}
-                  className="cat-sort-item"
-                  style={{
-                    padding: "11px 18px",
-                    fontFamily:
-                      "'Playfair Display', 'Blacker Display', Georgia, serif",
-                    fontSize: "15px",
-                    color: sortBy === opt ? "#BB8E43" : "#5D2030",
-                    backgroundColor:
-                      sortBy === opt ? "#FBF5EC" : "transparent",
-                    fontWeight: sortBy === opt ? 600 : 400,
-                    cursor: "pointer",
-                  }}
-                >
-                  {opt}
-                </div>
-              ))}
-            </div>
-          )}
+              <span
+                style={{
+                  fontFamily:
+                    "'Playfair Display', 'Blacker Display', Georgia, serif",
+                  fontSize: "18px",
+                  fontWeight: 600,
+                  color: "#5D2030",
+                }}
+              >
+                {sortBy}
+              </span>
+              <FiChevronDown
+                size={20}
+                color="#BB8E43"
+                style={{
+                  transform: sortOpen ? "rotate(180deg)" : "rotate(0deg)",
+                  transition: "transform 0.2s",
+                }}
+              />
+            </button>
+            {sortOpen && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "68px",
+                  right: 0,
+                  width: "224px",
+                  backgroundColor: "#FFFFFF",
+                  borderRadius: "16px",
+                  border: "1.5px solid #BB8E43",
+                  boxShadow: "0 12px 30px rgba(0,0,0,0.1)",
+                  zIndex: 80,
+                  overflow: "hidden",
+                  padding: "8px 0",
+                }}
+              >
+                {SORT_OPTIONS.map((opt) => (
+                  <div
+                    key={opt}
+                    onClick={() => {
+                      setSortBy(opt);
+                      setSortOpen(false);
+                    }}
+                    className="cat-sort-item"
+                    style={{
+                      padding: "11px 18px",
+                      fontFamily:
+                        "'Playfair Display', 'Blacker Display', Georgia, serif",
+                      fontSize: "15px",
+                      color: sortBy === opt ? "#BB8E43" : "#5D2030",
+                      backgroundColor:
+                        sortBy === opt ? "#FBF5EC" : "transparent",
+                      fontWeight: sortBy === opt ? 600 : 400,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {opt}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Quick Mobile Category Pill Slider */}
+      <div
+        className="cat-mobile-pills-bar"
+        style={{
+          display: "none",
+          width: "100%",
+          maxWidth: "1440px",
+          margin: "0 auto 16px auto",
+          padding: "0 16px",
+          boxSizing: "border-box",
+          overflowX: "auto",
+          WebkitOverflowScrolling: "touch",
+          scrollbarWidth: "none",
+          gap: "8px",
+        }}
+      >
+        {categoriesList.map((cat) => {
+          const active =
+            selectedCategory.toLowerCase() === cat.toLowerCase() ||
+            (selectedCategory === "All Products" && cat === "All Products");
+          return (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => handleCategorySelect(cat)}
+              style={{
+                flexShrink: 0,
+                padding: "8px 18px",
+                borderRadius: "999px",
+                backgroundColor: active ? "#BB8E43" : "#FFFFFF",
+                color: active ? "#FFFFFF" : "#5D2030",
+                border: active ? "1.5px solid #BB8E43" : "1px solid #DECDBE",
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontWeight: active ? 700 : 500,
+                fontSize: "13.5px",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                boxShadow: active ? "0 2px 8px rgba(187,142,67,0.25)" : "none",
+              }}
+            >
+              {cat}
+            </button>
+          );
+        })}
 
       {/* MAIN LAYOUT */}
       <div
@@ -1580,7 +1663,7 @@ export default function CategoriesPage() {
       >
         {/* SIDEBAR */}
         <aside
-          className="cat-sidebar"
+          className={`cat-sidebar ${mobileFiltersOpen ? "cat-sidebar-open" : "cat-sidebar-closed"}`}
           style={{
             width: "220px",
             minWidth: "220px",
@@ -2337,39 +2420,54 @@ export default function CategoriesPage() {
         @media (min-width: 992px) {
           .cat-desktop-nav { display: flex !important; }
           .mobile-header-actions { display: none !important; }
+          .cat-mobile-filter-btn { display: none !important; }
+          .cat-mobile-pills-bar { display: none !important; }
+          .cat-sidebar { display: flex !important; }
         }
         @media (max-width: 991px) {
           .cat-desktop-nav { display: none !important; }
           .mobile-header-actions { display: flex !important; }
           .cat-hamburger { display: flex !important; }
-          .cat-logo { height: 52px !important; max-width: 220px !important; }
-          .cat-top-bar { margin: 12px auto 18px !important; padding: 0 16px !important; gap: 12px !important; }
-          .cat-page-title { font-size: 32px !important; }
-          .cat-results-count { font-size: 15px !important; }
-          .cat-title-row { gap: 12px !important; }
-          .cat-sort-btn { width: 180px !important; height: 46px !important; border-radius: 12px !important; }
-          .cat-sort-btn span { font-size: 15px !important; }
-          .cat-main-layout { flex-direction: column !important; padding: 0 16px !important; gap: 24px !important; margin-bottom: 48px !important; }
+          .cat-mobile-filter-btn { display: inline-flex !important; }
+          .cat-mobile-pills-bar { display: flex !important; }
+          .cat-logo { height: 50px !important; max-width: 200px !important; }
+          .cat-top-bar { margin: 12px auto 14px !important; padding: 0 16px !important; gap: 12px !important; }
+          .cat-page-title { font-size: 30px !important; }
+          .cat-results-count { font-size: 14px !important; }
+          .cat-title-row { gap: 10px !important; width: 100% !important; justify-content: space-between !important; }
+          .cat-sort-btn { width: 150px !important; height: 46px !important; border-radius: 12px !important; }
+          .cat-sort-btn span { font-size: 14px !important; }
+          .cat-main-layout { flex-direction: column !important; padding: 0 16px !important; gap: 20px !important; margin-bottom: 48px !important; }
           .cat-sidebar { width: 100% !important; min-width: 100% !important; max-width: 100% !important; position: static !important; gap: 22px !important; }
-          .cat-sidebar-heading { font-size: 22px !important; margin-bottom: 12px !important; }
-          .cat-product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 14px !important; }
+          .cat-sidebar.cat-sidebar-closed { display: none !important; }
+          .cat-sidebar.cat-sidebar-open {
+            display: flex !important;
+            background-color: #FFFFFF !important;
+            padding: 22px 18px !important;
+            border-radius: 18px !important;
+            border: 1.5px solid #DECDBE !important;
+            box-shadow: 0 8px 24px rgba(93,32,48,0.06) !important;
+          }
+          .cat-sidebar-heading { font-size: 20px !important; margin-bottom: 12px !important; }
+          .cat-product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 12px !important; width: 100% !important; }
           .cat-card-wrap { padding: 8px !important; border-radius: 12px !important; }
-          .cat-card-tall .cat-card-img { height: 280px !important; }
+          .cat-card-tall .cat-card-img { height: 260px !important; }
           .cat-card-short .cat-card-img { height: 160px !important; }
-          .cat-card-title { font-size: 14px !important; line-height: 18px !important; height: 18px !important; }
+          .cat-card-title { font-size: 13.5px !important; line-height: 18px !important; height: 18px !important; }
           .cat-card-body { padding: 8px 2px 2px !important; }
         }
         @media (max-width: 640px) {
-          .cat-logo { height: 44px !important; max-width: 180px !important; }
-          .cat-top-bar { margin: 8px auto 14px !important; padding: 0 12px !important; }
-          .cat-page-title { font-size: 26px !important; }
-          .cat-results-count { font-size: 13px !important; }
-          .cat-sort-btn { width: 100% !important; max-width: 100% !important; height: 44px !important; }
-          .cat-main-layout { padding: 0 12px !important; gap: 18px !important; }
+          .cat-logo { height: 42px !important; max-width: 170px !important; }
+          .cat-top-bar { margin: 8px auto 12px !important; padding: 0 12px !important; }
+          .cat-page-title { font-size: 24px !important; }
+          .cat-results-count { font-size: 12.5px !important; }
+          .cat-sort-btn { width: auto !important; flex: 1 !important; max-width: 100% !important; height: 44px !important; }
+          .cat-mobile-filter-btn { flex: 1 !important; height: 44px !important; justify-content: center !important; }
+          .cat-main-layout { padding: 0 12px !important; gap: 16px !important; }
           .cat-sidebar-heading { font-size: 18px !important; margin-bottom: 10px !important; }
           .cat-product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important; }
           .cat-card-wrap { padding: 6px !important; border-radius: 10px !important; }
-          .cat-card-tall .cat-card-img { height: 200px !important; }
+          .cat-card-tall .cat-card-img { height: 190px !important; }
           .cat-card-short .cat-card-img { height: 130px !important; }
           .cat-card-title { font-size: 12px !important; line-height: 16px !important; height: 16px !important; }
           .cat-card-img { border-radius: 8px !important; }

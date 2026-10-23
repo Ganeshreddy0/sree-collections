@@ -129,23 +129,31 @@ img {
 }
 
 /* =========================================================================
-   Mobile Global Responsive Polish (<= 768px)
+   Mobile Global Responsive Polish (<= 768px and <= 480px)
    Does not modify desktop layouts or typography.
    ========================================================================= */
 @media (max-width: 768px) {
+  html, body {
+    overflow-x: clip !important;
+    position: relative;
+    width: 100%;
+    max-width: 100vw;
+  }
+
   /* Prevent any logo from pushing header content off-screen on mobile */
   header img[alt="Sree Collections"],
   header img[src*="logo"] {
-    height: 46px !important;
-    max-width: 195px !important;
+    height: 44px !important;
+    max-width: 180px !important;
     width: auto !important;
+    object-fit: contain !important;
   }
 
   /* Make sure header accommodates logo and action buttons comfortably */
   header {
-    min-height: 68px !important;
-    padding-left: 14px !important;
-    padding-right: 14px !important;
+    min-height: 64px !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
   }
 
   /* Universal hamburger button visibility on all subpages */
@@ -159,10 +167,39 @@ img {
     padding: 6px;
     color: #2F2C24;
     flex-shrink: 0;
+    min-width: 36px;
+    min-height: 36px;
   }
 
-  /* Flexible inputs in form groups prevent container busting */
+  /* Flexible inputs in form groups prevent container busting & iOS auto-zoom */
   input, select, textarea {
     max-width: 100% !important;
+    font-size: 16px !important; /* Prevents auto-zoom on iOS Safari */
+  }
+
+  /* Improve tap targets */
+  button, a {
+    -webkit-tap-highlight-color: transparent;
   }
 }
+
+@media (max-width: 480px) {
+  header img[alt="Sree Collections"],
+  header img[src*="logo"] {
+    height: 38px !important;
+    max-width: 155px !important;
+  }
+
+  header {
+    min-height: 58px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  /* Safe container paddings on very small mobile screens */
+  .container-responsive {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+}
+

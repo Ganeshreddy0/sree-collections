@@ -134,6 +134,7 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
           padding: "0 28px",
           boxSizing: "border-box",
         }}
+        className="category-spotlight-section"
       >
         {/* Top Header Row */}
         <div
@@ -211,7 +212,7 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
           className="category-section-grid"
         >
           {/* Left Column */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "20px", maxWidth: "420px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px", maxWidth: "420px", width: "100%" }}>
             <div
               style={{
                 width: "100%",
@@ -221,7 +222,7 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
                 boxShadow: "0 14px 36px rgba(93, 32, 48, 0.08)",
                 backgroundColor: "#F5EFE5",
               }}
-              className="float-hover"
+              className="float-hover category-tall-img-wrap"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -253,7 +254,7 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
             }}
           >
             {/* Overlapping Dual Cards */}
-            <div style={{ position: "relative", width: "100%", maxWidth: "380px", height: "380px" }}>
+            <div style={{ position: "relative", width: "100%", maxWidth: "380px", height: "380px" }} className="category-spotlight-dual-wrap">
               {/* Back / Main image */}
               <div
                 style={{
@@ -341,6 +342,7 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
           padding: "0 28px",
           boxSizing: "border-box",
         }}
+        className="category-spotlight-section"
       >
         {/* Top Header Row */}
         <div
@@ -444,7 +446,7 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
                 />
               </div>
             ) : (
-              <div style={{ position: "relative", width: "100%", maxWidth: "390px", height: "350px" }}>
+              <div style={{ position: "relative", width: "100%", maxWidth: "390px", height: "350px" }} className="category-spotlight-dual-wrap">
                 {/* Back image */}
                 <div
                   style={{
@@ -547,6 +549,7 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
         padding: "0 28px",
         boxSizing: "border-box",
       }}
+      className="category-spotlight-section"
     >
       {/* Top Header Row */}
       <div
@@ -662,7 +665,7 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
 
         {/* Right Column: Overlapping Dual Cards */}
         <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <div style={{ position: "relative", width: "100%", maxWidth: "390px", height: "350px" }}>
+          <div style={{ position: "relative", width: "100%", maxWidth: "390px", height: "350px" }} className="category-spotlight-dual-wrap">
             {/* Back image */}
             <div
               style={{
@@ -712,6 +715,48 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
           </div>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .category-spotlight-section {
+            padding: 0 16px !important;
+            margin-bottom: 60px !important;
+          }
+          .category-section-header {
+            flex-direction: column !important;
+            gap: 16px !important;
+            margin-bottom: 24px !important;
+          }
+          .category-section-header .header-text-right {
+            text-align: left !important;
+          }
+          .category-section-grid {
+            grid-template-columns: 1fr !important;
+            gap: 32px !important;
+          }
+          .category-spotlight-dual-wrap {
+            max-width: 100% !important;
+            height: clamp(260px, 68vw, 360px) !important;
+            margin: 0 auto;
+          }
+          .category-tall-img-wrap {
+            height: clamp(300px, 80vw, 440px) !important;
+            max-width: 100% !important;
+          }
+        }
+        @media (max-width: 480px) {
+          .category-spotlight-section {
+            padding: 0 12px !important;
+            margin-bottom: 44px !important;
+          }
+          .category-tall-img-wrap {
+            height: 290px !important;
+          }
+          .category-spotlight-dual-wrap {
+            height: 250px !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }

@@ -751,6 +751,7 @@ export default function ProductDetailPage() {
 
       {/* BREADCRUMBS */}
       <div
+        className="pdp-breadcrumbs"
         style={{
           width: "100%",
           maxWidth: 1440,
@@ -800,6 +801,7 @@ export default function ProductDetailPage() {
         {/* Gallery */}
         <div>
           <div
+            className="pdp-main-img-box"
             style={{
               width: "100%",
               height: 560,
