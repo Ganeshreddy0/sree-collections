@@ -24,9 +24,9 @@ const FOOTER_LINKS = [
 const SOCIAL = [
   { label: "Facebook", icon: FaFacebookF, href: "#" },
   { label: "YouTube", icon: FaYoutube, href: "#" },
-  { label: "Instagram", icon: FaInstagram, href: "#" },
+  { label: "Instagram", icon: FaInstagram, href: "https://www.instagram.com/sreecollections007?utm_source=ig_web_button_share_sheet&cplk=ZDNlZDc0MzIxNw==" },
   { label: "Google", icon: FaGoogle, href: "#" },
-  { label: "WhatsApp", icon: FaWhatsapp, href: "https://wa.me/?text=Hello%20Sree%20Collections" },
+  { label: "WhatsApp", icon: FaWhatsapp, href: "https://chat.whatsapp.com/C0d3jaOJF2DD7fvujaTesb" },
 ];
 
 export default function SiteFooter() {

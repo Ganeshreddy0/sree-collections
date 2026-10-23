@@ -240,6 +240,10 @@ export default function CheckoutPage() {
         color: "#2F2C24",
         fontFamily: "'Plus Jakarta Sans', sans-serif",
         paddingBottom: "80px",
+        width: "100%",
+        maxWidth: "100vw",
+        overflowX: "hidden",
+        boxSizing: "border-box",
       }}
     >
       {/* =========================================================================
@@ -247,6 +251,7 @@ export default function CheckoutPage() {
          ========================================================================= */}
       <div style={{ width: "100%", display: "flex", justifyContent: "center", position: "sticky", top: 0, zIndex: 100, backgroundColor: "#FCF8F2" }}>
         <header
+          className="checkout-header"
           style={{
             width: "100%",
             maxWidth: "1360px",
@@ -267,6 +272,7 @@ export default function CheckoutPage() {
               <img
                 src="/homepage/logo2_trans.png"
                 alt="Sree Collections"
+                className="checkout-logo-img"
                 style={{
                   height: "72px",
                   width: "auto",
@@ -478,7 +484,10 @@ export default function CheckoutPage() {
       )}
 
       {/* Main Container */}
-      <main style={{ maxWidth: "1200px", margin: "28px auto 0 auto", padding: "0 24px" }}>
+      <main
+        className="checkout-main-container"
+        style={{ maxWidth: "1200px", margin: "28px auto 0 auto", padding: "0 24px", boxSizing: "border-box", width: "100%" }}
+      >
         {/* Navigation Bar */}
         <div
           className="checkout-nav-bar"
@@ -516,11 +525,12 @@ export default function CheckoutPage() {
               fontWeight: 700,
               color: "#5D2030",
               margin: "0 0 8px 0",
+              wordBreak: "break-word",
             }}
           >
             Checkout & Order Confirmation
           </h2>
-          <p style={{ color: "#7A6858", fontSize: "15px", margin: 0 }}>
+          <p style={{ color: "#7A6858", fontSize: "15px", margin: 0, wordBreak: "break-word" }}>
             Complete your shipping address and receive automatic instant confirmation on your WhatsApp.
           </p>
         </div>
@@ -540,10 +550,12 @@ export default function CheckoutPage() {
               color: "#B3261E",
               fontSize: "14px",
               fontWeight: 600,
+              boxSizing: "border-box",
+              width: "100%",
             }}
           >
             <FiAlertCircle size={22} style={{ flexShrink: 0 }} />
-            <span>{errorMessage}</span>
+            <span style={{ flex: 1, minWidth: 0, wordBreak: "break-word" }}>{errorMessage}</span>
           </div>
         )}
 
@@ -552,9 +564,11 @@ export default function CheckoutPage() {
           className="checkout-main-grid"
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gridTemplateColumns: "minmax(0, 1.4fr) minmax(0, 1fr)",
             gap: "36px",
             alignItems: "start",
+            width: "100%",
+            boxSizing: "border-box",
           }}
         >
           {/* LEFT COLUMN: Customer Form */}
@@ -564,16 +578,23 @@ export default function CheckoutPage() {
               display: "flex",
               flexDirection: "column",
               gap: "28px",
+              width: "100%",
+              minWidth: 0,
+              boxSizing: "border-box",
             }}
           >
             {/* Section 1: Customer & WhatsApp Contact */}
             <div
+              className="checkout-section-card"
               style={{
                 backgroundColor: "#FFFFFF",
                 borderRadius: "16px",
                 padding: "28px",
                 border: "1px solid rgba(187,142,67,0.2)",
                 boxShadow: "0 4px 20px rgba(93,32,48,0.03)",
+                boxSizing: "border-box",
+                width: "100%",
+                minWidth: 0,
               }}
             >
               <div
@@ -584,6 +605,8 @@ export default function CheckoutPage() {
                   marginBottom: "20px",
                   borderBottom: "1px solid #F2ECE1",
                   paddingBottom: "14px",
+                  width: "100%",
+                  minWidth: 0,
                 }}
               >
                 <div
@@ -596,29 +619,32 @@ export default function CheckoutPage() {
                     alignItems: "center",
                     justifyContent: "center",
                     color: "#25D366",
+                    flexShrink: 0,
                   }}
                 >
                   <FaWhatsapp size={20} />
                 </div>
-                <div>
+                <div style={{ flex: 1, minWidth: 0 }}>
                   <h3
+                    className="checkout-card-heading"
                     style={{
                       fontFamily: "'Playfair Display', Georgia, serif",
                       fontSize: "19px",
                       fontWeight: 700,
                       color: "#5D2030",
                       margin: 0,
+                      wordBreak: "break-word",
                     }}
                   >
                     1. Customer & WhatsApp Details
                   </h3>
-                  <span style={{ fontSize: "12px", color: "#7A6858" }}>
+                  <span style={{ fontSize: "12px", color: "#7A6858", display: "block", wordBreak: "break-word" }}>
                     Your order details and delivery status will be sent here
                   </span>
                 </div>
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "18px", width: "100%", minWidth: 0 }}>
                 <div>
                   <label
                     style={{
@@ -639,6 +665,7 @@ export default function CheckoutPage() {
                     onChange={(e) => setCustomerName(e.target.value)}
                     style={{
                       width: "100%",
+                      maxWidth: "100%",
                       height: "46px",
                       borderRadius: "10px",
                       border: "1px solid #D8CAB8",
@@ -647,6 +674,7 @@ export default function CheckoutPage() {
                       outline: "none",
                       backgroundColor: "#FDFAF5",
                       fontFamily: "inherit",
+                      boxSizing: "border-box",
                     }}
                   />
                 </div>
@@ -664,31 +692,35 @@ export default function CheckoutPage() {
                   >
                     WhatsApp Mobile Number <span style={{ color: "#E53935" }}>*</span>
                   </label>
-                  <div style={{ display: "flex", gap: "10px", width: "100%" }}>
+                  <div
+                    className="checkout-phone-row"
+                    style={{ display: "flex", gap: "8px", width: "100%", minWidth: 0, boxSizing: "border-box" }}
+                  >
                     <select
                       value={countryCode}
                       onChange={(e) => setCountryCode(e.target.value)}
                       style={{
                         height: "46px",
-                        width: "88px",
+                        width: "84px",
                         flexShrink: 0,
                         borderRadius: "10px",
                         border: "1px solid #D8CAB8",
-                        padding: "0 8px",
-                        fontSize: "13.5px",
+                        padding: "0 6px",
+                        fontSize: "13px",
                         fontWeight: 600,
                         backgroundColor: "#FDFAF5",
                         color: "#5D2030",
                         outline: "none",
                         cursor: "pointer",
+                        boxSizing: "border-box",
                       }}
                     >
-                      <option value="+91">🇮🇳 +91</option>
-                      <option value="+1">🇺🇸 +1</option>
-                      <option value="+44">🇬🇧 +44</option>
-                      <option value="+971">🇦🇪 +971</option>
-                      <option value="+65">🇸🇬 +65</option>
-                      <option value="+60">🇲🇾 +60</option>
+                      <option value="+91">IN +91</option>
+                      <option value="+1">US +1</option>
+                      <option value="+44">UK +44</option>
+                      <option value="+971">AE +971</option>
+                      <option value="+65">SG +65</option>
+                      <option value="+60">MY +60</option>
                     </select>
 
                     <input
@@ -701,18 +733,20 @@ export default function CheckoutPage() {
                       style={{
                         flex: 1,
                         minWidth: 0,
+                        width: "100%",
                         height: "46px",
                         borderRadius: "10px",
                         border: "1px solid #D8CAB8",
-                        padding: "0 14px",
+                        padding: "0 12px",
                         fontSize: "14px",
                         outline: "none",
                         backgroundColor: "#FDFAF5",
                         fontFamily: "inherit",
+                        boxSizing: "border-box",
                       }}
                     />
                   </div>
-                  <span style={{ fontSize: "11.5px", color: "#666", marginTop: "4px", display: "block" }}>
+                  <span style={{ fontSize: "11.5px", color: "#666", marginTop: "4px", display: "block", wordBreak: "break-word" }}>
                     We send automatic order confirmation & tracking updates to this WhatsApp number.
                   </span>
                 </div>
@@ -736,6 +770,7 @@ export default function CheckoutPage() {
                     onChange={(e) => setCustomerEmail(e.target.value)}
                     style={{
                       width: "100%",
+                      maxWidth: "100%",
                       height: "46px",
                       borderRadius: "10px",
                       border: "1px solid #D8CAB8",
@@ -744,6 +779,7 @@ export default function CheckoutPage() {
                       outline: "none",
                       backgroundColor: "#FDFAF5",
                       fontFamily: "inherit",
+                      boxSizing: "border-box",
                     }}
                   />
                 </div>
@@ -754,10 +790,13 @@ export default function CheckoutPage() {
                     backgroundColor: "rgba(37,211,102,0.06)",
                     border: "1px solid rgba(37,211,102,0.3)",
                     borderRadius: "10px",
-                    padding: "14px 16px",
+                    padding: "12px 14px",
                     display: "flex",
                     alignItems: "flex-start",
-                    gap: "12px",
+                    gap: "10px",
+                    boxSizing: "border-box",
+                    width: "100%",
+                    minWidth: 0,
                   }}
                 >
                   <input
@@ -771,15 +810,19 @@ export default function CheckoutPage() {
                       height: "17px",
                       accentColor: "#25D366",
                       cursor: "pointer",
+                      flexShrink: 0,
                     }}
                   />
                   <label
                     htmlFor="waConsent"
                     style={{
-                      fontSize: "13px",
+                      fontSize: "12.5px",
                       color: "#2F2C24",
                       lineHeight: "1.45",
                       cursor: "pointer",
+                      flex: 1,
+                      minWidth: 0,
+                      wordBreak: "break-word",
                     }}
                   >
                     <strong style={{ color: "#128C7E", display: "block", marginBottom: "2px" }}>
@@ -793,12 +836,16 @@ export default function CheckoutPage() {
 
             {/* Section 2: Delivery Address */}
             <div
+              className="checkout-section-card"
               style={{
                 backgroundColor: "#FFFFFF",
                 borderRadius: "16px",
                 padding: "28px",
                 border: "1px solid rgba(187,142,67,0.2)",
                 boxShadow: "0 4px 20px rgba(93,32,48,0.03)",
+                boxSizing: "border-box",
+                width: "100%",
+                minWidth: 0,
               }}
             >
               <div
@@ -809,6 +856,8 @@ export default function CheckoutPage() {
                   marginBottom: "20px",
                   borderBottom: "1px solid #F2ECE1",
                   paddingBottom: "14px",
+                  width: "100%",
+                  minWidth: 0,
                 }}
               >
                 <div
@@ -821,29 +870,32 @@ export default function CheckoutPage() {
                     alignItems: "center",
                     justifyContent: "center",
                     color: "#BB8E43",
+                    flexShrink: 0,
                   }}
                 >
                   <FiTruck size={18} />
                 </div>
-                <div>
+                <div style={{ flex: 1, minWidth: 0 }}>
                   <h3
+                    className="checkout-card-heading"
                     style={{
                       fontFamily: "'Playfair Display', Georgia, serif",
                       fontSize: "19px",
                       fontWeight: 700,
                       color: "#5D2030",
                       margin: 0,
+                      wordBreak: "break-word",
                     }}
                   >
                     2. Delivery Address
                   </h3>
-                  <span style={{ fontSize: "12px", color: "#7A6858" }}>
+                  <span style={{ fontSize: "12px", color: "#7A6858", display: "block", wordBreak: "break-word" }}>
                     Safe, insured saree door delivery across India
                   </span>
                 </div>
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "18px", width: "100%", minWidth: 0 }}>
                 <div>
                   <label
                     style={{
@@ -864,6 +916,7 @@ export default function CheckoutPage() {
                     onChange={(e) => setStreet(e.target.value)}
                     style={{
                       width: "100%",
+                      maxWidth: "100%",
                       height: "46px",
                       borderRadius: "10px",
                       border: "1px solid #D8CAB8",
@@ -872,15 +925,19 @@ export default function CheckoutPage() {
                       outline: "none",
                       backgroundColor: "#FDFAF5",
                       fontFamily: "inherit",
+                      boxSizing: "border-box",
                     }}
                   />
                 </div>
 
                 <div
+                  className="checkout-address-grid"
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-                    gap: "16px",
+                    gridTemplateColumns: "1.2fr 1fr 1fr",
+                    gap: "14px",
+                    width: "100%",
+                    boxSizing: "border-box",
                   }}
                 >
                   <div>
@@ -906,11 +963,12 @@ export default function CheckoutPage() {
                         height: "46px",
                         borderRadius: "10px",
                         border: "1px solid #D8CAB8",
-                        padding: "0 16px",
+                        padding: "0 14px",
                         fontSize: "14px",
                         outline: "none",
                         backgroundColor: "#FDFAF5",
                         fontFamily: "inherit",
+                        boxSizing: "border-box",
                       }}
                     />
                   </div>
@@ -935,12 +993,13 @@ export default function CheckoutPage() {
                         height: "46px",
                         borderRadius: "10px",
                         border: "1px solid #D8CAB8",
-                        padding: "0 14px",
-                        fontSize: "14px",
+                        padding: "0 10px",
+                        fontSize: "13.5px",
                         outline: "none",
                         backgroundColor: "#FDFAF5",
                         color: "#5D2030",
                         cursor: "pointer",
+                        boxSizing: "border-box",
                       }}
                     >
                       {INDIAN_STATES.map((st) => (
@@ -975,11 +1034,12 @@ export default function CheckoutPage() {
                         height: "46px",
                         borderRadius: "10px",
                         border: "1px solid #D8CAB8",
-                        padding: "0 16px",
+                        padding: "0 14px",
                         fontSize: "14px",
                         outline: "none",
                         backgroundColor: "#FDFAF5",
                         fontFamily: "inherit",
+                        boxSizing: "border-box",
                       }}
                     />
                   </div>
@@ -1004,6 +1064,7 @@ export default function CheckoutPage() {
                     onChange={(e) => setNotes(e.target.value)}
                     style={{
                       width: "100%",
+                      maxWidth: "100%",
                       height: "46px",
                       borderRadius: "10px",
                       border: "1px solid #D8CAB8",
@@ -1012,6 +1073,7 @@ export default function CheckoutPage() {
                       outline: "none",
                       backgroundColor: "#FDFAF5",
                       fontFamily: "inherit",
+                      boxSizing: "border-box",
                     }}
                   />
                 </div>
@@ -1020,15 +1082,20 @@ export default function CheckoutPage() {
 
             {/* Section 3: Payment Method */}
             <div
+              className="checkout-section-card"
               style={{
                 backgroundColor: "#FFFFFF",
                 borderRadius: "16px",
                 padding: "28px",
                 border: "1px solid rgba(187,142,67,0.2)",
                 boxShadow: "0 4px 20px rgba(93,32,48,0.03)",
+                boxSizing: "border-box",
+                width: "100%",
+                minWidth: 0,
               }}
             >
               <h3
+                className="checkout-card-heading"
                 style={{
                   fontFamily: "'Playfair Display', Georgia, serif",
                   fontSize: "19px",
@@ -1037,23 +1104,27 @@ export default function CheckoutPage() {
                   margin: "0 0 16px 0",
                   borderBottom: "1px solid #F2ECE1",
                   paddingBottom: "14px",
+                  wordBreak: "break-word",
                 }}
               >
                 3. Payment Method
               </h3>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px", width: "100%", minWidth: 0 }}>
                 <label
                   style={{
                     display: "flex",
-                    alignItems: "center",
-                    gap: "14px",
-                    padding: "16px 18px",
+                    alignItems: "flex-start",
+                    gap: "12px",
+                    padding: "14px 16px",
                     borderRadius: "12px",
                     border: paymentMethod === "COD" ? "2px solid #BB8E43" : "1px solid #E5D9C8",
                     backgroundColor: paymentMethod === "COD" ? "rgba(187,142,67,0.06)" : "#FFFFFF",
                     cursor: "pointer",
                     transition: "all 0.2s ease",
+                    boxSizing: "border-box",
+                    width: "100%",
+                    minWidth: 0,
                   }}
                 >
                   <input
@@ -1062,10 +1133,10 @@ export default function CheckoutPage() {
                     value="COD"
                     checked={paymentMethod === "COD"}
                     onChange={() => setPaymentMethod("COD")}
-                    style={{ accentColor: "#BB8E43", width: "18px", height: "18px" }}
+                    style={{ accentColor: "#BB8E43", width: "18px", height: "18px", marginTop: "3px", flexShrink: 0 }}
                   />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <div style={{ flex: 1, minWidth: 0, wordBreak: "break-word" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                       <strong style={{ color: "#5D2030", fontSize: "15px" }}>Cash on Delivery (COD)</strong>
                       <span
                         style={{
@@ -1080,7 +1151,7 @@ export default function CheckoutPage() {
                         Popular
                       </span>
                     </div>
-                    <span style={{ fontSize: "12.5px", color: "#7A6858" }}>
+                    <span style={{ fontSize: "12.5px", color: "#7A6858", display: "block", marginTop: "2px" }}>
                       Pay in cash or scan UPI QR upon arrival at your doorstep.
                     </span>
                   </div>
@@ -1089,14 +1160,17 @@ export default function CheckoutPage() {
                 <label
                   style={{
                     display: "flex",
-                    alignItems: "center",
-                    gap: "14px",
-                    padding: "16px 18px",
+                    alignItems: "flex-start",
+                    gap: "12px",
+                    padding: "14px 16px",
                     borderRadius: "12px",
                     border: paymentMethod === "Online" ? "2px solid #BB8E43" : "1px solid #E5D9C8",
                     backgroundColor: paymentMethod === "Online" ? "rgba(187,142,67,0.06)" : "#FFFFFF",
                     cursor: "pointer",
                     transition: "all 0.2s ease",
+                    boxSizing: "border-box",
+                    width: "100%",
+                    minWidth: 0,
                   }}
                 >
                   <input
@@ -1105,11 +1179,11 @@ export default function CheckoutPage() {
                     value="Online"
                     checked={paymentMethod === "Online"}
                     onChange={() => setPaymentMethod("Online")}
-                    style={{ accentColor: "#BB8E43", width: "18px", height: "18px" }}
+                    style={{ accentColor: "#BB8E43", width: "18px", height: "18px", marginTop: "3px", flexShrink: 0 }}
                   />
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, minWidth: 0, wordBreak: "break-word" }}>
                     <strong style={{ color: "#5D2030", fontSize: "15px" }}>UPI / Online Transfer</strong>
-                    <span style={{ display: "block", fontSize: "12.5px", color: "#7A6858" }}>
+                    <span style={{ display: "block", fontSize: "12.5px", color: "#7A6858", marginTop: "2px" }}>
                       Instant payment via Google Pay, PhonePe, Paytm, or Net Banking.
                     </span>
                   </div>
@@ -1121,15 +1195,17 @@ export default function CheckoutPage() {
             <button
               type="submit"
               disabled={submitting || cartItems.length === 0}
+              className="checkout-submit-btn"
               style={{
                 width: "100%",
-                height: "56px",
+                minHeight: "54px",
+                padding: "12px 16px",
                 borderRadius: "14px",
                 backgroundColor: submitting || cartItems.length === 0 ? "#C4A67A" : "#5D2030",
                 color: "#FFFFFF",
                 fontFamily: "'Playfair Display', Georgia, serif",
                 fontWeight: 700,
-                fontSize: "18px",
+                fontSize: "17px",
                 border: "none",
                 cursor: submitting || cartItems.length === 0 ? "not-allowed" : "pointer",
                 boxShadow: "0 8px 24px rgba(93,32,48,0.25)",
@@ -1138,6 +1214,7 @@ export default function CheckoutPage() {
                 justifyContent: "center",
                 gap: "10px",
                 transition: "all 0.2s ease",
+                boxSizing: "border-box",
               }}
             >
               {submitting ? (
@@ -1152,14 +1229,18 @@ export default function CheckoutPage() {
           </form>
 
           {/* RIGHT COLUMN: Order Summary Card */}
-          <div style={{ position: "sticky", top: "100px" }}>
+          <div className="checkout-summary-col" style={{ position: "sticky", top: "100px", width: "100%", minWidth: 0, boxSizing: "border-box" }}>
             <div
+              className="checkout-section-card"
               style={{
                 backgroundColor: "#FFFFFF",
                 borderRadius: "16px",
                 padding: "28px",
                 border: "1px solid rgba(187,142,67,0.2)",
                 boxShadow: "0 4px 20px rgba(93,32,48,0.04)",
+                boxSizing: "border-box",
+                width: "100%",
+                minWidth: 0,
               }}
             >
               <div
@@ -1442,6 +1523,9 @@ export default function CheckoutPage() {
           .checkout-hamburger {
             display: flex !important;
           }
+          .checkout-summary-col {
+            position: static !important;
+          }
           .checkout-back-link {
             font-size: 13px !important;
             gap: 6px !important;
@@ -1450,37 +1534,70 @@ export default function CheckoutPage() {
             font-size: 24px !important;
           }
           .checkout-main-grid {
-            grid-template-columns: 1fr !important;
-            gap: 24px !important;
+            grid-template-columns: minmax(0, 1fr) !important;
+            gap: 20px !important;
           }
         }
-        @media (max-width: 640px) {
-          .checkout-back-link {
-            font-size: 12px !important;
+        @media (max-width: 768px) {
+          .checkout-header {
+            min-height: 64px !important;
+            padding: 0 14px !important;
           }
-          main h2 {
-            font-size: 20px !important;
+          .checkout-logo-img {
+            height: 44px !important;
+            max-width: 180px !important;
           }
-          main {
-            padding: 0 16px !important;
-            margin-top: 16px !important;
+          .checkout-main-container {
+            padding: 0 12px !important;
+            margin-top: 14px !important;
+            max-width: 100% !important;
+            overflow-x: hidden !important;
           }
           .checkout-section-card {
-            padding: 20px 16px !important;
+            padding: 18px 14px !important;
+            border-radius: 14px !important;
+          }
+          .checkout-card-heading {
+            font-size: 17px !important;
+          }
+          .checkout-address-grid {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
           }
           .checkout-phone-row {
-            flex-direction: column !important;
+            flex-direction: row !important;
+            gap: 8px !important;
           }
           .checkout-phone-row select {
-            width: 100% !important;
+            width: 82px !important;
+          }
+          main h2 {
+            font-size: 21px !important;
           }
         }
         @media (max-width: 480px) {
+          .checkout-main-container {
+            padding: 0 10px !important;
+          }
+          .checkout-section-card {
+            padding: 16px 12px !important;
+            border-radius: 12px !important;
+          }
+          .checkout-card-heading {
+            font-size: 16px !important;
+          }
+          .checkout-back-link {
+            font-size: 12.5px !important;
+          }
           main h2 {
             font-size: 18px !important;
           }
           main p {
-            font-size: 13px !important;
+            font-size: 12.5px !important;
+          }
+          .checkout-submit-btn {
+            font-size: 15px !important;
+            min-height: 50px !important;
           }
         }
         .checkout-nav-link:hover {
