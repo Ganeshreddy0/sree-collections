@@ -477,6 +477,7 @@ export default function TermsAndConditionsPage() {
           2. MAIN CONTAINER WITH TWO COLUMNS
          ════════════════════════════════════════ */}
       <div
+        className="tc-container"
         style={{
           width: "100%",
           maxWidth: "1240px",
@@ -860,7 +861,7 @@ export default function TermsAndConditionsPage() {
                     <div
                       key={sec.id}
                       id={sec.id}
-                      className="tc-sec-row"
+                      className="tc-sec-row tc-unboxing-row"
                       style={{
                         display: "grid",
                         gridTemplateColumns: "44px 1fr",
@@ -1191,13 +1192,51 @@ export default function TermsAndConditionsPage() {
             grid-template-columns: 1fr !important;
           }
         }
+        @media (max-width: 768px) {
+          .tc-container {
+            padding: 24px 16px 60px 16px !important;
+          }
+          .tc-hero-row h1 {
+            font-size: clamp(26px, 7vw, 40px) !important;
+          }
+        }
         @media (max-width: 600px) {
           .tc-unboxing-bullets {
             grid-template-columns: 1fr !important;
           }
           .tc-sec-row {
-            grid-template-columns: 38px 38px 1fr !important;
+            grid-template-columns: 36px 36px 1fr !important;
             gap: 0 10px !important;
+          }
+          .tc-unboxing-row {
+            grid-template-columns: 36px 1fr !important;
+          }
+        }
+        @media (max-width: 480px) {
+          .tc-container {
+            padding: 16px 12px 40px 12px !important;
+          }
+          .tc-hero-row h1 {
+            font-size: clamp(22px, 6.5vw, 30px) !important;
+          }
+          .tc-sec-row {
+            grid-template-columns: 30px 32px 1fr !important;
+            gap: 0 8px !important;
+            padding: 14px 0 !important;
+          }
+          .tc-unboxing-row {
+            grid-template-columns: 30px 1fr !important;
+            gap: 0 8px !important;
+          }
+          .tc-unboxing-row > div:last-child {
+            padding: 16px 12px !important;
+          }
+          .tc-sec-row h2 {
+            font-size: 15.5px !important;
+          }
+          .tc-sec-row p {
+            font-size: 12.5px !important;
+            line-height: 1.7 !important;
           }
         }
         .tc-nav-link:hover { opacity: 0.72; }

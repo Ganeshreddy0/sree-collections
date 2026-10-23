@@ -436,6 +436,7 @@ export default function CartPage() {
           </div>
         ) : (
           <div
+            className="cart-main-grid"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
@@ -718,10 +719,36 @@ export default function CartPage() {
             display: flex !important;
           }
         }
+        @media (max-width: 768px) {
+          .cart-main-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .cart-main-content {
+            padding: 0 16px !important;
+            margin-top: 20px !important;
+          }
+        }
         @media (max-width: 600px) {
           .cart-item-row {
             flex-wrap: wrap !important;
             gap: 12px !important;
+          }
+          .cart-item-row > div:first-child {
+            width: 72px !important;
+            height: 90px !important;
+          }
+          .cart-item-qty-controls {
+            width: 100% !important;
+            justify-content: flex-start !important;
+          }
+        }
+        @media (max-width: 480px) {
+          .cart-item-row {
+            gap: 10px !important;
+          }
+          .cart-item-row > div:first-child {
+            width: 64px !important;
+            height: 80px !important;
           }
         }
         .cart-nav-link:hover {

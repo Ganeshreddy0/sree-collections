@@ -145,13 +145,21 @@ export default function HomePage() {
     "spotlight-saree": 20,
     "spotlight-decor": 30,
   };
-  const spotlightSections = Object.values(cms)
-    .filter((s) => s.sectionId && s.sectionId.startsWith("spotlight-") && s.isActive !== false)
-    .sort((a, b) => {
-      const orderA = ((a as any).displayOrder ?? defaultSpotlightOrder[a.sectionId] ?? 99);
-      const orderB = ((b as any).displayOrder ?? defaultSpotlightOrder[b.sectionId] ?? 99);
-      return orderA - orderB;
-    });
+  const spotlightSections = useMemo(() => {
+    const seen = new Set<string>();
+    return Object.values(cms)
+      .filter((s) => {
+        if (!s.sectionId || !s.sectionId.startsWith("spotlight-") || s.isActive === false) return false;
+        if (seen.has(s.sectionId)) return false;
+        seen.add(s.sectionId);
+        return true;
+      })
+      .sort((a, b) => {
+        const orderA = ((a as any).displayOrder ?? defaultSpotlightOrder[a.sectionId] ?? 99);
+        const orderB = ((b as any).displayOrder ?? defaultSpotlightOrder[b.sectionId] ?? 99);
+        return orderA - orderB;
+      });
+  }, [cms]);
 
   return (
     <div style={{ backgroundColor: "#FCF8F2", minHeight: "100vh", overflowX: "hidden" }}>

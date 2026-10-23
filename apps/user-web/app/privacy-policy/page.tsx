@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import Link from "next/link";
@@ -115,7 +115,7 @@ export default function PrivacyPolicyPage() {
       {/* ════════════════════════════════════════
           PAGE BODY — max-width container
          ════════════════════════════════════════ */}
-      <div style={{ width: "100%", maxWidth: "1240px", margin: "0 auto", padding: "36px 24px 80px 24px", boxSizing: "border-box" }}>
+      <div className="pp-container" style={{ width: "100%", maxWidth: "1240px", margin: "0 auto", padding: "36px 24px 80px 24px", boxSizing: "border-box" }}>
 
         {/* Breadcrumb — full width, above the grid */}
         <nav aria-label="Breadcrumb" style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "28px", fontFamily: "var(--font-sans)", fontSize: "13px", color: "#9A8B7E" }}>
@@ -282,8 +282,36 @@ export default function PrivacyPolicyPage() {
           .pp-sidebar { position: static !important; }
           .pp-hero-inner { grid-template-columns: 1fr !important; }
         }
+        @media (max-width: 768px) {
+          .pp-container {
+            padding: 24px 16px 60px 16px !important;
+          }
+          .pp-hero-inner h1 {
+            font-size: clamp(26px, 7vw, 40px) !important;
+          }
+        }
         @media (max-width: 540px) {
-          .pp-sec-row { grid-template-columns: 42px 42px 1fr !important; gap: 0 10px !important; }
+          .pp-sec-row { grid-template-columns: 36px 36px 1fr !important; gap: 0 10px !important; }
+        }
+        @media (max-width: 480px) {
+          .pp-container {
+            padding: 16px 12px 40px 12px !important;
+          }
+          .pp-hero-inner h1 {
+            font-size: clamp(22px, 6.5vw, 30px) !important;
+          }
+          .pp-sec-row {
+            grid-template-columns: 30px 32px 1fr !important;
+            gap: 0 8px !important;
+            padding: 16px 0 !important;
+          }
+          .pp-sec-row h2 {
+            font-size: 15.5px !important;
+          }
+          .pp-sec-row p {
+            font-size: 12.5px !important;
+            line-height: 1.7 !important;
+          }
         }
         .pp-nav-link:hover { opacity: 0.7; }
         .pp-cta-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }

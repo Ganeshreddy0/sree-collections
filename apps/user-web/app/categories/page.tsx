@@ -570,6 +570,79 @@ function ProductCard({
   );
 }
 
+function ProductCardSkeleton({ isTall = false }: { isTall?: boolean }) {
+  const imgHeight = isTall ? 340 : 230;
+  return (
+    <div
+      style={{
+        backgroundColor: "#FFFFFF",
+        borderRadius: "16px",
+        border: "1.5px solid #EAE3D9",
+        padding: "12px",
+        boxSizing: "border-box",
+        minWidth: 0,
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          height: `${imgHeight}px`,
+          borderRadius: "12px",
+          backgroundColor: "#F4EFEA",
+          animation: "sc-skeleton-pulse 1.6s ease-in-out infinite",
+        }}
+      />
+      <div style={{ padding: "4px 2px" }}>
+        <div
+          style={{
+            width: "75%",
+            height: "18px",
+            borderRadius: "4px",
+            backgroundColor: "#F4EFEA",
+            marginBottom: "10px",
+            animation: "sc-skeleton-pulse 1.6s ease-in-out infinite",
+          }}
+        />
+        <div style={{ display: "flex", gap: "6px", marginBottom: "14px" }}>
+          <div style={{ width: 12, height: 12, borderRadius: "50%", backgroundColor: "#F4EFEA", animation: "sc-skeleton-pulse 1.6s ease-in-out infinite" }} />
+          <div style={{ width: 12, height: 12, borderRadius: "50%", backgroundColor: "#F4EFEA", animation: "sc-skeleton-pulse 1.6s ease-in-out infinite" }} />
+          <div style={{ width: 12, height: 12, borderRadius: "50%", backgroundColor: "#F4EFEA", animation: "sc-skeleton-pulse 1.6s ease-in-out infinite" }} />
+        </div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginTop: "6px",
+          }}
+        >
+          <div
+            style={{
+              width: "60px",
+              height: "20px",
+              borderRadius: "4px",
+              backgroundColor: "#F4EFEA",
+              animation: "sc-skeleton-pulse 1.6s ease-in-out infinite",
+            }}
+          />
+          <div
+            style={{
+              width: "90px",
+              height: "32px",
+              borderRadius: "999px",
+              backgroundColor: "#F4EFEA",
+              animation: "sc-skeleton-pulse 1.6s ease-in-out infinite",
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CheckboxRow({
   label,
   checked,
@@ -1646,6 +1719,7 @@ export default function CategoriesPage() {
             </button>
           );
         })}
+      </div>
 
       {/* MAIN LAYOUT */}
       <div
@@ -2151,18 +2225,17 @@ export default function CategoriesPage() {
           }}
         >
           {loading ? (
-            <div
-              style={{
-                gridColumn: "1 / -1",
-                textAlign: "center",
-                padding: "80px 24px",
-                fontFamily: "'Playfair Display', Georgia, serif",
-                color: "#5D2030",
-                fontSize: 18,
-              }}
-            >
-              Loading products…
-            </div>
+            <>
+              <style>{`
+                @keyframes sc-skeleton-pulse {
+                  0%, 100% { opacity: 0.55; }
+                  50% { opacity: 1; }
+                }
+              `}</style>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <ProductCardSkeleton key={`cat-skel-${i}`} isTall={i === 1 || i === 4} />
+              ))}
+            </>
           ) : fetchError ? (
             <div
               style={{

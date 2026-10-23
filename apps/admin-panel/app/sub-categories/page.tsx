@@ -6,6 +6,7 @@ import AdminShell from "@/components/AdminShell";
 import { FiSearch, FiChevronDown, FiChevronLeft, FiChevronRight, FiEdit, FiTrash2 } from "react-icons/fi";
 import { FaFilePdf, FaFileExcel } from "react-icons/fa";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
+import EditSubCategoryModal, { SubCategoryData } from "@/components/EditSubCategoryModal";
 
 import { API_BASE as API } from "@/lib/config";
 const AUTH = "Bearer super_admin_authenticated";
@@ -31,6 +32,7 @@ export default function SubCategoriesPage() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(1);
   const [deletingSubCategory, setDeletingSubCategory] = useState<{ id: string; name: string } | null>(null);
+  const [editingSubCategory, setEditingSubCategory] = useState<SubCatItem | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -55,6 +57,21 @@ export default function SubCategoriesPage() {
     if (!deletingSubCategory) return;
     const res = await fetch(`${API}/sub-categories/${deletingSubCategory.id}`, { method: "DELETE", headers: { Authorization: AUTH } });
     if (res.ok) setRows((prev) => prev.filter((r) => r.id !== deletingSubCategory.id));
+  };
+
+  const handleSaveSubCategory = (updated: SubCategoryData) => {
+    setRows((prev) =>
+      prev.map((r) =>
+        r.id === updated.id
+          ? {
+              ...r,
+              name: updated.name,
+              category: updated.category,
+              status: updated.status,
+            }
+          : r
+      )
+    );
   };
 
   const toggleAll = (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -108,8 +125,14 @@ export default function SubCategoriesPage() {
                 <td><StatusBadge status={c.status} onClick={() => toggleStatus(c.id)} /></td>
                 <td>
                   <div className="sc-action-2">
-                    <button className="sc-row-btn"><FiEdit size={12} /></button>
-                    <button className="sc-row-btn delete" onClick={() => setDeletingSubCategory({ id: c.id, name: c.name })}><FiTrash2 size={12} /></button>
+                    <button
+                      className="sc-row-btn"
+                      title="Edit"
+                      onClick={() => setEditingSubCategory(c)}
+                    >
+                      <FiEdit size={12} />
+                    </button>
+                    <button className="sc-row-btn delete" title="Delete" onClick={() => setDeletingSubCategory({ id: c.id, name: c.name })}><FiTrash2 size={12} /></button>
                   </div>
                 </td>
               </tr>
@@ -139,6 +162,13 @@ export default function SubCategoriesPage() {
         itemType="sub category"
         onConfirm={confirmDeleteSubCategory}
         onClose={() => setDeletingSubCategory(null)}
+      />
+
+      <EditSubCategoryModal
+        isOpen={!!editingSubCategory}
+        subCategory={editingSubCategory}
+        onClose={() => setEditingSubCategory(null)}
+        onSaveSuccess={handleSaveSubCategory}
       />
     </AdminShell>
   );

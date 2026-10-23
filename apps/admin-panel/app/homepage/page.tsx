@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import AdminShell from "@/components/AdminShell";
 import {
   FiSave, FiRefreshCw, FiPlus, FiTrash2, FiEdit2, FiCheck, FiX,
@@ -239,25 +239,90 @@ function Field({
   );
 }
 
-function SectionTab({ section, active, onClick }: { section: HomepageSection; active: boolean; onClick: () => void }) {
+function SectionTab({
+  section,
+  active,
+  onClick,
+}: {
+  section: HomepageSection;
+  active: boolean;
+  onClick: () => void;
+}) {
+  const isSpotlight = section.sectionId.startsWith("spotlight-");
+  let label = section.displayName || section.title || section.sectionId;
+  label = label.replace(/^Category Spotlight:\s*/i, "").replace(/^Category Spotlight -\s*/i, "");
+
   return (
     <button
       onClick={onClick}
       style={{
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        width: "100%", padding: "10px 14px", background: active ? "#5A2035" : "transparent",
-        color: active ? "#FFFFFF" : "#4A3828", border: "none", borderRadius: 8,
-        cursor: "pointer", fontSize: 13, fontWeight: active ? 700 : 500,
-        transition: "all 0.2s", textAlign: "left", gap: 8,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        width: "100%",
+        padding: "9px 12px",
+        background: active ? "#5D2030" : "transparent",
+        color: active ? "#FFFFFF" : "#3B2C24",
+        border: "none",
+        borderRadius: 8,
+        cursor: "pointer",
+        fontSize: 13,
+        fontWeight: active ? 700 : 500,
+        transition: "all 0.15s ease",
+        textAlign: "left",
+        gap: 8,
+        boxSizing: "border-box",
+      }}
+      onMouseEnter={(e) => {
+        if (!active) {
+          e.currentTarget.style.backgroundColor = "#F4ECE2";
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!active) {
+          e.currentTarget.style.backgroundColor = "transparent";
+        }
       }}
     >
-      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-        {section.displayName}
-      </span>
+      <div style={{ display: "flex", alignItems: "center", gap: 7, minWidth: 0, overflow: "hidden" }}>
+        {isSpotlight && (
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 700,
+              textTransform: "uppercase",
+              padding: "2px 5px",
+              borderRadius: 4,
+              letterSpacing: "0.5px",
+              backgroundColor: active ? "rgba(255, 255, 255, 0.22)" : "#EDE1D1",
+              color: active ? "#FFFFFF" : "#7D534A",
+              flexShrink: 0,
+            }}
+          >
+            Spotlight
+          </span>
+        )}
+        <span
+          style={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            lineHeight: 1.3,
+          }}
+        >
+          {label}
+        </span>
+      </div>
+
       <span
+        title={section.isActive ? "Visible on storefront" : "Hidden from storefront"}
         style={{
-          width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
+          width: 8,
+          height: 8,
+          borderRadius: "50%",
+          flexShrink: 0,
           background: section.isActive ? "#16A34A" : "#DC2626",
+          boxShadow: section.isActive ? "0 0 4px rgba(22, 163, 74, 0.4)" : "none",
         }}
       />
     </button>
@@ -266,12 +331,78 @@ function SectionTab({ section, active, onClick }: { section: HomepageSection; ac
 
 type NewItemForm = Omit<HomepageItem, "metadata"> & { metadata: Record<string, unknown> };
 
+function getItemGroupInfo(item: HomepageItem, sectionId: string): {
+  groupKey: string;
+  groupLabel: string;
+  badgeBg: string;
+  badgeColor: string;
+} {
+  const id = (item.itemId || "").toLowerCase();
+  const img = (item.imageUrl || "").toLowerCase();
+
+  if (id.startsWith("social-") || ["instagram", "facebook", "whatsapp", "pinterest", "twitter", "youtube"].includes(img)) {
+    return {
+      groupKey: "social",
+      groupLabel: "Social Link",
+      badgeBg: "#FCE7F3",
+      badgeColor: "#9D174D",
+    };
+  }
+  if (id.startsWith("nav-")) {
+    return {
+      groupKey: "nav",
+      groupLabel: "Navigation",
+      badgeBg: "#EEF2FF",
+      badgeColor: "#3730A3",
+    };
+  }
+  if (item.metadata?.group === "collections" || id.startsWith("footer-col-")) {
+    return {
+      groupKey: "collections",
+      groupLabel: "Collection",
+      badgeBg: "#FEF3C7",
+      badgeColor: "#92400E",
+    };
+  }
+  if (item.metadata?.group === "customer-care" || id.startsWith("footer-care-")) {
+    return {
+      groupKey: "customer-care",
+      groupLabel: "Customer Care",
+      badgeBg: "#E0F2FE",
+      badgeColor: "#075985",
+    };
+  }
+  if (id.startsWith("wa-step-")) {
+    return {
+      groupKey: "wa-step",
+      groupLabel: "Step Card",
+      badgeBg: "#DCFCE7",
+      badgeColor: "#166534",
+    };
+  }
+  if (id.startsWith("mosaic-")) {
+    return {
+      groupKey: "mosaic",
+      groupLabel: "Mosaic Card",
+      badgeBg: "#F3E8FF",
+      badgeColor: "#6B21A8",
+    };
+  }
+  return {
+    groupKey: "item",
+    groupLabel: "Card Item",
+    badgeBg: "#F4ECE2",
+    badgeColor: "#5D2030",
+  };
+}
+
 function ItemsManager({ section, onRefresh }: { section: HomepageSection; onRefresh: () => void }) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<Partial<NewItemForm>>({});
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [groupFilter, setGroupFilter] = useState<string>("all");
 
   const resetForm = () => { setForm({}); setShowAddForm(false); setEditingId(null); };
 
@@ -282,7 +413,7 @@ function ItemsManager({ section, onRefresh }: { section: HomepageSection; onRefr
   };
 
   const handleSaveItem = async () => {
-    if (!form.itemId?.trim()) { alert("itemId is required"); return; }
+    if (!form.itemId?.trim()) { alert("Item ID is required"); return; }
     setSaving(true);
     try {
       const method = editingId ? "PUT" : "POST";
@@ -297,10 +428,11 @@ function ItemsManager({ section, onRefresh }: { section: HomepageSection; onRefr
       });
       const data = await res.json();
       if (data.success) { 
-        // Broadcast to storefront tabs
         localStorage.setItem("cms_updated_at", Date.now().toString());
         try { new BroadcastChannel("cms_sync").postMessage("updated"); } catch { /* unsupported */ }
-        resetForm(); onRefresh(); }
+        resetForm();
+        onRefresh();
+      }
       else alert(data.message || "Failed to save item.");
     } catch { alert("Network error saving item."); }
     finally { setSaving(false); }
@@ -316,7 +448,6 @@ function ItemsManager({ section, onRefresh }: { section: HomepageSection; onRefr
       });
       const data = await res.json();
       if (data.success) {
-        // Broadcast to storefront tabs
         localStorage.setItem("cms_updated_at", Date.now().toString());
         try { new BroadcastChannel("cms_sync").postMessage("updated"); } catch { /* unsupported */ }
         onRefresh();
@@ -326,57 +457,141 @@ function ItemsManager({ section, onRefresh }: { section: HomepageSection; onRefr
     finally { setDeleting(null); }
   };
 
-  const activeItems = section.items.filter(i => i.isActive !== false);
-  const inactiveItems = section.items.filter(i => i.isActive === false);
+  // Distinct functional groups
+  const groups = useMemo(() => {
+    const map = new Map<string, { key: string; label: string; count: number }>();
+    section.items.forEach(it => {
+      const info = getItemGroupInfo(it, section.sectionId);
+      if (!map.has(info.groupKey)) {
+        map.set(info.groupKey, { key: info.groupKey, label: info.groupLabel, count: 0 });
+      }
+      map.get(info.groupKey)!.count += 1;
+    });
+    return Array.from(map.values());
+  }, [section.items, section.sectionId]);
+
+  // Grouped and sorted items
+  const sortedItems = useMemo(() => {
+    return [...section.items].sort((a, b) => {
+      const gA = getItemGroupInfo(a, section.sectionId).groupKey;
+      const gB = getItemGroupInfo(b, section.sectionId).groupKey;
+      if (gA !== gB) {
+        const priority: Record<string, number> = { nav: 1, social: 2, collections: 1, "customer-care": 2, "wa-step": 1, mosaic: 1 };
+        return (priority[gA] || 99) - (priority[gB] || 99);
+      }
+      return (a.displayOrder ?? 0) - (b.displayOrder ?? 0);
+    });
+  }, [section.items, section.sectionId]);
+
+  const filteredItems = useMemo(() => {
+    if (groupFilter === "all") return sortedItems;
+    return sortedItems.filter(it => getItemGroupInfo(it, section.sectionId).groupKey === groupFilter);
+  }, [sortedItems, groupFilter, section.sectionId]);
 
   return (
-    <div style={{ marginTop: 24 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-        <h4 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#2F2C24" }}>
-          Items / Cards ({section.items.length})
-        </h4>
+    <div style={{ marginTop: 28, paddingTop: 20, borderTop: "1.5px solid #F0E8D8" }}>
+      {/* Header and Add Button */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, flexWrap: "wrap", gap: 10 }}>
+        <div>
+          <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: "#2F2C24" }}>
+            Section Items / Cards ({section.items.length})
+          </h4>
+          <p style={{ margin: "3px 0 0 0", fontSize: 12, color: "#8C827A" }}>
+            Manage navigation links, social icons, or content cards belonging to this section.
+          </p>
+        </div>
         <button
-          onClick={() => { setShowAddForm(!showAddForm); setEditingId(null); setForm({}); }}
+          onClick={() => { setShowAddForm(!showAddForm); setEditingId(null); setForm({ displayOrder: (section.items.length + 1), isActive: true }); }}
           style={{
-            background: "#5A2035", color: "#fff", border: "none", borderRadius: 8,
-            padding: "7px 14px", cursor: "pointer", fontSize: 12, fontWeight: 600,
-            display: "flex", alignItems: "center", gap: 6,
+            background: "#5A2035", color: "#FFFFFF", border: "none", borderRadius: 8,
+            padding: "8px 16px", cursor: "pointer", fontSize: 13, fontWeight: 600,
+            display: "inline-flex", alignItems: "center", gap: 6,
+            boxShadow: "0 2px 6px rgba(90, 32, 53, 0.15)",
           }}
         >
-          <FiPlus size={13} /> Add Item
+          <FiPlus size={14} /> Add Item
         </button>
       </div>
 
+      {/* Filter Tabs if multiple groups exist (e.g. Nav Links vs Social Icons) */}
+      {groups.length > 1 && (
+        <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap", alignItems: "center" }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#8C827A", textTransform: "uppercase", letterSpacing: "0.6px", marginRight: 2 }}>
+            Group View:
+          </span>
+          <button
+            onClick={() => setGroupFilter("all")}
+            style={{
+              padding: "5px 12px",
+              borderRadius: 20,
+              border: groupFilter === "all" ? "1.5px solid #5A2035" : "1px solid #DECDBE",
+              background: groupFilter === "all" ? "#5A2035" : "#FFFFFF",
+              color: groupFilter === "all" ? "#FFFFFF" : "#5A2035",
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: "pointer",
+              transition: "all 0.15s ease",
+            }}
+          >
+            All Items ({section.items.length})
+          </button>
+          {groups.map(g => (
+            <button
+              key={g.key}
+              onClick={() => setGroupFilter(g.key)}
+              style={{
+                padding: "5px 12px",
+                borderRadius: 20,
+                border: groupFilter === g.key ? "1.5px solid #5A2035" : "1px solid #DECDBE",
+                background: groupFilter === g.key ? "#5A2035" : "#FFFFFF",
+                color: groupFilter === g.key ? "#FFFFFF" : "#5A2035",
+                fontSize: 12,
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "all 0.15s ease",
+              }}
+            >
+              {g.label}s ({g.count})
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Add / Edit Form */}
       {(showAddForm || editingId) && (
-        <div style={{ background: "#FBF3E6", borderRadius: 12, padding: 18, border: "1px solid #E5D7C5", marginBottom: 16 }}>
-          <h5 style={{ margin: "0 0 14px 0", fontSize: 13, color: "#5A2035", fontWeight: 700 }}>
-            {editingId ? `Edit Item: ${editingId}` : "Add New Item"}
-          </h5>
-          {!editingId && (
-            <Field label="Item ID *" value={form.itemId || ""} onChange={v => setForm(p => ({ ...p, itemId: v }))} placeholder="unique-item-id" />
-          )}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            <Field label="Title" value={form.title || ""} onChange={v => setForm(p => ({ ...p, title: v }))} />
-            <Field label="Subtitle" value={form.subtitle || ""} onChange={v => setForm(p => ({ ...p, subtitle: v }))} />
-            <Field label="Badge" value={form.badge || ""} onChange={v => setForm(p => ({ ...p, badge: v }))} />
-            <Field label="Link URL" value={form.linkUrl || ""} onChange={v => setForm(p => ({ ...p, linkUrl: v }))} />
-            <Field label="CTA Text" value={form.ctaText || ""} onChange={v => setForm(p => ({ ...p, ctaText: v }))} />
-            <Field label="Display Order" value={String(form.displayOrder ?? "")} onChange={v => setForm(p => ({ ...p, displayOrder: parseInt(v) || 0 }))} type="number" />
+        <div style={{ background: "#FBF3E6", borderRadius: 12, padding: 20, border: "1.5px solid #E5D7C5", marginBottom: 20, boxShadow: "0 4px 12px rgba(0,0,0,0.04)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+            <h5 style={{ margin: 0, fontSize: 14, color: "#5A2035", fontWeight: 700 }}>
+              {editingId ? `Edit Item: ${editingId}` : "Add New Item"}
+            </h5>
+            <button onClick={resetForm} style={{ background: "transparent", border: "none", cursor: "pointer", color: "#8C827A" }}>
+              <FiX size={16} />
+            </button>
           </div>
-          <Field label="Description" value={form.description || ""} onChange={v => setForm(p => ({ ...p, description: v }))} multiline />
-          <ImageUploader label="Image URL" value={form.imageUrl || ""} onChange={v => setForm(p => ({ ...p, imageUrl: v }))} />
+          {!editingId && (
+            <Field label="Item ID *" value={form.itemId || ""} onChange={v => setForm(p => ({ ...p, itemId: v }))} placeholder="e.g. nav-contact or social-youtube" />
+          )}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 16px" }}>
+            <Field label="Title / Label" value={form.title || ""} onChange={v => setForm(p => ({ ...p, title: v }))} placeholder="e.g. Instagram or Saree Collection" />
+            <Field label="Subtitle" value={form.subtitle || ""} onChange={v => setForm(p => ({ ...p, subtitle: v }))} />
+            <Field label="Badge Text" value={form.badge || ""} onChange={v => setForm(p => ({ ...p, badge: v }))} />
+            <Field label="Link URL" value={form.linkUrl || ""} onChange={v => setForm(p => ({ ...p, linkUrl: v }))} placeholder="e.g. /categories or https://..." />
+            <Field label="CTA Button Text" value={form.ctaText || ""} onChange={v => setForm(p => ({ ...p, ctaText: v }))} />
+            <Field label="Display Order (Within Group)" value={String(form.displayOrder ?? "")} onChange={v => setForm(p => ({ ...p, displayOrder: parseInt(v) || 0 }))} type="number" placeholder="1, 2, 3..." />
+          </div>
+          <Field label="Description" value={form.description || ""} onChange={v => setForm(p => ({ ...p, description: v }))} multiline placeholder="Optional supporting item text" />
+          <ImageUploader label="Image URL or Icon Name" value={form.imageUrl || ""} onChange={v => setForm(p => ({ ...p, imageUrl: v }))} hint="Image URL, photo upload, or icon identifier: instagram, facebook, whatsapp, pinterest" />
           <Field label="Image Alt Text" value={form.imageAlt || ""} onChange={v => setForm(p => ({ ...p, imageAlt: v }))} />
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-            <label style={{ fontSize: 12, fontWeight: 600, color: "#5A2035", textTransform: "uppercase", letterSpacing: "0.5px" }}>Active</label>
-            <input type="checkbox" checked={form.isActive !== false} onChange={e => setForm(p => ({ ...p, isActive: e.target.checked }))} style={{ width: 16, height: 16 }} />
+          <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "14px 0" }}>
+            <label style={{ fontSize: 12, fontWeight: 600, color: "#5A2035", textTransform: "uppercase", letterSpacing: "0.5px" }}>Active on Storefront</label>
+            <input type="checkbox" checked={form.isActive !== false} onChange={e => setForm(p => ({ ...p, isActive: e.target.checked }))} style={{ width: 16, height: 16, cursor: "pointer" }} />
           </div>
           <div style={{ display: "flex", gap: 10 }}>
             <button
               onClick={handleSaveItem} disabled={saving}
-              style={{ background: "#5A2035", color: "#fff", border: "none", borderRadius: 8, padding: "9px 20px", cursor: "pointer", fontSize: 13, fontWeight: 700, display: "flex", alignItems: "center", gap: 8, opacity: saving ? 0.7 : 1 }}
+              style={{ background: "#5A2035", color: "#FFFFFF", border: "none", borderRadius: 8, padding: "9px 22px", cursor: "pointer", fontSize: 13, fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 8, opacity: saving ? 0.7 : 1 }}
             >
-              {saving ? <FiRefreshCw size={13} /> : <FiSave size={13} />} {saving ? "Saving…" : "Save Item"}
+              {saving ? <FiRefreshCw size={13} className="spinning" /> : <FiSave size={13} />} {saving ? "Saving…" : "Save Item"}
             </button>
             <button onClick={resetForm} style={{ background: "transparent", color: "#685F53", border: "1px solid #E5D7C5", borderRadius: 8, padding: "9px 16px", cursor: "pointer", fontSize: 13 }}>
               Cancel
@@ -385,72 +600,302 @@ function ItemsManager({ section, onRefresh }: { section: HomepageSection; onRefr
         </div>
       )}
 
-      {/* Items Table */}
+      {/* Items Table with Proper Responsive Alignment and Dedicated Columns */}
       {section.items.length === 0 ? (
-        <p style={{ color: "#A8926B", fontSize: 13, textAlign: "center", padding: "20px 0" }}>No items yet. Click "Add Item" to create the first one.</p>
+        <div style={{ padding: "32px 16px", textAlign: "center", background: "#FDFAF5", borderRadius: 10, border: "1px dashed #DECDBE" }}>
+          <FiImage size={24} color="#C4B49A" style={{ marginBottom: 8, display: "inline-block" }} />
+          <p style={{ color: "#8C827A", fontSize: 13, margin: 0 }}>No items in this section. Click &ldquo;Add Item&rdquo; above to create one.</p>
+        </div>
       ) : (
-        <div style={{ borderRadius: 10, overflow: "hidden", border: "1px solid #E5D7C5" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead style={{ background: "#F7F1E8" }}>
+        <div
+          style={{
+            borderRadius: 10,
+            border: "1px solid #E5D7C5",
+            background: "#FFFFFF",
+            overflowX: "auto",
+            WebkitOverflowScrolling: "touch",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
+            width: "100%",
+          }}
+        >
+          <table
+            style={{
+              width: "100%",
+              minWidth: 780,
+              borderCollapse: "collapse",
+              tableLayout: "fixed",
+            }}
+          >
+            <colgroup>
+              <col style={{ width: 140 }} /> {/* ID */}
+              <col style={{ width: 180 }} /> {/* Title */}
+              <col style={{ width: 115 }} /> {/* Group / Type */}
+              <col style={{ width: 90 }} />  {/* Image / Icon */}
+              <col style={{ width: 75 }} />  {/* Order */}
+              <col style={{ width: 85 }} />  {/* Status */}
+              <col style={{ width: 135 }} /> {/* Actions */}
+            </colgroup>
+            <thead style={{ background: "#F7F1E8", borderBottom: "1.5px solid #DECDBE" }}>
               <tr>
-                {["ID", "Title", "Image", "Order", "Status", "Actions"].map(h => (
-                  <th key={h} style={{ padding: "9px 12px", fontSize: 11, fontWeight: 700, color: "#5A2035", textAlign: "left", textTransform: "uppercase", letterSpacing: "0.5px" }}>{h}</th>
-                ))}
+                <th style={{ padding: "12px 14px", fontSize: 11, fontWeight: 700, color: "#5A2035", textAlign: "left", textTransform: "uppercase", letterSpacing: "0.6px", whiteSpace: "nowrap" }}>
+                  Item ID
+                </th>
+                <th style={{ padding: "12px 14px", fontSize: 11, fontWeight: 700, color: "#5A2035", textAlign: "left", textTransform: "uppercase", letterSpacing: "0.6px", whiteSpace: "nowrap" }}>
+                  Title / Label
+                </th>
+                <th style={{ padding: "12px 14px", fontSize: 11, fontWeight: 700, color: "#5A2035", textAlign: "left", textTransform: "uppercase", letterSpacing: "0.6px", whiteSpace: "nowrap" }}>
+                  Type
+                </th>
+                <th style={{ padding: "12px 14px", fontSize: 11, fontWeight: 700, color: "#5A2035", textAlign: "center", textTransform: "uppercase", letterSpacing: "0.6px", whiteSpace: "nowrap" }}>
+                  Image / Icon
+                </th>
+                <th style={{ padding: "12px 14px", fontSize: 11, fontWeight: 700, color: "#5A2035", textAlign: "center", textTransform: "uppercase", letterSpacing: "0.6px", whiteSpace: "nowrap" }}>
+                  Order
+                </th>
+                <th style={{ padding: "12px 14px", fontSize: 11, fontWeight: 700, color: "#5A2035", textAlign: "center", textTransform: "uppercase", letterSpacing: "0.6px", whiteSpace: "nowrap" }}>
+                  Status
+                </th>
+                <th style={{ padding: "12px 14px", fontSize: 11, fontWeight: 700, color: "#5A2035", textAlign: "center", textTransform: "uppercase", letterSpacing: "0.6px", whiteSpace: "nowrap" }}>
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
-              {[...activeItems, ...inactiveItems].map((item, idx) => (
-                <tr
-                  key={item.itemId}
-                  style={{ background: idx % 2 === 0 ? "#FDFAF5" : "#FFFFFF", opacity: item.isActive ? 1 : 0.55 }}
-                >
-                  <td style={{ padding: "9px 12px", fontSize: 12, color: "#5A2035", fontWeight: 600 }}>{item.itemId}</td>
-                  <td style={{ padding: "9px 12px", fontSize: 13, color: "#2F2C24", maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {item.title || item.description?.substring(0, 40) || <span style={{ color: "#A8926B" }}>—</span>}
-                  </td>
-                  <td style={{ padding: "9px 12px" }}>
-                    {isLikelyImageUrl(item.imageUrl) ? (
-                      <img
-                        src={normalizeImageSrc(item.imageUrl)}
-                        alt={item.imageAlt || item.title}
-                        style={{ width: 40, height: 30, objectFit: "cover", borderRadius: 4, display: "block" }}
-                        onError={(e) => {
-                          (e.target as HTMLElement).style.display = "none";
-                        }}
-                      />
-                    ) : item.imageUrl ? (
-                      <div style={{ width: 40, height: 30, display: "flex", alignItems: "center", justifyContent: "center", background: "#FDF8F0", borderRadius: 4, border: "1px solid #E5D7C5" }}>
-                        {renderSocialOrCustomIcon(item.imageUrl, 16)}
-                      </div>
-                    ) : (
-                      <FiImage size={16} color="#C4B49A" />
+              {filteredItems.map((item, idx) => {
+                const typeInfo = getItemGroupInfo(item, section.sectionId);
+                const prevItem = idx > 0 ? filteredItems[idx - 1] : null;
+                const isFirstOfGroup = groupFilter === "all" && groups.length > 1 && (!prevItem || getItemGroupInfo(prevItem, section.sectionId).groupKey !== typeInfo.groupKey);
+
+                return (
+                  <React.Fragment key={item.itemId}>
+                    {isFirstOfGroup && (
+                      <tr style={{ background: "#F5EFE6" }}>
+                        <td
+                          colSpan={7}
+                          style={{
+                            padding: "7px 14px",
+                            fontSize: 11,
+                            fontWeight: 800,
+                            color: "#5A2035",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.8px",
+                            borderTop: idx > 0 ? "1.5px solid #DECDBE" : "none",
+                            borderBottom: "1px solid #DECDBE",
+                          }}
+                        >
+                          ✦ {typeInfo.groupLabel}s ({groups.find(g => g.key === typeInfo.groupKey)?.count || 0})
+                        </td>
+                      </tr>
                     )}
-                  </td>
-                  <td style={{ padding: "9px 12px", fontSize: 12, color: "#685F53" }}>{item.displayOrder}</td>
-                  <td style={{ padding: "9px 12px" }}>
-                    <span style={{ background: item.isActive ? "#16A34A" : "#DC2626", color: "#fff", padding: "2px 9px", borderRadius: 4, fontSize: 11, fontWeight: 700 }}>
-                      {item.isActive ? "Active" : "Inactive"}
-                    </span>
-                  </td>
-                  <td style={{ padding: "9px 12px" }}>
-                    <div style={{ display: "flex", gap: 6 }}>
-                      <button
-                        onClick={() => handleEdit(item)}
-                        style={{ background: "#EEF2FF", color: "#4338CA", border: "none", borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}
-                      >
-                        <FiEdit2 size={12} /> Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item.itemId)}
-                        disabled={deleting === item.itemId}
-                        style={{ background: "#FEE2E2", color: "#DC2626", border: "none", borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontSize: 12, display: "flex", alignItems: "center", gap: 4, opacity: deleting === item.itemId ? 0.6 : 1 }}
-                      >
-                        {deleting === item.itemId ? <FiRefreshCw size={12} /> : <FiTrash2 size={12} />} Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    <tr
+                      style={{
+                        background: idx % 2 === 0 ? "#FDFAF5" : "#FFFFFF",
+                        borderBottom: "1px solid #F0E8D8",
+                        opacity: item.isActive ? 1 : 0.6,
+                        transition: "background 0.15s ease",
+                      }}
+                    >
+                      {/* ID */}
+                      <td style={{ padding: "10px 14px", verticalAlign: "middle" }}>
+                        <code
+                          style={{
+                            fontSize: 11,
+                            background: "#F5EFE6",
+                            color: "#5A2035",
+                            padding: "3px 6px",
+                            borderRadius: 4,
+                            fontWeight: 600,
+                            display: "inline-block",
+                            maxWidth: 125,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                          title={item.itemId}
+                        >
+                          {item.itemId}
+                        </code>
+                      </td>
+
+                      {/* Title & subtitle */}
+                      <td style={{ padding: "10px 14px", verticalAlign: "middle" }}>
+                        <div
+                          style={{
+                            fontWeight: 600,
+                            color: "#2F2C24",
+                            fontSize: 13,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                          title={item.title || item.description}
+                        >
+                          {item.title || item.description?.substring(0, 40) || <span style={{ color: "#A8926B" }}>—</span>}
+                        </div>
+                        {item.subtitle && (
+                          <div
+                            style={{
+                              fontSize: 11,
+                              color: "#8C827A",
+                              marginTop: 2,
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {item.subtitle}
+                          </div>
+                        )}
+                        {item.linkUrl && item.linkUrl !== "#" && (
+                          <div
+                            style={{
+                              fontSize: 10.5,
+                              color: "#BA8E43",
+                              marginTop: 2,
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {item.linkUrl}
+                          </div>
+                        )}
+                      </td>
+
+                      {/* Group / Type */}
+                      <td style={{ padding: "10px 14px", verticalAlign: "middle" }}>
+                        <span
+                          style={{
+                            fontSize: 10,
+                            fontWeight: 700,
+                            textTransform: "uppercase",
+                            padding: "3px 7px",
+                            borderRadius: 4,
+                            letterSpacing: "0.4px",
+                            backgroundColor: typeInfo.badgeBg,
+                            color: typeInfo.badgeColor,
+                            whiteSpace: "nowrap",
+                            display: "inline-block",
+                          }}
+                        >
+                          {typeInfo.groupLabel}
+                        </span>
+                      </td>
+
+                      {/* Image / Icon */}
+                      <td style={{ padding: "10px 14px", textAlign: "center", verticalAlign: "middle" }}>
+                        <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+                          {isLikelyImageUrl(item.imageUrl) ? (
+                            <img
+                              src={normalizeImageSrc(item.imageUrl)}
+                              alt={item.imageAlt || item.title}
+                              style={{ width: 44, height: 32, objectFit: "cover", borderRadius: 4, border: "1px solid #E5D7C5", display: "block" }}
+                              onError={(e) => { (e.target as HTMLElement).style.display = "none"; }}
+                            />
+                          ) : item.imageUrl ? (
+                            <div style={{ width: 38, height: 32, display: "flex", alignItems: "center", justifyContent: "center", background: "#FDFAF5", borderRadius: 6, border: "1px solid #DECDBE" }}>
+                              {renderSocialOrCustomIcon(item.imageUrl, 18)}
+                            </div>
+                          ) : (
+                            <div style={{ width: 38, height: 32, display: "flex", alignItems: "center", justifyContent: "center", background: "#FAF6F0", borderRadius: 6, border: "1px dashed #DBC49A" }}>
+                              <FiImage size={16} color="#B8A392" />
+                            </div>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* Order */}
+                      <td style={{ padding: "10px 14px", textAlign: "center", verticalAlign: "middle" }}>
+                        <span
+                          style={{
+                            display: "inline-block",
+                            padding: "3px 8px",
+                            borderRadius: 4,
+                            fontSize: 12,
+                            fontWeight: 700,
+                            background: "#F4ECE2",
+                            color: "#5D2030",
+                            minWidth: 24,
+                            textAlign: "center",
+                          }}
+                        >
+                          #{item.displayOrder}
+                        </span>
+                      </td>
+
+                      {/* Status */}
+                      <td style={{ padding: "10px 14px", textAlign: "center", verticalAlign: "middle" }}>
+                        <span
+                          style={{
+                            display: "inline-block",
+                            background: item.isActive ? "#DCFCE7" : "#FEE2E2",
+                            color: item.isActive ? "#166534" : "#991B1B",
+                            padding: "3px 8px",
+                            borderRadius: 4,
+                            fontSize: 11,
+                            fontWeight: 700,
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {item.isActive ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+
+                      {/* Actions */}
+                      <td style={{ padding: "10px 14px", textAlign: "center", verticalAlign: "middle" }}>
+                        <div style={{ display: "inline-flex", gap: 6, alignItems: "center", justifyContent: "center" }}>
+                          <button
+                            onClick={() => handleEdit(item)}
+                            title="Edit item"
+                            style={{
+                              background: "#F5EFE6",
+                              color: "#5A2035",
+                              border: "1px solid #DECDBE",
+                              borderRadius: 6,
+                              padding: "5px 10px",
+                              cursor: "pointer",
+                              fontSize: 12,
+                              fontWeight: 600,
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 4,
+                              transition: "all 0.15s ease",
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#EADCCB"; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#F5EFE6"; }}
+                          >
+                            <FiEdit2 size={12} /> Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(item.itemId)}
+                            disabled={deleting === item.itemId}
+                            title="Delete item"
+                            style={{
+                              background: "#FEE2E2",
+                              color: "#DC2626",
+                              border: "1px solid #FCA5A5",
+                              borderRadius: 6,
+                              padding: "5px 10px",
+                              cursor: "pointer",
+                              fontSize: 12,
+                              fontWeight: 600,
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 4,
+                              opacity: deleting === item.itemId ? 0.6 : 1,
+                              transition: "all 0.15s ease",
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#FECACA"; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#FEE2E2"; }}
+                          >
+                            {deleting === item.itemId ? <FiRefreshCw size={12} className="spinning" /> : <FiTrash2 size={12} />} Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </React.Fragment>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -1031,10 +1476,17 @@ export default function HomepageCMSPage() {
       });
       const data = await res.json();
       if (data.success) {
-        const list = data.ordered || Object.values(data.data || {});
-        setSections(list);
-        if (!activeSectionId && list.length) {
-          setActiveSectionId(list[0].sectionId);
+        const rawList: HomepageSection[] = data.ordered || Object.values(data.data || {});
+        const seen = new Set<string>();
+        const uniqueList: HomepageSection[] = [];
+        for (const s of rawList) {
+          if (!s.sectionId || seen.has(s.sectionId)) continue;
+          seen.add(s.sectionId);
+          uniqueList.push(s);
+        }
+        setSections(uniqueList);
+        if (!activeSectionId && uniqueList.length) {
+          setActiveSectionId(uniqueList[0].sectionId);
         }
       } else {
         setError(data.message || "Failed to load homepage sections.");
@@ -1096,42 +1548,107 @@ export default function HomepageCMSPage() {
         onSuccess={handleSpotlightCreated}
       />
 
-      {/* Page Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+      {/* Page Header matching Admin Design System */}
+      <div className="sc-page-header" style={{ marginBottom: 20 }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "#2F2C24" }}>Homepage CMS</h1>
-          <p style={{ margin: "4px 0 0 0", fontSize: 13, color: "#A8926B" }}>
-            Manage all non-exempt homepage sections & Category Spotlights. <strong style={{ color: "#5A2035" }}>Featured Collection is protected and excluded.</strong>
-          </p>
+          <h1 className="sc-page-title">Homepage CMS</h1>
+          <div className="sc-breadcrumbs">
+            <span>Dashboard</span>
+            <span>›</span>
+            <span style={{ color: "#3B2C24", fontWeight: 600 }}>Homepage CMS</span>
+          </div>
         </div>
-        <div style={{ display: "flex", gap: 12 }}>
+        <div className="sc-action-buttons" style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           <button
             onClick={() => setIsAddSpotlightOpen(true)}
+            className="sc-btn-add"
             style={{
-              background: "#5A2035", color: "#FFFFFF", border: "none", borderRadius: 8,
-              padding: "9px 18px", cursor: "pointer", display: "flex", alignItems: "center",
-              gap: 8, fontSize: 13, fontWeight: 700, boxShadow: "0 4px 12px rgba(90, 32, 53, 0.2)",
+              height: 36,
+              padding: "0 18px",
+              borderRadius: 6,
+              fontSize: 13,
+              fontWeight: 600,
+              gap: 6,
+              display: "inline-flex",
+              alignItems: "center",
+              whiteSpace: "nowrap",
             }}
           >
             <FiPlus size={15} /> Add Category Spotlight
           </button>
           <button
-            onClick={fetchSections} disabled={loading}
-            style={{ background: "#F7F1E8", color: "#5A2035", border: "1px solid #E5D7C5", borderRadius: 8, padding: "9px 16px", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600 }}
+            onClick={fetchSections}
+            disabled={loading}
+            style={{
+              height: 36,
+              padding: "0 16px",
+              borderRadius: 6,
+              background: "#FFFFFF",
+              color: "var(--primary-burgundy, #5D2030)",
+              border: "1px solid #DECDBE",
+              fontSize: 13,
+              fontWeight: 600,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+              transition: "all 0.15s ease",
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#FAF6F0"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#FFFFFF"; }}
           >
-            <FiRefreshCw size={14} className={loading ? "spinning" : ""} /> Refresh
+            <FiRefreshCw size={13} className={loading ? "spinning" : ""} /> Refresh
           </button>
           <button
-            onClick={handleSeedDefault} disabled={seeding}
-            style={{ background: "#F7F1E8", color: "#685F53", border: "1px solid #E5D7C5", borderRadius: 8, padding: "9px 16px", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, opacity: seeding ? 0.7 : 1 }}
+            onClick={handleSeedDefault}
+            disabled={seeding}
+            style={{
+              height: 36,
+              padding: "0 16px",
+              borderRadius: 6,
+              background: "#FFFFFF",
+              color: "#685F53",
+              border: "1px solid #DECDBE",
+              fontSize: 13,
+              fontWeight: 600,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              cursor: "pointer",
+              opacity: seeding ? 0.6 : 1,
+              whiteSpace: "nowrap",
+              transition: "all 0.15s ease",
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#FAF6F0"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#FFFFFF"; }}
           >
-            {seeding ? <FiRefreshCw size={14} className="spinning" /> : <FiExternalLink size={14} />} Reset Defaults
+            {seeding ? <FiRefreshCw size={13} className="spinning" /> : <FiExternalLink size={13} />} Reset Defaults
           </button>
           <a
             href={STORE_URL}
             target="_blank"
             rel="noreferrer"
-            style={{ background: "#F7F1E8", color: "#5A2035", border: "1px solid #E5D7C5", borderRadius: 8, padding: "9px 16px", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, textDecoration: "none" }}
+            style={{
+              height: 36,
+              padding: "0 16px",
+              borderRadius: 6,
+              background: "#FFFFFF",
+              color: "#BA8E43",
+              border: "1px solid #DECDBE",
+              fontSize: 13,
+              fontWeight: 600,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              cursor: "pointer",
+              textDecoration: "none",
+              whiteSpace: "nowrap",
+              boxSizing: "border-box",
+              transition: "all 0.15s ease",
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#FAF6F0"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#FFFFFF"; }}
           >
             <FiEye size={14} /> Preview Site
           </a>
@@ -1150,23 +1667,23 @@ export default function HomepageCMSPage() {
           <p style={{ color: "#A8926B", fontSize: 14 }}>Loading homepage sections…</p>
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: 24, alignItems: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "300px minmax(0, 1fr)", gap: 24, alignItems: "start" }}>
           {/* Section Sidebar */}
           <div style={{ background: "#FDFAF5", borderRadius: 14, border: "1px solid #E5D7C5", padding: 12, position: "sticky", top: 24 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, padding: "0 4px" }}>
-              <p style={{ fontSize: 11, fontWeight: 700, color: "#A8926B", textTransform: "uppercase", letterSpacing: "0.8px", margin: 0 }}>
+              <p style={{ fontSize: 11, fontWeight: 700, color: "#8C827A", textTransform: "uppercase", letterSpacing: "0.8px", margin: 0 }}>
                 Sections ({sections.length})
               </p>
               <button
                 onClick={() => setIsAddSpotlightOpen(true)}
                 style={{
                   background: "#5A2035", color: "#FFFFFF", border: "none", borderRadius: 6,
-                  padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer",
-                  display: "flex", alignItems: "center", gap: 4,
+                  padding: "4px 10px", fontSize: 11.5, fontWeight: 700, cursor: "pointer",
+                  display: "inline-flex", alignItems: "center", gap: 5, whiteSpace: "nowrap",
                 }}
                 title="Add a new Spotlight section"
               >
-                <FiPlus size={11} /> + Spotlight
+                <FiPlus size={12} /> Spotlight
               </button>
             </div>
 
@@ -1188,7 +1705,7 @@ export default function HomepageCMSPage() {
           </div>
 
           {/* Section Editor */}
-          <div style={{ background: "#FFFFFF", borderRadius: 14, border: "1px solid #E5D7C5", padding: 28 }}>
+          <div style={{ background: "#FFFFFF", borderRadius: 14, border: "1px solid #E5D7C5", padding: 28, minWidth: 0, overflow: "hidden" }}>
             {activeSection ? (
               <SectionEditor
                 key={activeSection.sectionId}

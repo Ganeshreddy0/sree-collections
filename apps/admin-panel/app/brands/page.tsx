@@ -6,6 +6,7 @@ import AdminShell from "@/components/AdminShell";
 import { FiSearch, FiChevronDown, FiChevronLeft, FiChevronRight, FiEdit, FiTrash2 } from "react-icons/fi";
 import { FaFilePdf, FaFileExcel } from "react-icons/fa";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
+import EditBrandModal, { BrandData } from "@/components/EditBrandModal";
 
 import { API_BASE as API } from "@/lib/config";
 const AUTH = "Bearer super_admin_authenticated";
@@ -31,6 +32,7 @@ export default function BrandsPage() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(1);
   const [deletingBrand, setDeletingBrand] = useState<{ id: string; name: string } | null>(null);
+  const [editingBrand, setEditingBrand] = useState<BrandItem | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -55,6 +57,21 @@ export default function BrandsPage() {
     if (!deletingBrand) return;
     const res = await fetch(`${API}/brands/${deletingBrand.id}`, { method: "DELETE", headers: { Authorization: AUTH } });
     if (res.ok) setRows((prev) => prev.filter((r) => r.id !== deletingBrand.id));
+  };
+
+  const handleSaveBrand = (updated: BrandData) => {
+    setRows((prev) =>
+      prev.map((r) =>
+        r.id === updated.id
+          ? {
+              ...r,
+              name: updated.name,
+              countryOrigin: updated.countryOrigin || "",
+              status: updated.status,
+            }
+          : r
+      )
+    );
   };
 
   const toggleAll = (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -108,8 +125,14 @@ export default function BrandsPage() {
                 <td><StatusBadge status={b.status} onClick={() => toggleStatus(b.id)} /></td>
                 <td>
                   <div className="sc-action-2">
-                    <button className="sc-row-btn"><FiEdit size={12} /></button>
-                    <button className="sc-row-btn delete" onClick={() => setDeletingBrand({ id: b.id, name: b.name })}><FiTrash2 size={12} /></button>
+                    <button
+                      className="sc-row-btn"
+                      title="Edit"
+                      onClick={() => setEditingBrand(b)}
+                    >
+                      <FiEdit size={12} />
+                    </button>
+                    <button className="sc-row-btn delete" title="Delete" onClick={() => setDeletingBrand({ id: b.id, name: b.name })}><FiTrash2 size={12} /></button>
                   </div>
                 </td>
               </tr>
@@ -139,6 +162,13 @@ export default function BrandsPage() {
         itemType="brand"
         onConfirm={confirmDeleteBrand}
         onClose={() => setDeletingBrand(null)}
+      />
+
+      <EditBrandModal
+        isOpen={!!editingBrand}
+        brand={editingBrand}
+        onClose={() => setEditingBrand(null)}
+        onSaveSuccess={handleSaveBrand}
       />
     </AdminShell>
   );

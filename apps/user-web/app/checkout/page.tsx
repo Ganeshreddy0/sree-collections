@@ -549,6 +549,7 @@ export default function CheckoutPage() {
 
         {/* Checkout Grid */}
         <div
+          className="checkout-main-grid"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
@@ -1448,6 +1449,10 @@ export default function CheckoutPage() {
           main h2 {
             font-size: 24px !important;
           }
+          .checkout-main-grid {
+            grid-template-columns: 1fr !important;
+            gap: 24px !important;
+          }
         }
         @media (max-width: 640px) {
           .checkout-back-link {
@@ -1459,6 +1464,23 @@ export default function CheckoutPage() {
           main {
             padding: 0 16px !important;
             margin-top: 16px !important;
+          }
+          .checkout-section-card {
+            padding: 20px 16px !important;
+          }
+          .checkout-phone-row {
+            flex-direction: column !important;
+          }
+          .checkout-phone-row select {
+            width: 100% !important;
+          }
+        }
+        @media (max-width: 480px) {
+          main h2 {
+            font-size: 18px !important;
+          }
+          main p {
+            font-size: 13px !important;
           }
         }
         .checkout-nav-link:hover {
