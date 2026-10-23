@@ -17,8 +17,8 @@ const FOOTER_LINKS = [
   { label: "ABOUT US", href: "/about" },
   { label: "CONTACT US", href: "/contact" },
   { label: "CATEGORY", href: "/categories" },
-  { label: "PRIVACY POLICY", href: "#" },
-  { label: "TERMS & CONDITIONS", href: "#" },
+  { label: "PRIVACY POLICY", href: "/privacy-policy" },
+  { label: "TERMS & CONDITIONS", href: "/terms-and-conditions" },
 ];
 
 const SOCIAL = [
@@ -243,6 +243,12 @@ export default function SiteFooter() {
               <Link
                 key={label}
                 href={href}
+                scroll={true}
+                onClick={() => {
+                  if (typeof window !== "undefined") {
+                    window.scrollTo({ top: 0, behavior: "instant" });
+                  }
+                }}
                 className="site-footer-link"
                 style={{
                   fontSize: "12px",
