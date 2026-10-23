@@ -132,16 +132,79 @@ function normalizeImageUrl(src?: string, fallback = ""): string {
   return `/${trimmed}`;
 }
 
+// CMS item shape coming from the HomepageSection items array
+interface CMSItem {
+  itemId: string;
+  title: string;
+  badge: string;
+  imageUrl: string;
+  imageAlt: string;
+  linkUrl: string;
+  ctaText: string;
+  bgColor: string;
+  description?: string;
+  displayOrder: number;
+  isActive: boolean;
+  metadata: Record<string, unknown>;
+}
+
+// Map CMS items (from admin panel) directly to mosaic slots by metadata.type
+function mapCmsItemsToSlots(cmsItems: CMSItem[]): MosaicCardSlot[] {
+  const TYPE_ORDER: MosaicCardSlot["type"][] = [
+    "left-top",
+    "left-bottom",
+    "right-tall",
+    "bottom-small-left",
+    "bottom-wide",
+    "bottom-small-right",
+  ];
+
+  const result: MosaicCardSlot[] = [...DEFAULT_SLOTS];
+
+  cmsItems.forEach((item, fallbackIdx) => {
+    const type = (item.metadata?.type as MosaicCardSlot["type"]) || TYPE_ORDER[fallbackIdx];
+    const slotIdx = result.findIndex((s) => s.type === type);
+    const idx = slotIdx !== -1 ? slotIdx : fallbackIdx;
+    if (idx < result.length) {
+      result[idx] = {
+        ...result[idx],
+        badge: item.badge || result[idx].badge,
+        title: item.title || result[idx].title,
+        description: item.description || result[idx].description,
+        imageUrl: normalizeImageUrl(item.imageUrl, result[idx].imageUrl),
+        imageAlt: item.imageAlt || result[idx].imageAlt,
+        ctaText: item.ctaText || result[idx].ctaText,
+        linkUrl: item.linkUrl || result[idx].linkUrl,
+        bgColor: item.bgColor || result[idx].bgColor,
+        badgeColor: (item.metadata?.badgeColor as string) || (item.metadata?.textColor as string) || result[idx].badgeColor,
+        titleColor: (item.metadata?.titleColor as string) || result[idx].titleColor,
+      };
+    }
+  });
+
+  return result;
+}
+
 export default function CategoriesMosaicShowcase({
   sectionTitle = "Explore Our World of Styles",
   sectionSubtitle = "Discover By Category",
+  cmsItems = [],
 }: {
   sectionTitle?: string;
   sectionSubtitle?: string;
+  cmsItems?: CMSItem[];
 }) {
   const [categories, setCategories] = useState<CategoryDoc[]>([]);
   const [slots, setSlots] = useState<MosaicCardSlot[]>(DEFAULT_SLOTS);
   const [loading, setLoading] = useState(true);
+
+  // ── If admin CMS items are provided, use them directly ─────────────────────
+  useEffect(() => {
+    if (cmsItems && cmsItems.length > 0) {
+      setSlots(mapCmsItemsToSlots(cmsItems));
+      setLoading(false);
+    }
+  }, [cmsItems]);
 
   // Map active categories into the 6 mosaic slots
   const mapCategoriesToSlots = useCallback((activeCats: CategoryDoc[]) => {
@@ -278,7 +341,10 @@ export default function CategoriesMosaicShowcase({
     }
   }, [mapCategoriesToSlots]);
 
+  // ── Fetch from categories API only when no CMS items are given ────────────
   useEffect(() => {
+    if (cmsItems && cmsItems.length > 0) return; // CMS items take priority
+
     fetchCategories();
 
     // Re-sync when tab gains focus or on storage update
@@ -304,7 +370,7 @@ export default function CategoriesMosaicShowcase({
       window.removeEventListener("storage", onStorage);
       bc?.close();
     };
-  }, [fetchCategories]);
+  }, [fetchCategories, cmsItems]);
 
   // If no active categories exist and loading has finished, hide section cleanly
   if (!loading && categories.length === 0 && slots.length === 0) {
