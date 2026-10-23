@@ -1044,6 +1044,7 @@ export default function HomePage() {
       <CategoriesMosaicShowcase
         sectionTitle={S("categories-mosaic").title || "Explore Our World of Styles"}
         sectionSubtitle={S("categories-mosaic").subtitle || "Discover By Category"}
+        cmsItems={items("categories-mosaic")}
       />
 
       {/* =========================================================================
