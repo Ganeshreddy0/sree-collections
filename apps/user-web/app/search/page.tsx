@@ -1197,6 +1197,9 @@ function SearchPageInner() {
         }
         @media (max-width: 640px) {
           .srch-masonry-grid { columns: 2 !important; column-gap: 14px !important; }
+          main { padding: 0 16px 60px !important; }
+          section { padding: 0 16px !important; }
+          .srch-chip { font-size: 12px !important; padding: 7px 14px !important; }
         }
         @media (max-width: 420px) {
           .srch-masonry-grid { columns: 1 !important; }

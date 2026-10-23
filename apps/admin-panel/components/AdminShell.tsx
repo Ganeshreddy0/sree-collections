@@ -14,7 +14,12 @@ import {
   FiShoppingBag,
   FiMenu,
   FiX,
+  FiKey,
+  FiLogOut,
+  FiUser,
 } from "react-icons/fi";
+import { useRouter } from "next/navigation";
+import ChangePasswordModal from "./ChangePasswordModal";
 import {
   LuLayoutGrid,
   LuFolderTree,
@@ -28,11 +33,42 @@ import {
 type Props = { children: React.ReactNode };
 
 export default function AdminShell({ children }: Props) {
+  const router = useRouter();
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
+
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [adminUser, setAdminUser] = useState<{ name?: string; email?: string } | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+
+  // ─── Auth Guard ───────────────────────────────────────────────────────────
+  useEffect(() => {
+    const token = localStorage.getItem("admin_token");
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+    // Token exists — load user info
+    try {
+      const stored = localStorage.getItem("admin_user");
+      if (stored) {
+        setAdminUser(JSON.parse(stored));
+      }
+    } catch {
+      // ignore JSON parse error
+    }
+    setAuthChecked(true);
+  }, [router]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("admin_token");
+    localStorage.removeItem("admin_user");
+    router.push("/login");
+  };
 
   useEffect(() => {
     const checkSize = () => {
@@ -92,6 +128,9 @@ export default function AdminShell({ children }: Props) {
       </nav>
     </>
   );
+
+  // Don't render anything until auth is confirmed (prevents flash of content)
+  if (!authChecked) return null;
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "#FFFFFF" }}>
@@ -191,17 +230,155 @@ export default function AdminShell({ children }: Props) {
           <span className="kbd-badge">⌘ K</span>
         </div>
 
-        <div className="sc-header-actions">
-          <button className="sc-icon-btn"><FiBell size={16} /></button>
-          <button className="sc-icon-btn sc-hide-mobile"><FiSettings size={16} /></button>
-          <div className="sc-user-avatar">
-            <Image
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
-              alt="Admin" width={38} height={38}
-              style={{ objectFit: "cover", width: "100%", height: "100%" }}
-            />
+        <div className="sc-header-actions" style={{ position: "relative" }}>
+          <button className="sc-icon-btn" title="Notifications">
+            <FiBell size={16} />
+          </button>
+          <button
+            className="sc-icon-btn sc-hide-mobile"
+            title="Settings / Change Password"
+            onClick={() => setShowPasswordModal(true)}
+          >
+            <FiSettings size={16} />
+          </button>
+
+          {/* User Avatar + Dropdown toggle */}
+          <div style={{ position: "relative" }}>
+            <button
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              style={{
+                background: "none",
+                border: "none",
+                padding: 0,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                borderRadius: "50%",
+              }}
+              title="Admin Menu"
+            >
+              <div className="sc-user-avatar" style={{ border: showUserMenu ? "2px solid #541A28" : "none" }}>
+                <Image
+                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
+                  alt="Admin"
+                  width={38}
+                  height={38}
+                  style={{ objectFit: "cover", width: "100%", height: "100%" }}
+                />
+              </div>
+            </button>
+
+            {/* Dropdown Menu */}
+            {showUserMenu && (
+              <>
+                <div
+                  style={{ position: "fixed", inset: 0, zIndex: 90 }}
+                  onClick={() => setShowUserMenu(false)}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    right: 0,
+                    top: "calc(100% + 8px)",
+                    background: "#FFFFFF",
+                    border: "1px solid #EFE8E0",
+                    borderRadius: 12,
+                    boxShadow: "0 10px 30px rgba(84, 26, 40, 0.12)",
+                    width: 220,
+                    zIndex: 100,
+                    overflow: "hidden",
+                    animation: "fadeIn 0.15s ease",
+                  }}
+                >
+                  {/* User info */}
+                  <div
+                    style={{
+                      padding: "14px 16px",
+                      borderBottom: "1px solid #F0EAE1",
+                      background: "#FDFAF5",
+                    }}
+                  >
+                    <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "#541A28" }}>
+                      {adminUser?.name || "Administrator"}
+                    </p>
+                    <p
+                      style={{
+                        margin: "2px 0 0",
+                        fontSize: 11,
+                        color: "#7E5664",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {adminUser?.email || "gr0184236@gmail.com"}
+                    </p>
+                  </div>
+
+                  {/* Options */}
+                  <div style={{ padding: "6px 0" }}>
+                    <button
+                      onClick={() => {
+                        setShowUserMenu(false);
+                        setShowPasswordModal(true);
+                      }}
+                      style={{
+                        width: "100%",
+                        padding: "10px 16px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 10,
+                        border: "none",
+                        background: "transparent",
+                        fontSize: 13,
+                        fontWeight: 500,
+                        color: "#333",
+                        cursor: "pointer",
+                        textAlign: "left",
+                        transition: "background 0.15s",
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#FAF4EC")}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                    >
+                      <FiKey size={15} color="#541A28" />
+                      <span>Change Password</span>
+                    </button>
+
+                    <button
+                      onClick={handleLogout}
+                      style={{
+                        width: "100%",
+                        padding: "10px 16px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 10,
+                        border: "none",
+                        background: "transparent",
+                        fontSize: 13,
+                        fontWeight: 500,
+                        color: "#C53030",
+                        cursor: "pointer",
+                        textAlign: "left",
+                        transition: "background 0.15s",
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#FFF5F5")}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                    >
+                      <FiLogOut size={15} color="#C53030" />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
+
+        {/* Change Password Modal */}
+        <ChangePasswordModal
+          isOpen={showPasswordModal}
+          onClose={() => setShowPasswordModal(false)}
+        />
       </header>
 
       {/* ── WORKSPACE ── */}

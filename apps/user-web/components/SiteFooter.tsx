@@ -17,285 +17,178 @@ const FOOTER_LINKS = [
   { label: "ABOUT US", href: "/about" },
   { label: "CONTACT US", href: "/contact" },
   { label: "CATEGORY", href: "/categories" },
-  { label: "PRIVACY POLICY", href: "#" },
-  { label: "TERMS & CONDITIONS", href: "#" },
+  { label: "PRIVACY POLICY", href: "/privacy-policy" },
+  { label: "TERMS & CONDITIONS", href: "/terms-and-conditions" },
 ];
 
 const SOCIAL = [
   { label: "Facebook", icon: FaFacebookF, href: "#" },
   { label: "YouTube", icon: FaYoutube, href: "#" },
-  { label: "Instagram", icon: FaInstagram, href: "#" },
+  { label: "Instagram", icon: FaInstagram, href: "https://www.instagram.com/sreecollections007?utm_source=ig_web_button_share_sheet&cplk=ZDNlZDc0MzIxNw==" },
   { label: "Google", icon: FaGoogle, href: "#" },
-  { label: "WhatsApp", icon: FaWhatsapp, href: "https://wa.me/?text=Hello%20Sree%20Collections" },
+  { label: "WhatsApp", icon: FaWhatsapp, href: "https://chat.whatsapp.com/C0d3jaOJF2DD7fvujaTesb" },
 ];
 
 export default function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer
-      style={{
-        width: "100%",
-        backgroundColor: "#FCF8F2",
-        color: "#5D2030",
-        paddingTop: "50px",
-        boxSizing: "border-box",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "1140px",
-          margin: "0 auto",
-          padding: "0 24px",
-          boxSizing: "border-box",
-        }}
-      >
-        {/* Top rule matching container width */}
-        <div
-          style={{
-            width: "100%",
-            height: "1.5px",
-            backgroundColor: "#5D2030",
-            opacity: 0.8,
-            marginBottom: "48px",
-          }}
-        />
+    <footer style={{ width: "100%", backgroundColor: "#FCF8F2", color: "#5D2030", boxSizing: "border-box" }}>
+      <div style={{ width: "100%", maxWidth: "1140px", margin: "0 auto", padding: "0 20px", boxSizing: "border-box" }}>
 
-        {/* Main Row: Brand Logo | Contact Info */}
+        {/* Top rule */}
+        <div style={{ width: "100%", height: "1.5px", backgroundColor: "#5D2030", opacity: 0.8, margin: "32px 0 24px 0" }} />
+
+        {/* ── DESKTOP layout ── */}
         <div
-          className="site-footer-main"
+          className="sf-main"
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: "36px",
-            marginBottom: "36px",
+            gap: "32px",
+            marginBottom: "20px",
           }}
         >
-          {/* Logo on Left */}
-          <Link href="/" style={{ display: "inline-block", flexShrink: 0 }}>
+          {/* Logo */}
+          <Link href="/" className="sf-logo" style={{ display: "inline-block", flexShrink: 0 }}>
             <img
               src="/homepage/logo2_trans.png"
               alt="Sree Collections"
-              style={{
-                height: "82px",
-                width: "auto",
-                objectFit: "contain",
-                display: "block",
-              }}
+              style={{ height: "76px", width: "auto", objectFit: "contain", display: "block" }}
             />
           </Link>
 
-          {/* Contact Details on Right */}
+          {/* Contact column */}
           <div
-            className="site-footer-contact"
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-end",
-              gap: "14px",
-              textAlign: "right",
-            }}
+            className="sf-contact"
+            style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "10px", textAlign: "right" }}
           >
-            {/* Address Row */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                fontSize: "14px",
-                color: "#5D2030",
-                fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', var(--font-sans), sans-serif",
-                fontWeight: 400,
-              }}
-            >
-              <FaMapMarkerAlt size={15} color="#5D2030" style={{ flexShrink: 0 }} />
-              <span>345 Faulconer Drive, Suite 4 • Charlottesville, CA, 12345</span>
+            {/* Address */}
+            <div className="sf-address" style={{ display: "flex", alignItems: "flex-start", gap: "7px", fontSize: "13px", color: "#5D2030", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <FaMapMarkerAlt size={13} style={{ flexShrink: 0, marginTop: "2px" }} />
+              <span style={{ lineHeight: "1.5" }}>
+                345 Faulconer Drive, Suite 4,<br />Charlottesville, CA, 12345
+              </span>
             </div>
 
-            {/* Phone & Email Row */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "24px",
-                flexWrap: "wrap",
-                justifyContent: "flex-end",
-                fontSize: "14px",
-                color: "#5D2030",
-                fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', var(--font-sans), sans-serif",
-                fontWeight: 400,
-              }}
-            >
-              <a
-                href="tel:+19526830741"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  color: "#5D2030",
-                  textDecoration: "none",
-                  transition: "opacity 0.2s ease",
-                }}
-                className="site-footer-link"
-              >
-                <FaPhoneAlt size={13} color="#5D2030" style={{ flexShrink: 0 }} />
-                <span>+19526830741</span>
-              </a>
+            {/* Phone */}
+            <a href="tel:+19526830741" className="sf-link" style={{ display: "flex", alignItems: "center", gap: "7px", fontSize: "13px", color: "#5D2030", textDecoration: "none" }}>
+              <FaPhoneAlt size={12} style={{ flexShrink: 0 }} />
+              <span>+19526830741</span>
+            </a>
 
-              <a
-                href="mailto:Sreecollections007@gmail.com"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  color: "#5D2030",
-                  textDecoration: "none",
-                  transition: "opacity 0.2s ease",
-                }}
-                className="site-footer-link"
-              >
-                <FaEnvelope size={14} color="#5D2030" style={{ flexShrink: 0 }} />
-                <span>Sreecollections007@gmail.com</span>
-              </a>
-            </div>
+            {/* Email */}
+            <a href="mailto:Sreecollections007@gmail.com" className="sf-link" style={{ display: "flex", alignItems: "center", gap: "7px", fontSize: "13px", color: "#5D2030", textDecoration: "none" }}>
+              <FaEnvelope size={13} style={{ flexShrink: 0 }} />
+              <span>Sreecollections007@gmail.com</span>
+            </a>
 
-            {/* Social Media Row */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "16px",
-                flexWrap: "wrap",
-                justifyContent: "flex-end",
-              }}
-            >
-              <span
-                style={{
-                  fontSize: "13.5px",
-                  fontWeight: 500,
-                  color: "#5D2030",
-                  fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', var(--font-sans), sans-serif",
-                }}
-              >
+            {/* Social */}
+            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+              <span style={{ fontSize: "12.5px", fontWeight: 500, color: "#5D2030", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 Social Media
               </span>
-              <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                {SOCIAL.map(({ label, icon: Icon, href }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    aria-label={label}
-                    className="site-footer-social-icon"
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "#5D2030",
-                      textDecoration: "none",
-                      transition: "transform 0.2s ease, opacity 0.2s ease",
-                    }}
-                  >
-                    <Icon size={16} />
-                  </a>
-                ))}
-              </div>
+              {SOCIAL.map(({ label, icon: Icon, href }) => (
+                <a key={label} href={href} aria-label={label} className="sf-social" target="_blank" rel="noreferrer"
+                  style={{ display: "flex", alignItems: "center", color: "#5D2030", textDecoration: "none" }}>
+                  <Icon size={15} />
+                </a>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Middle divider rule */}
-        <div
-          style={{
-            width: "100%",
-            height: "1px",
-            backgroundColor: "#DECDBE",
-            opacity: 0.8,
-            margin: "36px 0 22px 0",
-          }}
-        />
+        {/* Divider */}
+        <div style={{ width: "100%", height: "1px", backgroundColor: "#DECDBE", opacity: 0.8, margin: "0 0 16px 0" }} />
 
-        {/* Bottom row: links | copyright */}
+        {/* Bottom: nav links + copyright */}
         <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: "20px",
-            paddingBottom: "36px",
-          }}
+          className="sf-bottom"
+          style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px", paddingBottom: "28px" }}
         >
-          <nav
-            className="site-footer-links"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "32px",
-              flexWrap: "wrap",
-            }}
-          >
+          <nav className="sf-links" style={{ display: "flex", alignItems: "center", gap: "28px", flexWrap: "wrap" }}>
             {FOOTER_LINKS.map(({ label, href }) => (
               <Link
-                key={label}
-                href={href}
-                className="site-footer-link"
-                style={{
-                  fontSize: "12px",
-                  fontWeight: 600,
-                  letterSpacing: "0.8px",
-                  textTransform: "uppercase",
-                  color: "#5D2030",
-                  textDecoration: "none",
-                  fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', var(--font-sans), sans-serif",
-                  transition: "color 0.2s ease",
-                }}
+                key={label} href={href} scroll={true}
+                onClick={() => { if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "instant" }); }}
+                className="sf-link"
+                style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.7px", textTransform: "uppercase", color: "#5D2030", textDecoration: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
               >
                 {label}
               </Link>
             ))}
           </nav>
 
-          <span
-            style={{
-              fontSize: "12.5px",
-              color: "#5D2030",
-              fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', var(--font-sans), sans-serif",
-              fontWeight: 400,
-            }}
-          >
+          <span style={{ fontSize: "12px", color: "#5D2030", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             Copyright © {year} • kitsacitsolutions
           </span>
         </div>
       </div>
 
       <style>{`
-        .site-footer-social-icon:hover {
-          color: #BB8E43 !important;
-          transform: translateY(-2px);
-        }
-        .site-footer-link:hover {
-          color: #BB8E43 !important;
-        }
-        @media (max-width: 768px) {
-          .site-footer-main {
+        .sf-social:hover { color: #BB8E43 !important; transform: translateY(-2px); transition: all 0.2s; }
+        .sf-link:hover   { color: #BB8E43 !important; }
+
+        /* ── MOBILE (≤ 640px) ── */
+        @media (max-width: 640px) {
+          .sf-main {
             flex-direction: column !important;
-            align-items: flex-start !important;
+            align-items: center !important;
+            gap: 12px !important;
+            margin-bottom: 12px !important;
           }
-          .site-footer-contact {
-            align-items: flex-start !important;
+          .sf-logo img {
+            height: 60px !important;
+          }
+          .sf-contact {
+            align-items: center !important;
+            text-align: center !important;
+            gap: 8px !important;
+            width: 100% !important;
+          }
+          .sf-contact > div,
+          .sf-contact > a {
+            justify-content: center !important;
+          }
+          .sf-address {
+            display: inline-flex !important;
+            justify-content: center !important;
             text-align: left !important;
           }
-          .site-footer-contact > div {
-            justify-content: flex-start !important;
+          .sf-bottom {
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 10px !important;
+            padding-bottom: 20px !important;
           }
-          .site-footer-links {
+          .sf-links {
+            justify-content: center !important;
+            gap: 8px 18px !important;
+          }
+          .sf-bottom > span {
+            text-align: center !important;
+            font-size: 11px !important;
+          }
+        }
+
+        /* ── TABLET (641px – 768px) ── */
+        @media (min-width: 641px) and (max-width: 768px) {
+          .sf-main {
+            flex-direction: column !important;
+            align-items: center !important;
             gap: 18px !important;
           }
+          .sf-contact {
+            align-items: center !important;
+            text-align: center !important;
+            width: 100% !important;
+          }
+          .sf-contact > div,
+          .sf-contact > a {
+            justify-content: center !important;
+          }
+          .sf-links { gap: 12px 22px !important; }
         }
       `}</style>
     </footer>

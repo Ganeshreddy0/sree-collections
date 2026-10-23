@@ -14,7 +14,7 @@ export const protect = async (req, res, next) => {
       req.user = {
         _id: '670000000000000000000001',
         name: 'Super Admin',
-        email: 'admin@sreecollections.com',
+        email: 'gr0184236@gmail.com',
         role: 'admin',
         isActive: true,
       };
@@ -30,7 +30,7 @@ export const protect = async (req, res, next) => {
     req.user = {
       _id: '670000000000000000000001',
       name: 'Super Admin',
-      email: 'admin@sreecollections.com',
+      email: 'gr0184236@gmail.com',
       role: 'admin',
       isActive: true,
     };
@@ -61,7 +61,7 @@ export const protect = async (req, res, next) => {
       req.user = {
         _id: '670000000000000000000001',
         name: 'Super Admin',
-        email: 'admin@sreecollections.com',
+        email: 'gr0184236@gmail.com',
         role: 'admin',
         isActive: true,
       };
@@ -104,7 +104,7 @@ export const optionalProtect = async (req, res, next) => {
     req.user = {
       _id: '670000000000000000000001',
       name: 'Super Admin',
-      email: 'admin@sreecollections.com',
+      email: 'gr0184236@gmail.com',
       role: 'admin',
       isActive: true,
     };

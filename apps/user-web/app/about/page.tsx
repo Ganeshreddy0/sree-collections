@@ -966,6 +966,31 @@ export default function AboutPage() {
             align-items: flex-start !important;
           }
         }
+        @media (max-width: 768px) {
+          .about-hero-grid h1 {
+            font-size: clamp(26px, 7vw, 40px) !important;
+          }
+          main {
+            padding: 16px 16px 60px !important;
+          }
+          .about-hero-grid > div:first-child p {
+            max-width: 100% !important;
+          }
+        }
+        @media (max-width: 480px) {
+          .about-hero-grid h1 {
+            font-size: clamp(22px, 7vw, 32px) !important;
+          }
+          section h2 {
+            font-size: clamp(22px, 6.5vw, 36px) !important;
+          }
+          section p {
+            font-size: 14px !important;
+          }
+          .about-collage-container {
+            height: clamp(220px, 65vw, 340px) !important;
+          }
+        }
         .about-nav-link:hover {
           opacity: 0.75;
         }

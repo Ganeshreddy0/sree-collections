@@ -310,6 +310,7 @@ export default function ContactPage() {
           2. HERO TITLE & SUBTITLE
          ========================================================================= */}
       <section
+        className="contact-hero-section"
         style={{
           width: "100%",
           maxWidth: "1240px",
@@ -351,6 +352,7 @@ export default function ContactPage() {
           3. THREE CONTACT INFO CARDS
          ========================================================================= */}
       <section
+        className="contact-cards-section"
         style={{
           width: "100%",
           maxWidth: "1240px",
@@ -416,14 +418,16 @@ export default function ContactPage() {
               }}
             >
               {[
-                { name: "WhatsApp", href: "#", underline: true },
-                { name: "Instagram", href: "#", underline: true },
+                { name: "WhatsApp", href: "https://chat.whatsapp.com/C0d3jaOJF2DD7fvujaTesb", underline: true },
+                { name: "Instagram", href: "https://www.instagram.com/sreecollections007?utm_source=ig_web_button_share_sheet&cplk=ZDNlZDc0MzIxNw==", underline: true },
                 { name: "Facebook", href: "#", underline: false },
                 { name: "YouTube", href: "#", underline: false },
               ].map((s) => (
                 <a
                   key={s.name}
                   href={s.href}
+                  target={s.href.startsWith("http") ? "_blank" : undefined}
+                  rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
                   className="contact-social-link"
                   style={{
                     fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
@@ -892,6 +896,31 @@ export default function ContactPage() {
           }
           .contact-footer-contact {
             align-items: flex-start !important;
+          }
+        }
+        @media (max-width: 768px) {
+          .contact-hero-section {
+            padding: 0 16px !important;
+            margin: 24px auto 24px !important;
+          }
+          .contact-hero-section h1 {
+            font-size: clamp(24px, 7vw, 36px) !important;
+          }
+          .contact-cards-section {
+            padding: 0 16px !important;
+            margin: 24px auto 40px !important;
+          }
+          .contact-form-section {
+            padding: 0 16px !important;
+            margin-bottom: 40px !important;
+          }
+        }
+        @media (max-width: 480px) {
+          .contact-hero-section h1 {
+            font-size: clamp(20px, 6.5vw, 28px) !important;
+          }
+          .contact-info-card {
+            padding: 24px 18px !important;
           }
         }
         .contact-nav-link:hover {

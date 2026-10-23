@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import AdminShell from "@/components/AdminShell";
 import {
   FiSearch,
@@ -20,19 +21,9 @@ import { API_BASE } from "@/lib/config";
 
 type ProductItem = ProductDetailItem;
 
-const DEFAULT_PRODUCTS: ProductItem[] = [
-  { id: "1", code: "PT001", name: "Tack Pant",     category: "Casual Wear",     brand: "Zara",        price: "$600", unit: "Pc", qty: 100, img: "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=100&q=80" },
-  { id: "2", code: "PT002", name: "T Shirt",        category: "Casual Wear",     brand: "Zara",        price: "$160", unit: "Pc", qty: 140, img: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=100&q=80" },
-  { id: "3", code: "PT003", name: "Cotton Saree",   category: "Saree",           brand: "Chanderi",    price: "$110", unit: "Pc", qty: 300, img: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=100&q=80" },
-  { id: "4", code: "PT004", name: "Silk Saree",     category: "Saree",           brand: "Pochampally", price: "$120", unit: "Pc", qty: 450, img: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=100&q=80" },
-  { id: "5", code: "PT005", name: "Earrings",       category: "Jewellery",       brand: "Caratlane",   price: "$80",  unit: "Pc", qty: 320, img: "https://images.unsplash.com/photo-1635767798638-3e25273a8236?w=100&q=80" },
-  { id: "6", code: "PT006", name: "One Step Chain", category: "Jewellery",       brand: "Caratlane",   price: "$320", unit: "Pc", qty: 650, img: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=100&q=80" },
-  { id: "7", code: "PT007", name: "Pop Ups",        category: "Decorative Items",brand: "---",         price: "$60",  unit: "Pc", qty: 700, img: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=100&q=80" },
-  { id: "8", code: "PT008", name: "Birthday Caps",  category: "Decorative Items",brand: "---",         price: "$540", unit: "Pc", qty: 630, img: "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=100&q=80" },
-];
-
 export default function ProductsPage() {
-  const [products, setProducts] = useState<ProductItem[]>(DEFAULT_PRODUCTS);
+  const router = useRouter();
+  const [products, setProducts] = useState<ProductItem[]>([]);
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState("Category");
   const [brandFilter, setBrandFilter] = useState("Brand");
@@ -43,7 +34,7 @@ export default function ProductsPage() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [viewingProduct, setViewingProduct] = useState<ProductDetailItem | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<{ id: string; name: string } | null>(null);
 
@@ -207,9 +198,54 @@ export default function ProductsPage() {
             </tr>
           </thead>
           <tbody>
-            {products.map((p) => {
-              const rowId = p.id || p._id || p.code;
-              return (
+            {loading ? (
+              Array.from({ length: 6 }).map((_, i) => (
+                <tr key={`skel-${i}`}>
+                  <td>
+                    <div style={{ width: 16, height: 16, backgroundColor: "#F3EDE7", borderRadius: 3, opacity: 0.8 }} />
+                  </td>
+                  <td>
+                    <div style={{ width: 60, height: 14, backgroundColor: "#F3EDE7", borderRadius: 4, opacity: 0.8 }} />
+                  </td>
+                  <td>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <div style={{ width: 32, height: 32, backgroundColor: "#F3EDE7", borderRadius: 4, flexShrink: 0, opacity: 0.8 }} />
+                      <div style={{ width: 130, height: 14, backgroundColor: "#F3EDE7", borderRadius: 4, opacity: 0.8 }} />
+                    </div>
+                  </td>
+                  <td>
+                    <div style={{ width: 80, height: 14, backgroundColor: "#F3EDE7", borderRadius: 4, opacity: 0.8 }} />
+                  </td>
+                  <td>
+                    <div style={{ width: 65, height: 14, backgroundColor: "#F3EDE7", borderRadius: 4, opacity: 0.8 }} />
+                  </td>
+                  <td>
+                    <div style={{ width: 55, height: 14, backgroundColor: "#F3EDE7", borderRadius: 4, opacity: 0.8 }} />
+                  </td>
+                  <td>
+                    <div style={{ width: 30, height: 14, backgroundColor: "#F3EDE7", borderRadius: 4, opacity: 0.8 }} />
+                  </td>
+                  <td>
+                    <div style={{ width: 35, height: 14, backgroundColor: "#F3EDE7", borderRadius: 4, opacity: 0.8 }} />
+                  </td>
+                  <td>
+                    <div style={{ width: 64, height: 22, backgroundColor: "#F3EDE7", borderRadius: 4, opacity: 0.8 }} />
+                  </td>
+                  <td>
+                    <div style={{ width: 70, height: 24, backgroundColor: "#F3EDE7", borderRadius: 4, opacity: 0.8 }} />
+                  </td>
+                </tr>
+              ))
+            ) : products.length === 0 ? (
+              <tr>
+                <td colSpan={10} style={{ textAlign: "center", padding: "48px 24px", color: "#9CA3AF", fontSize: 14 }}>
+                  No products found.
+                </td>
+              </tr>
+            ) : (
+              products.map((p) => {
+                const rowId = p.id || p._id || p.code;
+                return (
                 <tr key={rowId} className={selected.includes(rowId) ? "selected" : ""}>
                   <td>
                     <input
@@ -263,7 +299,13 @@ export default function ProductsPage() {
                       >
                         <FiEye size={12} />
                       </button>
-                      <button className="sc-row-btn" title="Edit"><FiEdit size={12} /></button>
+                      <button
+                        className="sc-row-btn"
+                        title="Edit"
+                        onClick={() => router.push(`/products/edit/${p._id || p.id || p.code}`)}
+                      >
+                        <FiEdit size={12} />
+                      </button>
                       <button
                         className="sc-row-btn delete"
                         title="Delete"
@@ -275,7 +317,7 @@ export default function ProductsPage() {
                   </td>
                 </tr>
               );
-            })}
+            }))}
           </tbody>
         </table>
 
