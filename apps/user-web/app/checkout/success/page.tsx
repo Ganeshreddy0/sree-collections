@@ -336,10 +336,11 @@ function OrderSuccessContent() {
     >
       {siteHeader}
 
-      <div style={{ padding: "32px 20px 80px 20px" }}>
+      <div className="success-main-wrapper" style={{ padding: "32px 20px 80px 20px" }}>
         <div style={{ maxWidth: "860px", margin: "0 auto" }}>
           {/* Success Banner */}
           <div
+            className="success-banner-card"
             style={{
               backgroundColor: "#FFFFFF",
               borderRadius: "20px",
@@ -818,7 +819,7 @@ function OrderSuccessContent() {
           )}
 
           {/* Bottom Actions */}
-          <div style={{ display: "flex", justifyContent: "center", gap: "16px", flexWrap: "wrap" }}>
+          <div className="success-bottom-actions" style={{ display: "flex", justifyContent: "center", gap: "16px", flexWrap: "wrap" }}>
             <Link
               href="/"
               style={{
@@ -844,8 +845,57 @@ function OrderSuccessContent() {
       </div>
 
       <style>{`
-        @media (min-width: 992px) { .success-desktop-nav { display: flex !important; } }
-        @media (max-width: 991px) { .success-hamburger { display: flex !important; } }
+        @media (min-width: 992px) {
+          .success-desktop-nav { display: flex !important; }
+          .mobile-header-actions { display: none !important; }
+        }
+        @media (max-width: 991px) {
+          .success-desktop-nav { display: none !important; }
+          .mobile-header-actions { display: flex !important; }
+          .success-hamburger { display: flex !important; }
+        }
+        @media (max-width: 768px) {
+          .success-main-wrapper {
+            padding: 20px 16px 60px !important;
+          }
+          .success-banner-card {
+            padding: 24px 16px !important;
+            border-radius: 16px !important;
+          }
+          .success-banner-card h1 {
+            font-size: clamp(20px, 5.5vw, 28px) !important;
+          }
+          .success-order-info-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+          }
+          .success-order-number-pill {
+            font-size: 12px !important;
+          }
+          .success-bottom-actions {
+            flex-direction: column !important;
+            align-items: stretch !important;
+          }
+          .success-bottom-actions a,
+          .success-bottom-actions button {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+          .success-wa-card {
+            padding: 16px !important;
+          }
+        }
+        @media (max-width: 480px) {
+          .success-main-wrapper {
+            padding: 16px 12px 40px !important;
+          }
+          .success-banner-card {
+            padding: 20px 14px !important;
+          }
+          .success-banner-card h1 {
+            font-size: 18px !important;
+          }
+        }
       `}</style>
     </div>
   );

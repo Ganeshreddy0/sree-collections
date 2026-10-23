@@ -310,6 +310,7 @@ export default function ContactPage() {
           2. HERO TITLE & SUBTITLE
          ========================================================================= */}
       <section
+        className="contact-hero-section"
         style={{
           width: "100%",
           maxWidth: "1240px",
@@ -351,6 +352,7 @@ export default function ContactPage() {
           3. THREE CONTACT INFO CARDS
          ========================================================================= */}
       <section
+        className="contact-cards-section"
         style={{
           width: "100%",
           maxWidth: "1240px",
@@ -892,6 +894,31 @@ export default function ContactPage() {
           }
           .contact-footer-contact {
             align-items: flex-start !important;
+          }
+        }
+        @media (max-width: 768px) {
+          .contact-hero-section {
+            padding: 0 16px !important;
+            margin: 24px auto 24px !important;
+          }
+          .contact-hero-section h1 {
+            font-size: clamp(24px, 7vw, 36px) !important;
+          }
+          .contact-cards-section {
+            padding: 0 16px !important;
+            margin: 24px auto 40px !important;
+          }
+          .contact-form-section {
+            padding: 0 16px !important;
+            margin-bottom: 40px !important;
+          }
+        }
+        @media (max-width: 480px) {
+          .contact-hero-section h1 {
+            font-size: clamp(20px, 6.5vw, 28px) !important;
+          }
+          .contact-info-card {
+            padding: 24px 18px !important;
           }
         }
         .contact-nav-link:hover {

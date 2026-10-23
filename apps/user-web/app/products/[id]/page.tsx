@@ -751,6 +751,7 @@ export default function ProductDetailPage() {
 
       {/* BREADCRUMBS */}
       <div
+        className="pdp-breadcrumbs"
         style={{
           width: "100%",
           maxWidth: 1440,
@@ -800,6 +801,7 @@ export default function ProductDetailPage() {
         {/* Gallery */}
         <div>
           <div
+            className="pdp-main-img-box"
             style={{
               width: "100%",
               height: 560,
@@ -1687,11 +1689,38 @@ export default function ProductDetailPage() {
           .pdp-desktop-nav { display: none !important; }
           .mobile-header-actions { display: flex !important; }
           .pdp-hamburger { display: flex !important; }
-          .pdp-showcase { grid-template-columns: 1fr !important; gap: 28px !important; padding: 0 20px !important; }
-          .pdp-details { grid-template-columns: 1fr !important; padding: 0 20px !important; }
+          .pdp-showcase {
+            grid-template-columns: 1fr !important;
+            gap: 28px !important;
+            padding: 0 16px !important;
+            margin-bottom: 36px !important;
+          }
+          .pdp-details {
+            grid-template-columns: 1fr !important;
+            padding: 0 16px !important;
+            margin-bottom: 40px !important;
+          }
+          .pdp-breadcrumbs {
+            padding: 0 16px !important;
+            margin: 12px auto 20px !important;
+            font-size: 12px !important;
+          }
+          .pdp-main-img-box {
+            height: clamp(280px, 88vw, 500px) !important;
+          }
+          .pdp-related {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 16px !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .pdp-showcase h1 { font-size: clamp(22px, 6.5vw, 32px) !important; }
+          .pdp-details { padding: 0 12px !important; }
           .pdp-related { grid-template-columns: 1fr 1fr !important; }
         }
-        @media (max-width: 600px) {
+        @media (max-width: 480px) {
+          .pdp-showcase { padding: 0 12px !important; }
+          .pdp-main-img-box { height: clamp(240px, 90vw, 360px) !important; }
           .pdp-related { grid-template-columns: 1fr !important; }
         }
       `}</style>

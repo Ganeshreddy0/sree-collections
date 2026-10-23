@@ -145,13 +145,21 @@ export default function HomePage() {
     "spotlight-saree": 20,
     "spotlight-decor": 30,
   };
-  const spotlightSections = Object.values(cms)
-    .filter((s) => s.sectionId && s.sectionId.startsWith("spotlight-") && s.isActive !== false)
-    .sort((a, b) => {
-      const orderA = ((a as any).displayOrder ?? defaultSpotlightOrder[a.sectionId] ?? 99);
-      const orderB = ((b as any).displayOrder ?? defaultSpotlightOrder[b.sectionId] ?? 99);
-      return orderA - orderB;
-    });
+  const spotlightSections = useMemo(() => {
+    const seen = new Set<string>();
+    return Object.values(cms)
+      .filter((s) => {
+        if (!s.sectionId || !s.sectionId.startsWith("spotlight-") || s.isActive === false) return false;
+        if (seen.has(s.sectionId)) return false;
+        seen.add(s.sectionId);
+        return true;
+      })
+      .sort((a, b) => {
+        const orderA = ((a as any).displayOrder ?? defaultSpotlightOrder[a.sectionId] ?? 99);
+        const orderB = ((b as any).displayOrder ?? defaultSpotlightOrder[b.sectionId] ?? 99);
+        return orderA - orderB;
+      });
+  }, [cms]);
 
   return (
     <div style={{ backgroundColor: "#FCF8F2", minHeight: "100vh", overflowX: "hidden" }}>
@@ -425,6 +433,7 @@ export default function HomePage() {
       >
         {/* Subtle Royal SC Circular Crest Watermark in Background (Accurate Size, Opacity, Position) */}
         <div
+          className="hero-watermark"
           style={{
             position: "absolute",
             top: "385px",
@@ -2009,6 +2018,20 @@ export default function HomePage() {
           box-shadow: 0 8px 24px rgba(187, 142, 67, 0.35);
         }
 
+        @media (max-width: 768px) {
+          .hero-watermark {
+            width: clamp(260px, 80vw, 420px) !important;
+            height: clamp(260px, 80vw, 420px) !important;
+            top: 260px !important;
+          }
+          .hero-three-cols > div:first-child img,
+          .hero-three-cols > div:last-child img {
+            max-height: 380px !important;
+            width: 100% !important;
+            object-fit: cover !important;
+          }
+        }
+
         @media (max-width: 640px) {
           .home-logo {
             height: 42px !important;
@@ -2087,6 +2110,49 @@ export default function HomePage() {
           }
           .delivery-truck {
             max-width: 130px !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          #home, #featured {
+            padding-left: 12px !important;
+            padding-right: 12px !important;
+            margin-bottom: 40px !important;
+          }
+          .hero-watermark {
+            width: 240px !important;
+            height: 240px !important;
+          }
+          .hero-three-cols {
+            padding: 8px !important;
+            gap: 12px !important;
+          }
+          .hero-three-cols > div:first-child img,
+          .hero-three-cols > div:last-child img {
+            max-height: 300px !important;
+          }
+          .hero-main-title,
+          .hero-second-title {
+            font-size: 21px !important;
+            line-height: 1.2 !important;
+          }
+          .editorial-banner-text {
+            font-size: 17px !important;
+          }
+          .editorial-banner-img {
+            width: 66px !important;
+            height: 22px !important;
+          }
+          .whatsapp-banner {
+            padding: 20px 14px !important;
+            margin-bottom: 40px !important;
+          }
+          .delivery-banner {
+            padding: 20px 12px !important;
+            margin-bottom: 40px !important;
+          }
+          .testimonial-card {
+            padding: 18px 12px !important;
           }
         }
 

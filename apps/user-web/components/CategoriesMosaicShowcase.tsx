@@ -321,6 +321,7 @@ export default function CategoriesMosaicShowcase({
   return (
     <section
       id="categories"
+      className="categories-mosaic-section"
       style={{
         width: "100%",
         maxWidth: "1535px",
@@ -906,12 +907,46 @@ export default function CategoriesMosaicShowcase({
           min-height: 350px !important;
         }
         @media (max-width: 991px) {
-          .mosaic-bottom-small {
-            height: auto !important;
-            min-height: 330px !important;
+          .categories-mosaic-section {
+            padding: 0 16px !important;
+            margin: 30px auto 60px auto !important;
           }
-        }
-        @media (max-width: 991px) {
+          .mosaic-top-container {
+            grid-template-columns: 1fr !important;
+            gap: 20px !important;
+            margin-bottom: 20px !important;
+          }
+          .mosaic-left-column {
+            width: 100% !important;
+            gap: 20px !important;
+          }
+          .mosaic-right-tall {
+            width: 100% !important;
+            height: clamp(260px, 65vw, 420px) !important;
+          }
+          .mosaic-bottom-container {
+            grid-template-columns: 1fr !important;
+            gap: 20px !important;
+          }
+          .mosaic-bottom-small {
+            width: 100% !important;
+            height: auto !important;
+            min-height: 320px !important;
+          }
+          .mosaic-bottom-wide {
+            width: 100% !important;
+            height: auto !important;
+            min-height: 220px !important;
+            flex-direction: column !important;
+          }
+          .mosaic-bottom-wide .mosaic-bottom-text-wrap {
+            width: 100% !important;
+            padding: 24px 18px !important;
+          }
+          .mosaic-bottom-wide .mosaic-bottom-img-wrap {
+            width: 100% !important;
+            height: 180px !important;
+          }
           .mosaic-split-card {
             flex-direction: column !important;
             height: auto !important;
@@ -923,7 +958,7 @@ export default function CategoriesMosaicShowcase({
           }
           .mosaic-split-card .mosaic-card-text-wrap {
             width: 100% !important;
-            padding: 16px 14px !important;
+            padding: 20px 16px !important;
           }
           .mosaic-split-card .mosaic-card-title {
             font-size: 20px !important;
@@ -935,16 +970,23 @@ export default function CategoriesMosaicShowcase({
           .mosaic-split-card .mosaic-card-cta {
             font-size: 12px !important;
           }
-          .mosaic-split-card .mosaic-card-desc {
-            display: none !important;
-          }
         }
         @media (max-width: 640px) {
+          .categories-mosaic-section {
+            padding: 0 12px !important;
+            margin: 24px auto 48px auto !important;
+          }
           .mosaic-split-card .mosaic-card-img-wrap {
             height: 160px !important;
           }
           .mosaic-split-card .mosaic-card-title {
-            font-size: 17px !important;
+            font-size: 18px !important;
+          }
+          .mosaic-right-tall {
+            height: 260px !important;
+          }
+          .mosaic-bottom-wide .mosaic-bottom-img-wrap {
+            height: 150px !important;
           }
         }
       `}</style>
