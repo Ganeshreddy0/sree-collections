@@ -418,14 +418,16 @@ export default function ContactPage() {
               }}
             >
               {[
-                { name: "WhatsApp", href: "#", underline: true },
-                { name: "Instagram", href: "#", underline: true },
+                { name: "WhatsApp", href: "https://chat.whatsapp.com/C0d3jaOJF2DD7fvujaTesb", underline: true },
+                { name: "Instagram", href: "https://www.instagram.com/sreecollections007?utm_source=ig_web_button_share_sheet&cplk=ZDNlZDc0MzIxNw==", underline: true },
                 { name: "Facebook", href: "#", underline: false },
                 { name: "YouTube", href: "#", underline: false },
               ].map((s) => (
                 <a
                   key={s.name}
                   href={s.href}
+                  target={s.href.startsWith("http") ? "_blank" : undefined}
+                  rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
                   className="contact-social-link"
                   style={{
                     fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', sans-serif",
