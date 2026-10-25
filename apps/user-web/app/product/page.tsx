@@ -559,9 +559,10 @@ function MockProductDetailPage() {
         }}
       >
         {/* Left Column: Image and Thumbnails */}
-        <div>
+        <div className="prod-gallery">
           {/* Main Image */}
           <div
+            className="prod-main-img-box"
             style={{
               width: "100%",
               height: "560px",
@@ -586,6 +587,7 @@ function MockProductDetailPage() {
 
           {/* Thumbnails Row */}
           <div
+            className="prod-thumbnails"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(3, 1fr)",
@@ -596,6 +598,7 @@ function MockProductDetailPage() {
             {THUMBNAILS.slice(1).map((thumb) => (
               <div
                 key={thumb.id}
+                className="prod-thumb-btn"
                 onClick={() => setActiveImage(thumb.src)}
                 style={{
                   height: "128px",
@@ -627,9 +630,10 @@ function MockProductDetailPage() {
         </div>
 
         {/* Right Column: Product Purchase Info */}
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        <div className="prod-info-col" style={{ display: "flex", flexDirection: "column" }}>
           {/* Title */}
           <h1
+            className="prod-title"
             style={{
               fontFamily: "'Playfair Display', 'Blacker Display', Georgia, serif",
               fontWeight: 700,
@@ -1326,6 +1330,7 @@ function MockProductDetailPage() {
 
       {/* YOU MAY ALSO LIKE */}
       <div
+        className="prod-related-section"
         style={{
           width: "100%",
           maxWidth: "1440px",
@@ -1335,6 +1340,7 @@ function MockProductDetailPage() {
         }}
       >
         <h2
+          className="prod-related-title"
           style={{
             fontFamily: "'Playfair Display', 'Blacker Display', Georgia, serif",
             fontWeight: 700,
@@ -1369,10 +1375,12 @@ function MockProductDetailPage() {
                   padding: "12px",
                   boxSizing: "border-box",
                   position: "relative",
+                  minWidth: 0,
                   transition: "transform 0.25s ease, box-shadow 0.25s ease",
                 }}
               >
                 <div
+                  className="prod-related-img-box"
                   style={{
                     width: "100%",
                     height: "230px",
@@ -1394,6 +1402,7 @@ function MockProductDetailPage() {
                 </div>
                 <div style={{ padding: "10px 2px 2px 2px" }}>
                   <h3
+                    className="prod-related-name"
                     style={{
                       fontFamily: "'Playfair Display', 'Blacker Display', Georgia, serif",
                       fontWeight: 600,
@@ -2197,21 +2206,197 @@ function MockProductDetailPage() {
         @media (max-width: 991px) {
           .prod-desktop-nav { display: none !important; }
           .prod-hamburger { display: flex !important; }
-          .prod-showcase-grid { grid-template-columns: 1fr !important; gap: 28px !important; padding: 0 16px !important; }
-          .prod-details-grid { grid-template-columns: 1fr !important; padding: 0 16px !important; }
-          .prod-related-grid { grid-template-columns: 1fr 1fr !important; }
+          .prod-showcase-grid {
+            grid-template-columns: 1fr !important;
+            gap: 14px !important;
+            padding: 0 14px !important;
+            margin-bottom: 20px !important;
+          }
+          .prod-gallery {
+            width: 100% !important;
+            max-width: 320px !important;
+            margin: 0 auto !important;
+          }
+          .prod-main-img-box {
+            width: 100% !important;
+            max-width: 300px !important;
+            height: clamp(210px, 58vw, 255px) !important;
+            margin: 0 auto !important;
+            border-radius: 14px !important;
+          }
+          .prod-thumbnails {
+            display: flex !important;
+            justify-content: center !important;
+            overflow-x: auto !important;
+            gap: 8px !important;
+            margin-top: 8px !important;
+            padding-bottom: 4px !important;
+            scrollbar-width: none !important;
+            -webkit-overflow-scrolling: touch !important;
+          }
+          .prod-thumbnails::-webkit-scrollbar {
+            display: none !important;
+          }
+          .prod-thumb-btn {
+            flex: 0 0 50px !important;
+            width: 50px !important;
+            height: 50px !important;
+            border-radius: 8px !important;
+          }
+          .prod-title {
+            font-size: clamp(20px, 5.2vw, 25px) !important;
+            margin-bottom: 6px !important;
+            line-height: 1.25 !important;
+          }
+          .prod-details-grid {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+            padding: 0 14px !important;
+            margin-bottom: 22px !important;
+          }
+          /* Related Products: Matching Categories page reference */
+          .prod-related-section {
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 0 16px !important;
+            margin-top: 36px !important;
+            margin-bottom: 32px !important;
+            box-sizing: border-box !important;
+          }
+          .prod-related-title {
+            font-size: 20px !important;
+            margin-bottom: 12px !important;
+          }
+          .prod-related-grid {
+            display: grid !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 12px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+          }
+          .prod-related-card {
+            min-width: 0 !important;
+            width: 100% !important;
+            padding: 8px !important;
+            border-radius: 12px !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+          }
+          .prod-related-img-box {
+            width: 100% !important;
+            height: 160px !important;
+            border-radius: 8px !important;
+            margin-bottom: 6px !important;
+            overflow: hidden !important;
+          }
+          .prod-related-img-box img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            display: block !important;
+          }
+          .prod-related-name {
+            font-size: 13.5px !important;
+            line-height: 18px !important;
+            height: 18px !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            margin-bottom: 2px !important;
+          }
         }
         @media (max-width: 600px) {
           .prod-modal-overlay { padding: 12px !important; }
-          .prod-cart-card { margin-top: 20px !important; }
+          .prod-cart-card {
+            margin-top: 20px !important;
+            max-height: 90vh !important;
+            height: auto !important;
+            width: 100% !important;
+          }
+        }
+        /* Screen compression (phones <= 640px matching Categories page) */
+        @media (max-width: 640px) {
+          .prod-related-section {
+            padding: 0 12px !important;
+            margin-top: 24px !important;
+            margin-bottom: 24px !important;
+          }
+          .prod-related-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 10px !important;
+          }
+          .prod-related-card {
+            padding: 6px !important;
+            border-radius: 10px !important;
+          }
+          .prod-related-img-box {
+            height: 130px !important;
+            border-radius: 8px !important;
+          }
+          .prod-related-name {
+            font-size: 12px !important;
+            line-height: 16px !important;
+            height: 16px !important;
+          }
         }
         @media (max-width: 480px) {
-          .prod-showcase-grid { padding: 0 12px !important; }
-          .prod-details-grid { padding: 0 12px !important; }
-          .prod-related-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
-          .prod-related-card { padding: 8px !important; border-radius: 12px !important; }
-          .prod-related-card > div:first-child { height: 140px !important; border-radius: 8px !important; }
-          .prod-related-card h3 { font-size: 13px !important; }
+          .prod-showcase-grid {
+            padding: 0 10px !important;
+            gap: 10px !important;
+          }
+          .prod-gallery {
+            max-width: 270px !important;
+          }
+          .prod-main-img-box {
+            max-width: 260px !important;
+            height: clamp(180px, 52vw, 225px) !important;
+            border-radius: 12px !important;
+          }
+          .prod-thumbnails {
+            gap: 6px !important;
+            margin-top: 6px !important;
+          }
+          .prod-thumb-btn {
+            flex: 0 0 42px !important;
+            width: 42px !important;
+            height: 42px !important;
+            border-radius: 6px !important;
+          }
+          .prod-title {
+            font-size: 18px !important;
+          }
+          .prod-details-grid {
+            padding: 0 10px !important;
+          }
+          .prod-related-section {
+            padding: 0 10px !important;
+          }
+        }
+        /* Extra small screens (<= 380px matching Categories page) */
+        @media (max-width: 380px) {
+          .prod-related-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 8px !important;
+          }
+          .prod-related-card {
+            padding: 5px !important;
+            border-radius: 8px !important;
+          }
+          .prod-related-img-box {
+            height: 110px !important;
+          }
+          .prod-gallery {
+            max-width: 230px !important;
+          }
+          .prod-main-img-box {
+            max-width: 230px !important;
+            height: 180px !important;
+          }
+          .prod-thumb-btn {
+            flex: 0 0 38px !important;
+            width: 38px !important;
+            height: 38px !important;
+          }
         }
         .cat-nav-link:hover { opacity: 0.75; }
         .prod-contact-btn:hover { filter: brightness(1.08); transform: translateY(-2px); }
