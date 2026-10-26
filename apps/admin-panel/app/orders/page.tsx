@@ -91,6 +91,7 @@ export default function AdminOrdersPage() {
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [actionMessage, setActionMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [sendingAlertOrderId, setSendingAlertOrderId] = useState<string | null>(null);
+  const [retryingWa, setRetryingWa] = useState(false);
 
   // Fetch orders from backend
   const fetchOrders = useCallback(async () => {
