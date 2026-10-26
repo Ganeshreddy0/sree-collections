@@ -44,7 +44,7 @@ const DEFAULT_SLOTS: MosaicCardSlot[] = [
     imageUrl: "/homepage/mosaic_denim.jpg",
     imageAlt: "Denim Jeans",
     ctaText: "Shop Denims",
-    linkUrl: "/categories?slug=casual-wear",
+    linkUrl: "/categories?category=Casual%20Wear&subCategory=Denim%20Wear",
     bgColor: "#DDEBEA",
     badgeColor: "#4A6261",
     titleColor: "#2F2C24",
@@ -57,7 +57,7 @@ const DEFAULT_SLOTS: MosaicCardSlot[] = [
     imageUrl: "/homepage/mosaic_ethnic.jpg",
     imageAlt: "Ethnic Wear",
     ctaText: "Explore Kurtas",
-    linkUrl: "/categories?slug=saree",
+    linkUrl: "/categories?category=Casual%20Wear&subCategory=Ethnic%20Wear",
     bgColor: "#EFE4E0",
     badgeColor: "#7D534A",
     titleColor: "#5D2030",
@@ -70,7 +70,7 @@ const DEFAULT_SLOTS: MosaicCardSlot[] = [
     imageUrl: "/homepage/mosaic_necklace.jpg",
     imageAlt: "Royal Gold Jewellery",
     ctaText: "Explore Jewellery",
-    linkUrl: "/categories?slug=jewellery",
+    linkUrl: "/categories?category=Jewellery&subCategory=Temple%20Jewellery",
     bgColor: "#0A1C1A",
     badgeColor: "#DFBE7E",
     titleColor: "#FFFFFF",
@@ -83,7 +83,7 @@ const DEFAULT_SLOTS: MosaicCardSlot[] = [
     imageUrl: "/homepage/mosaic_shirt.jpg",
     imageAlt: "Summer Casuals",
     ctaText: "Explore",
-    linkUrl: "/categories",
+    linkUrl: "/categories?category=Casual%20Wear&subCategory=Everyday%20Linens",
     bgColor: "#F2EFE9",
     badgeColor: "#BB8E43",
     titleColor: "#2F2C24",
@@ -97,7 +97,7 @@ const DEFAULT_SLOTS: MosaicCardSlot[] = [
     imageUrl: "/homepage/mosaic_street.jpg",
     imageAlt: "Activewear & Street Style",
     ctaText: "Shop Street Edit",
-    linkUrl: "/categories?slug=casual-wear",
+    linkUrl: "/categories?category=Casual%20Wear&subCategory=Active%20Wear%20%26%20Street%20Style",
     bgColor: "#D8F0EC",
     badgeColor: "#2F5F58",
     titleColor: "#2F2C24",
@@ -110,12 +110,137 @@ const DEFAULT_SLOTS: MosaicCardSlot[] = [
     imageUrl: "/homepage/mosaic_decor.jpg",
     imageAlt: "Festive Party Decor",
     ctaText: "Explore",
-    linkUrl: "/categories?slug=decorative-items",
+    linkUrl: "/categories?category=Decorative%20Items&subCategory=Festive%20Home%20Decor",
     bgColor: "#F7F2FA",
     badgeColor: "#8E5BB0",
     titleColor: "#2F2C24",
   },
 ];
+
+interface SubCategoryMeta {
+  slotType: MosaicCardSlot["type"];
+  defaultSubCategory: string;
+  defaultCategory: string;
+  keywords: string[];
+}
+
+const SLOT_SUBCATEGORY_MAPPING: SubCategoryMeta[] = [
+  {
+    slotType: "left-top",
+    defaultSubCategory: "Denim Wear",
+    defaultCategory: "Casual Wear",
+    keywords: ["denim", "denim wear", "denim wears", "casuals", "effortless casuals"],
+  },
+  {
+    slotType: "left-bottom",
+    defaultSubCategory: "Ethnic Wear",
+    defaultCategory: "Casual Wear",
+    keywords: ["ethnic", "ethnic wear", "heritage elegance", "kurtas", "kurta"],
+  },
+  {
+    slotType: "right-tall",
+    defaultSubCategory: "Temple Jewellery",
+    defaultCategory: "Jewellery",
+    keywords: ["temple jewellery", "temple jewelry", "royal gold", "temple craft", "jewellery", "jewelry"],
+  },
+  {
+    slotType: "bottom-small-left",
+    defaultSubCategory: "Everyday Linens",
+    defaultCategory: "Casual Wear",
+    keywords: ["everyday linens", "linen", "linens", "minimalist"],
+  },
+  {
+    slotType: "bottom-wide",
+    defaultSubCategory: "Active Wear & Street Style",
+    defaultCategory: "Casual Wear",
+    keywords: ["active wear", "street style", "urban atelier", "activewear", "street"],
+  },
+  {
+    slotType: "bottom-small-right",
+    defaultSubCategory: "Festive Home Decor",
+    defaultCategory: "Decorative Items",
+    keywords: ["festive home decor", "home decor", "festive decor", "celebrations", "decor"],
+  },
+];
+
+export interface SubCategoryDoc {
+  id?: string;
+  _id?: string;
+  name: string;
+  category: string;
+  slug?: string;
+  status?: string;
+}
+
+function resolveCardSubCategoryLink(
+  slotType: MosaicCardSlot["type"],
+  item: Partial<CMSItem> | undefined,
+  activeSubCats: SubCategoryDoc[]
+): string {
+  const defaultMeta = SLOT_SUBCATEGORY_MAPPING.find((m) => m.slotType === slotType);
+
+  // 1. Determine target subCategory name and parent category
+  let targetSubName = (item?.metadata?.subCategory as string) || "";
+  let targetCatName = (item?.metadata?.category as string) || "";
+
+  // If item.linkUrl explicitly specifies subCategory query param, extract it
+  if (!targetSubName && item?.linkUrl && item.linkUrl.includes("subCategory=")) {
+    try {
+      const url = new URL(item.linkUrl, "http://localhost");
+      targetSubName = url.searchParams.get("subCategory") || "";
+      if (!targetCatName) {
+        targetCatName = url.searchParams.get("category") || "";
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
+  // If still not specified, use the slot's default subcategory
+  if (!targetSubName && defaultMeta) {
+    targetSubName = defaultMeta.defaultSubCategory;
+    if (!targetCatName) targetCatName = defaultMeta.defaultCategory;
+  }
+
+  // 2. If subcategories from API haven't loaded yet, return expected link
+  if (!activeSubCats || activeSubCats.length === 0) {
+    if (targetSubName && targetCatName) {
+      return `/categories?category=${encodeURIComponent(targetCatName)}&subCategory=${encodeURIComponent(targetSubName)}`;
+    }
+    return "/categories";
+  }
+
+  // 3. Match against subcategories present in categories page
+  // A. Exact or slug match
+  let matched = activeSubCats.find((s) => {
+    const sName = s.name.trim().toLowerCase();
+    const tName = targetSubName.trim().toLowerCase();
+    return sName === tName || (s.slug && s.slug === tName.replace(/\s+/g, "-"));
+  });
+
+  // B. Fuzzy / keyword match against badge, title, or slot keywords
+  if (!matched && defaultMeta) {
+    const badgeText = (item?.badge || "").toLowerCase();
+    const titleText = (item?.title || "").toLowerCase();
+    matched = activeSubCats.find((s) => {
+      const sName = s.name.trim().toLowerCase();
+      return (
+        defaultMeta.keywords.some((kw) => sName.includes(kw) || kw.includes(sName)) ||
+        (badgeText && (sName.includes(badgeText) || badgeText.includes(sName))) ||
+        (titleText && (sName.includes(titleText) || titleText.includes(sName)))
+      );
+    });
+  }
+
+  // 4. If matched with a subcategory present in categories page:
+  if (matched) {
+    return `/categories?category=${encodeURIComponent(matched.category)}&subCategory=${encodeURIComponent(matched.name)}`;
+  }
+
+  // 5. If in these six sub categories that are not matched with the sub categories present in categories page,
+  // it should open categories page!
+  return "/categories";
+}
 
 function normalizeImageUrl(src?: string, fallback = ""): string {
   if (!src) return fallback;
@@ -149,7 +274,10 @@ interface CMSItem {
 }
 
 // Map CMS items (from admin panel) directly to mosaic slots by metadata.type
-function mapCmsItemsToSlots(cmsItems: CMSItem[]): MosaicCardSlot[] {
+function mapCmsItemsToSlots(
+  cmsItems: CMSItem[],
+  activeSubCats: SubCategoryDoc[] = []
+): MosaicCardSlot[] {
   const TYPE_ORDER: MosaicCardSlot["type"][] = [
     "left-top",
     "left-bottom",
@@ -166,6 +294,9 @@ function mapCmsItemsToSlots(cmsItems: CMSItem[]): MosaicCardSlot[] {
     const slotIdx = result.findIndex((s) => s.type === type);
     const idx = slotIdx !== -1 ? slotIdx : fallbackIdx;
     if (idx < result.length) {
+      // Resolve subcategory link dynamically: if matched -> category+subcategory; if not matched -> /categories
+      const resolvedLink = resolveCardSubCategoryLink(type, item, activeSubCats);
+
       result[idx] = {
         ...result[idx],
         badge: item.badge || result[idx].badge,
@@ -174,7 +305,7 @@ function mapCmsItemsToSlots(cmsItems: CMSItem[]): MosaicCardSlot[] {
         imageUrl: normalizeImageUrl(item.imageUrl, result[idx].imageUrl),
         imageAlt: item.imageAlt || result[idx].imageAlt,
         ctaText: item.ctaText || result[idx].ctaText,
-        linkUrl: item.linkUrl || result[idx].linkUrl,
+        linkUrl: resolvedLink,
         bgColor: item.bgColor || result[idx].bgColor,
         badgeColor: (item.metadata?.badgeColor as string) || (item.metadata?.textColor as string) || result[idx].badgeColor,
         titleColor: (item.metadata?.titleColor as string) || result[idx].titleColor,
@@ -195,16 +326,58 @@ export default function CategoriesMosaicShowcase({
   cmsItems?: CMSItem[];
 }) {
   const [categories, setCategories] = useState<CategoryDoc[]>([]);
+  const [subCategories, setSubCategories] = useState<SubCategoryDoc[]>([]);
   const [slots, setSlots] = useState<MosaicCardSlot[]>(DEFAULT_SLOTS);
   const [loading, setLoading] = useState(true);
 
-  // ── If admin CMS items are provided, use them directly ─────────────────────
+  // Fetch active subcategories to dynamically match each of the 6 cards with categories page
+  const fetchSubCategories = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/sub-categories?status=Active&_t=${Date.now()}`);
+      if (!res.ok) throw new Error("API error");
+      const data = await res.json();
+      if (data.success && Array.isArray(data.data)) {
+        setSubCategories(data.data);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchSubCategories();
+    const onFocus = () => fetchSubCategories();
+    window.addEventListener("focus", onFocus);
+    const onStorage = (e: StorageEvent) => {
+      if (
+        e.key === "sub_category_updated_at" ||
+        e.key === "cms_updated_at" ||
+        e.key === "category_updated_at"
+      ) {
+        fetchSubCategories();
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("storage", onStorage);
+    };
+  }, [fetchSubCategories]);
+
+  // ── When CMS items or subCategories update, map directly to mosaic slots ─────
   useEffect(() => {
     if (cmsItems && cmsItems.length > 0) {
-      setSlots(mapCmsItemsToSlots(cmsItems));
+      setSlots(mapCmsItemsToSlots(cmsItems, subCategories));
       setLoading(false);
+    } else {
+      setSlots(
+        DEFAULT_SLOTS.map((s) => ({
+          ...s,
+          linkUrl: resolveCardSubCategoryLink(s.type, undefined, subCategories),
+        }))
+      );
     }
-  }, [cmsItems]);
+  }, [cmsItems, subCategories]);
 
   // Map active categories into the 6 mosaic slots
   const mapCategoriesToSlots = useCallback((activeCats: CategoryDoc[]) => {
