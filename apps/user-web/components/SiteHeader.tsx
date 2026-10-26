@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { FiSearch, FiShoppingCart, FiMenu, FiX } from "react-icons/fi";
 
 interface SiteHeaderProps {
@@ -12,14 +12,20 @@ interface SiteHeaderProps {
 
 export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
   const pathname = usePathname() || "/";
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [activeItem, setActiveItem] = useState<string>("home");
 
+  // Inline Search state (icon-side search bar)
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
   // Determine active nav item based on pathname or activePath prop
   useEffect(() => {
     const current = activePath || pathname;
-    if (current === "/" || current === "/#home" || current.startsWith("/#")) {
+    if (current === "/" || current === "/#home") {
       setActiveItem("home");
     } else if (current.startsWith("/about")) {
       setActiveItem("about");
@@ -35,6 +41,15 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
       setActiveItem("");
     }
   }, [pathname, activePath]);
+
+  // Focus search input when expanded
+  useEffect(() => {
+    if (searchOpen) {
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 50);
+    }
+  }, [searchOpen]);
 
   // Load and listen to cart updates from localStorage
   useEffect(() => {
@@ -67,6 +82,17 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
     };
   }, []);
 
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+
+    if (pathname.startsWith("/categories")) {
+      router.push(`/categories?search=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
   const navItems = [
     { id: "home", label: "Home", href: "/" },
     { id: "about", label: "About", href: "/about" },
@@ -75,18 +101,19 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
   ];
 
   return (
-    <div
+    <header
       style={{
         width: "100%",
-        display: "flex",
-        justifyContent: "center",
         position: "sticky",
         top: 0,
-        zIndex: 100,
+        zIndex: 9999,
         backgroundColor: "#FCF8F2",
+        borderBottom: "1px solid rgba(186, 142, 67, 0.15)",
+        boxShadow: "0 2px 12px rgba(90, 32, 53, 0.06)",
+        transition: "all 0.25s ease",
       }}
     >
-      <header
+      <div
         style={{
           width: "100%",
           maxWidth: "1360px",
@@ -98,7 +125,6 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
           justifyContent: "space-between",
           boxSizing: "border-box",
           position: "relative",
-          zIndex: 50,
         }}
       >
         {/* Brand Logo */}
@@ -120,7 +146,7 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
 
         {/* Desktop Navigation Links & Action Items */}
         <nav
-          className="site-desktop-nav desktop-nav about-desktop-nav cat-desktop-nav contact-desktop-nav cart-desktop-nav srch-desktop-nav pdp-desktop-nav"
+          className="site-desktop-nav desktop-nav"
           style={{
             display: "none",
             alignItems: "center",
@@ -167,32 +193,101 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
                         transition: "all 0.25s ease",
                         textDecoration: "none",
                         lineHeight: 1.2,
-                        padding: "4px 2px",
+                        padding: "6px 12px",
+                        borderRadius: "9999px",
                         cursor: "pointer",
                       }
                 }
                 className={isActive ? "primary-btn active-nav-btn" : "nav-link"}
               >
-                {item.label}
+                {isActive ? item.label.toUpperCase() : item.label}
               </Link>
             );
           })}
 
-          {/* Search Icon */}
-          <Link
-            href="/search"
-            aria-label="Search"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#5A2035",
-              padding: "4px",
-              transition: "transform 0.2s ease",
-            }}
-          >
-            <FiSearch size={22} strokeWidth={2} />
-          </Link>
+          {/* Search Icon & Expandable Search Field */}
+          <div style={{ display: "flex", alignItems: "center", position: "relative" }}>
+            {searchOpen ? (
+              <form
+                onSubmit={handleSearchSubmit}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  backgroundColor: "#FFFFFF",
+                  border: "1.5px solid #BA8E43",
+                  borderRadius: "9999px",
+                  padding: "4px 12px 4px 14px",
+                  height: "40px",
+                  boxSizing: "border-box",
+                  boxShadow: "0 2px 8px rgba(186, 142, 67, 0.2)",
+                  animation: "fadeIn 0.2s ease",
+                }}
+              >
+                <FiSearch size={17} color="#BA8E43" style={{ flexShrink: 0 }} />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{
+                    border: "none",
+                    outline: "none",
+                    background: "transparent",
+                    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+                    fontSize: "13.5px",
+                    color: "#2F2C24",
+                    width: "160px",
+                    padding: 0,
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (searchQuery) {
+                      setSearchQuery("");
+                    } else {
+                      setSearchOpen(false);
+                    }
+                  }}
+                  aria-label="Close search"
+                  style={{
+                    border: "none",
+                    background: "none",
+                    cursor: "pointer",
+                    padding: "2px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#5A2035",
+                  }}
+                >
+                  <FiX size={16} />
+                </button>
+              </form>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setSearchOpen(true)}
+                aria-label="Search"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#5A2035",
+                  padding: "6px",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  transition: "color 0.2s ease",
+                }}
+                className="header-icon-btn"
+              >
+                <FiSearch size={22} strokeWidth={2} />
+              </button>
+            )}
+          </div>
 
           {/* Cart Icon */}
           <Link
@@ -217,7 +312,7 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
                   right: "-9px",
                   backgroundColor: "#BA8E43",
                   color: "#FFFFFF",
-                  fontSize: "10px",
+                  fontSize: "10.5px",
                   fontWeight: 700,
                   width: "18px",
                   height: "18px",
@@ -226,7 +321,9 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
                   alignItems: "center",
                   justifyContent: "center",
                   boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
-                  fontFamily: "var(--font-serif)",
+                  fontFamily: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif",
+                  lineHeight: 1,
+                  userSelect: "none",
                 }}
               >
                 {cartCount > 9 ? "9+" : cartCount}
@@ -244,19 +341,81 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
             gap: "8px",
           }}
         >
-          <Link
-            href="/search"
-            aria-label="Search"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#5A2035",
-              padding: "6px",
-            }}
-          >
-            <FiSearch size={21} strokeWidth={2} />
-          </Link>
+          {searchOpen ? (
+            <form
+              onSubmit={handleSearchSubmit}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                backgroundColor: "#FFFFFF",
+                border: "1.5px solid #BA8E43",
+                borderRadius: "9999px",
+                padding: "3px 10px",
+                height: "36px",
+                boxSizing: "border-box",
+                boxShadow: "0 2px 6px rgba(186, 142, 67, 0.18)",
+              }}
+            >
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  border: "none",
+                  outline: "none",
+                  background: "transparent",
+                  fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+                  fontSize: "13px",
+                  color: "#2F2C24",
+                  width: "110px",
+                  padding: 0,
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  if (searchQuery) {
+                    setSearchQuery("");
+                  } else {
+                    setSearchOpen(false);
+                  }
+                }}
+                aria-label="Close search"
+                style={{
+                  border: "none",
+                  background: "none",
+                  cursor: "pointer",
+                  padding: "2px",
+                  display: "flex",
+                  alignItems: "center",
+                  color: "#5A2035",
+                }}
+              >
+                <FiX size={15} />
+              </button>
+            </form>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Search"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#5A2035",
+                padding: "6px",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              <FiSearch size={21} strokeWidth={2} />
+            </button>
+          )}
 
           <Link
             href="/cart"
@@ -279,15 +438,18 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
                   right: "-3px",
                   backgroundColor: "#BA8E43",
                   color: "#FFFFFF",
-                  fontSize: "10px",
+                  fontSize: "10.5px",
                   fontWeight: 700,
-                  width: "17px",
-                  height: "17px",
+                  width: "18px",
+                  height: "18px",
                   borderRadius: "50%",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontFamily: "var(--font-serif)",
+                  boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+                  fontFamily: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif",
+                  lineHeight: 1,
+                  userSelect: "none",
                 }}
               >
                 {cartCount > 9 ? "9+" : cartCount}
@@ -310,7 +472,7 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
             {mobileMenuOpen ? <FiX size={25} /> : <FiMenu size={25} />}
           </button>
         </div>
-      </header>
+      </div>
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
@@ -322,7 +484,7 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
             width: "100%",
             height: "100vh",
             backgroundColor: "rgba(0,0,0,0.5)",
-            zIndex: 200,
+            zIndex: 10000,
             display: "flex",
             justifyContent: "flex-end",
           }}
@@ -411,7 +573,7 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
                           }
                     }
                   >
-                    {item.label}
+                    {isActive ? item.label.toUpperCase() : item.label}
                   </Link>
                 );
               })}
@@ -420,7 +582,7 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
         </div>
       )}
 
-      {/* Header Media Queries */}
+      {/* Header Media Queries & Clean input overrides */}
       <style jsx global>{`
         @media (min-width: 992px) {
           .site-desktop-nav {
@@ -439,14 +601,26 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
           }
         }
         .nav-link:hover {
-          opacity: 0.8;
           color: #ba8e43 !important;
+          background: rgba(186, 142, 67, 0.08) !important;
         }
         .active-nav-btn:hover {
           background-color: #a87d35 !important;
           transform: translateY(-1px);
         }
+        .header-icon-btn:hover {
+          color: #ba8e43 !important;
+          transform: scale(1.08);
+        }
+        /* Prevent duplicate WebKit search clear icon */
+        input::-webkit-search-decoration,
+        input::-webkit-search-cancel-button,
+        input::-webkit-search-results-button,
+        input::-webkit-search-results-decoration {
+          display: none !important;
+          -webkit-appearance: none !important;
+        }
       `}</style>
-    </div>
+    </header>
   );
 }

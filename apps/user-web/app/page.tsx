@@ -38,11 +38,38 @@ const FALLBACK_CMS: CMSData = {
 };
 
 export default function HomePage() {
+  const [cartCount, setCartCount] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [activeTab, setActiveTab] = useState("all");
   const [cms, setCms] = useState<CMSData>(FALLBACK_CMS);
   const [cmsLoading, setCmsLoading] = useState(true);
+
+  useEffect(() => {
+    const updateCount = () => {
+      try {
+        const raw = localStorage.getItem("sc_cart") || localStorage.getItem("cart");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const count = Array.isArray(parsed)
+            ? parsed.reduce((sum: number, item: any) => sum + (Number(item?.quantity) || 1), 0)
+            : 0;
+          setCartCount(count);
+          return;
+        }
+        setCartCount(0);
+      } catch {
+        setCartCount(0);
+      }
+    };
+    updateCount();
+    window.addEventListener("storage", updateCount);
+    window.addEventListener("cart-updated", updateCount);
+    return () => {
+      window.removeEventListener("storage", updateCount);
+      window.removeEventListener("cart-updated", updateCount);
+    };
+  }, []);
 
   const fetchCms = useCallback(async (silent = false) => {
     if (!silent) setCmsLoading(true);
@@ -164,249 +191,7 @@ export default function HomePage() {
   return (
     <div style={{ backgroundColor: "#FCF8F2", minHeight: "100vh", overflowX: "hidden" }}>
       {/* =========================================================================
-          1. HEADER (Exact Navbar Alignment from Reference Screenshot)
-          - Logo on Left
-          - Right-aligned: Home (with active underline), About, Categories,
-            "CONTACT US" golden pill button, Search icon, Cart icon
-         ========================================================================= */}
-      <div style={{ width: "100%", display: "flex", justifyContent: "center", position: "sticky", top: 0, zIndex: 100, backgroundColor: "#FCF8F2" }}>
-        <header
-          style={{
-            width: "100%",
-            maxWidth: "1360px",
-            minHeight: "95px",
-            margin: "0 auto",
-            padding: "0 20px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            boxSizing: "border-box",
-            position: "relative",
-            zIndex: 50,
-          }}
-        >
-          {/* Brand Logo */}
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <a href="#" style={{ display: "inline-block" }}>
-              <img
-                className="home-logo"
-                src={S("header").mediaUrl || "/homepage/logo2_trans.png"}
-                alt={S("header").mediaAlt || "Sree Collections"}
-                style={{
-                  height: "72px",
-                  width: "auto",
-                  objectFit: "contain",
-                  maxWidth: "340px",
-                  display: "block",
-                }}
-              />
-            </a>
-          </div>
-
-          {/* Desktop Navigation Links & Action Items (Exact Match) */}
-          <nav
-            style={{
-              display: "none",
-              alignItems: "center",
-              gap: "36px",
-            }}
-            className="desktop-nav"
-          >
-            {/* CMS-driven nav links */}
-            {navLinks.map((link) => {
-              const isHome = link.itemId === "nav-home" || link.linkUrl === "#home";
-              return (
-                <a
-                  key={link.itemId}
-                  href={link.linkUrl}
-                  style={{
-                    fontFamily: "var(--font-serif)",
-                    fontSize: "17px",
-                    fontWeight: 700,
-                    color: "#5A2035",
-                    borderBottom: isHome ? "2.5px solid #5A2035" : undefined,
-                    paddingBottom: isHome ? "3px" : undefined,
-                    transition: "opacity 0.2s",
-                    lineHeight: 1.2,
-                  }}
-                  className={isHome ? undefined : "nav-link"}
-                >
-                  {link.title}
-                </a>
-              );
-            })}
-
-            {/* CONTACT US Pill Button */}
-            <a
-              href={S("header").ctaLink || "/contact"}
-              style={{
-                background: "#BA8E43",
-                color: "#FFFFFF",
-                fontFamily: "var(--font-serif)",
-                fontSize: "12.5px",
-                fontWeight: 700,
-                letterSpacing: "0.8px",
-                textTransform: "uppercase",
-                padding: "11px 28px",
-                borderRadius: "9999px",
-                boxShadow: "0 2px 10px rgba(186, 142, 67, 0.25)",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transition: "all 0.25s ease",
-              }}
-              className="primary-btn"
-            >
-              {S("header").ctaText || "CONTACT US"}
-            </a>
-
-            {/* Search Icon */}
-            <a
-              href="/search"
-              aria-label="Search"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#5A2035",
-                padding: "4px",
-                transition: "transform 0.2s ease",
-              }}
-            >
-              <FiSearch size={22} strokeWidth={2} />
-            </a>
-
-            {/* Cart Icon */}
-            <Link
-              href="/cart"
-              aria-label="Shopping Cart"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#5A2035",
-                padding: "4px",
-                transition: "transform 0.2s ease",
-              }}
-            >
-              <FiShoppingCart size={22} strokeWidth={2} />
-            </Link>
-          </nav>
-
-          {/* Mobile Right Actions: Search + Cart + Hamburger */}
-          <div
-            style={{
-              display: "none",
-              alignItems: "center",
-              gap: "8px",
-            }}
-            className="mobile-header-actions"
-          >
-            <a
-              href="/search"
-              aria-label="Search"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#5A2035",
-                padding: "6px",
-              }}
-            >
-              <FiSearch size={21} strokeWidth={2} />
-            </a>
-            <Link
-              href="/cart"
-              aria-label="Shopping Cart"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#5A2035",
-                padding: "6px",
-                position: "relative",
-              }}
-            >
-              <FiShoppingCart size={21} strokeWidth={2} />
-            </Link>
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Toggle menu"
-              style={{
-                padding: "6px",
-                color: "#2F2C24",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-              }}
-              className="mobile-hamburger"
-            >
-              {mobileMenuOpen ? <FiX size={25} /> : <FiMenu size={25} />}
-            </button>
-          </div>
-        </header>
-      </div>
-
-      {/* Mobile Drawer */}
-      {mobileMenuOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100vh",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            zIndex: 100,
-            display: "flex",
-            justifyContent: "flex-end",
-          }}
-          onClick={() => setMobileMenuOpen(false)}
-        >
-          <div
-            style={{
-              width: "290px",
-              height: "100%",
-              backgroundColor: "#FCF8F2",
-              padding: "30px 24px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "20px",
-              boxShadow: "-4px 0 20px rgba(0,0,0,0.15)",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <img src={S("header").secondaryMediaUrl || "/homepage/logo2.png"} alt="Logo" style={{ height: "48px" }} />
-              <button onClick={() => setMobileMenuOpen(false)}>
-                <FiX size={24} />
-              </button>
-            </div>
-            <nav style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "20px" }}>
-              {navLinks.map((link) => (
-                <a
-                  key={link.itemId}
-                  href={link.linkUrl}
-                  onClick={() => setMobileMenuOpen(false)}
-                  style={{ fontSize: "16px", fontWeight: link.itemId === "nav-home" ? 600 : 500 }}
-                >
-                  {link.title}
-                </a>
-              ))}
-              <a
-                href={S("header").ctaLink || "/contact"}
-                onClick={() => setMobileMenuOpen(false)}
-                style={{ fontSize: "16px", fontWeight: 500 }}
-              >
-                {S("header").ctaText || "Contact Us"}
-              </a>
-            </nav>
-          </div>
-        </div>
-      )}
-
-      {/* =========================================================================
-          2. HERO SECTION
+          HERO SECTION
           Exact Match with Figma Reference:
           - Background Watermark: Clean SC circular emblem (no text)
           - Left-Aligned Heading:
