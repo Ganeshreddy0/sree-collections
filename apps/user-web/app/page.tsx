@@ -34,15 +34,42 @@ const FALLBACK_CMS: CMSData = {
   "spotlight-decor": { sectionId: "spotlight-decor", title: "Decorative Item", subtitle: "Collections", description: "We provide the largest clothing collection for any season. You can choose trendy or classy design according to your preferences. Our services are super fast and we update within 24 hours.", badgeText: "We consider your look and comfort on cold weather.", mediaUrl: "/about/stars.jpg", mediaAlt: "Festive Star Lanterns", secondaryMediaUrl: "/about/party.jpg", secondaryMediaAlt: "Festive Party Decor", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "Explore", ctaLink: "/categories?category=Decorative+Items", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: { layout: "right-overlapping", secondaryDescription: "Our main aim is to serve our customer with better quality product. We try to understand their needs and provide them within a short period of time. We provide the largest clothing collection for any season. You can choose trendy or classy design according to your preferences. Our services are super fast and we update within 24 hours." }, items: [] },
   "whatsapp-banner": { sectionId: "whatsapp-banner", title: "Curate your cart.", subtitle: "Complete on WhatsApp.", description: "", badgeText: "🛍 Shopping Made Personal", mediaUrl: "/homepage/img5.png", mediaAlt: "Sree Collections WhatsApp Shopping Bag", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "Chat on WhatsApp", ctaLink: "https://wa.me/?text=Hello%20Sree%20Collections%2C%20I%20want%20to%20shop!", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{ itemId: "wa-step-1", title: "Added Cart", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: {} }, { itemId: "wa-step-2", title: "WhatsApp", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: {} }, { itemId: "wa-step-3", title: "Order Confirmed", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 3, isActive: true, metadata: {} }] },
   testimonials: { sectionId: "testimonials", title: "What our Customer says", subtitle: "", description: "", badgeText: "", mediaUrl: "", mediaAlt: "", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "", ctaLink: "#", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: {}, items: [{ itemId: "t1", title: "Jane Bennet", subtitle: "Fashion Model", description: "Sree Collections provided me the exact quality product I wanted. I'm very much satisfied by their quick delivery process and attention to detail. The silk saree and royal jewellery exceeded all my expectations. Highly recommended!", badge: "Fashion Model", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: { rating: 5 } }, { itemId: "t2", title: "Priya Sundaram", subtitle: "Verified Bride", description: "The silk saree and the temple necklace set I ordered for my sister's wedding completely surpassed my expectations. The zari craftsmanship is truly heirloom quality.", badge: "Chennai, India", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: { rating: 5 } }, { itemId: "t3", title: "Ananya Deshmukh", subtitle: "Verified Buyer", description: "Shopping via WhatsApp concierge was the smoothest experience ever. They shared detailed 4K close-up videos of the Banarasi weaves.", badge: "Mumbai, India", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 3, isActive: true, metadata: { rating: 5 } }] },
-  footer: { sectionId: "footer", title: "", subtitle: "", description: "Celebrating timeless Indian royalty with handpicked silk sarees, designer ethnic sets, and authentic temple jewellery crafted for extraordinary celebrations.", badgeText: "", mediaUrl: "/homepage/logo2.png", mediaAlt: "Sree Collections", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "", ctaLink: "#", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: { phone: "+91 98765 43210", email: "support@sreecollections.com", copyright: "Sree Collections. All Rights Reserved." }, items: [{ itemId: "footer-col-1", title: "Kanjeevaram Pure Silk", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-col-2", title: "Banarasi Heritage Weaves", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-col-3", title: "Bridal Lehengas & Kurtas", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 3, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-col-4", title: "Temple Jewellery Sets", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 4, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-col-5", title: "Everyday Casuals & Denims", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 5, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-col-6", title: "Festive Home Decor", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#featured", ctaText: "", bgColor: "", displayOrder: 6, isActive: true, metadata: { group: "collections" } }, { itemId: "footer-care-1", title: "Track Your Order", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: { group: "customer-care" } }, { itemId: "footer-care-2", title: "Shipping & Global Delivery", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: { group: "customer-care" } }, { itemId: "footer-care-3", title: "Custom Blouse Stitching", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 3, isActive: true, metadata: { group: "customer-care" } }, { itemId: "footer-care-4", title: "WhatsApp Live Video Call", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 4, isActive: true, metadata: { group: "customer-care" } }, { itemId: "footer-care-5", title: "Returns & Exchanges", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 5, isActive: true, metadata: { group: "customer-care" } }, { itemId: "footer-care-6", title: "Authenticity Certificate", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#home", ctaText: "", bgColor: "", displayOrder: 6, isActive: true, metadata: { group: "customer-care" } }] },
+  footer: { sectionId: "footer", title: "Footer & Contact Info", subtitle: "", description: "", badgeText: "", mediaUrl: "/homepage/logo2_trans.png", mediaAlt: "Sree Collections", secondaryMediaUrl: "", secondaryMediaAlt: "", tertiaryMediaUrl: "", tertiaryMediaAlt: "", ctaText: "", ctaLink: "#", secondaryCtaText: "", secondaryCtaLink: "", isActive: true, settings: { address: "345 Faulconer Drive, Suite 4, Charlottesville, CA, 12345", phone: "+19526830741", email: "Sreecollections007@gmail.com", copyright: "kitsacitsolutions" }, items: [{ itemId: "social-facebook", title: "Facebook", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: { type: "social", icon: "facebook" } }, { itemId: "social-youtube", title: "YouTube", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: { type: "social", icon: "youtube" } }, { itemId: "social-instagram", title: "Instagram", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "https://www.instagram.com/sreecollections007?utm_source=ig_web_button_share_sheet&cplk=ZDNlZDc0MzIxNw==", ctaText: "", bgColor: "", displayOrder: 3, isActive: true, metadata: { type: "social", icon: "instagram" } }, { itemId: "social-google", title: "Google", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "#", ctaText: "", bgColor: "", displayOrder: 4, isActive: true, metadata: { type: "social", icon: "google" } }, { itemId: "social-whatsapp", title: "WhatsApp", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "https://chat.whatsapp.com/C0d3jaOJF2DD7fvujaTesb", ctaText: "", bgColor: "", displayOrder: 5, isActive: true, metadata: { type: "social", icon: "whatsapp" } }, { itemId: "nav-about", title: "ABOUT US", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "/about", ctaText: "", bgColor: "", displayOrder: 1, isActive: true, metadata: { type: "nav-link" } }, { itemId: "nav-contact", title: "CONTACT US", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "/contact", ctaText: "", bgColor: "", displayOrder: 2, isActive: true, metadata: { type: "nav-link" } }, { itemId: "nav-cat", title: "CATEGORY", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "/categories", ctaText: "", bgColor: "", displayOrder: 3, isActive: true, metadata: { type: "nav-link" } }, { itemId: "nav-privacy", title: "PRIVACY POLICY", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "/privacy-policy", ctaText: "", bgColor: "", displayOrder: 4, isActive: true, metadata: { type: "nav-link" } }, { itemId: "nav-terms", title: "TERMS & CONDITIONS", subtitle: "", description: "", badge: "", imageUrl: "", imageAlt: "", linkUrl: "/terms-and-conditions", ctaText: "", bgColor: "", displayOrder: 5, isActive: true, metadata: { type: "nav-link" } }] },
 };
 
 export default function HomePage() {
+  const [cartCount, setCartCount] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [activeTab, setActiveTab] = useState("all");
   const [cms, setCms] = useState<CMSData>(FALLBACK_CMS);
   const [cmsLoading, setCmsLoading] = useState(true);
+
+  useEffect(() => {
+    const updateCount = () => {
+      try {
+        const raw = localStorage.getItem("sc_cart") || localStorage.getItem("cart");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const count = Array.isArray(parsed)
+            ? parsed.reduce((sum: number, item: any) => sum + (Number(item?.quantity) || 1), 0)
+            : 0;
+          setCartCount(count);
+          return;
+        }
+        setCartCount(0);
+      } catch {
+        setCartCount(0);
+      }
+    };
+    updateCount();
+    window.addEventListener("storage", updateCount);
+    window.addEventListener("cart-updated", updateCount);
+    return () => {
+      window.removeEventListener("storage", updateCount);
+      window.removeEventListener("cart-updated", updateCount);
+    };
+  }, []);
 
   const fetchCms = useCallback(async (silent = false) => {
     if (!silent) setCmsLoading(true);
@@ -164,249 +191,7 @@ export default function HomePage() {
   return (
     <div style={{ backgroundColor: "#FCF8F2", minHeight: "100vh", overflowX: "hidden" }}>
       {/* =========================================================================
-          1. HEADER (Exact Navbar Alignment from Reference Screenshot)
-          - Logo on Left
-          - Right-aligned: Home (with active underline), About, Categories,
-            "CONTACT US" golden pill button, Search icon, Cart icon
-         ========================================================================= */}
-      <div style={{ width: "100%", display: "flex", justifyContent: "center", position: "sticky", top: 0, zIndex: 100, backgroundColor: "#FCF8F2" }}>
-        <header
-          style={{
-            width: "100%",
-            maxWidth: "1360px",
-            minHeight: "95px",
-            margin: "0 auto",
-            padding: "0 20px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            boxSizing: "border-box",
-            position: "relative",
-            zIndex: 50,
-          }}
-        >
-          {/* Brand Logo */}
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <a href="#" style={{ display: "inline-block" }}>
-              <img
-                className="home-logo"
-                src={S("header").mediaUrl || "/homepage/logo2_trans.png"}
-                alt={S("header").mediaAlt || "Sree Collections"}
-                style={{
-                  height: "72px",
-                  width: "auto",
-                  objectFit: "contain",
-                  maxWidth: "340px",
-                  display: "block",
-                }}
-              />
-            </a>
-          </div>
-
-          {/* Desktop Navigation Links & Action Items (Exact Match) */}
-          <nav
-            style={{
-              display: "none",
-              alignItems: "center",
-              gap: "36px",
-            }}
-            className="desktop-nav"
-          >
-            {/* CMS-driven nav links */}
-            {navLinks.map((link) => {
-              const isHome = link.itemId === "nav-home" || link.linkUrl === "#home";
-              return (
-                <a
-                  key={link.itemId}
-                  href={link.linkUrl}
-                  style={{
-                    fontFamily: "var(--font-serif)",
-                    fontSize: "17px",
-                    fontWeight: 700,
-                    color: "#5A2035",
-                    borderBottom: isHome ? "2.5px solid #5A2035" : undefined,
-                    paddingBottom: isHome ? "3px" : undefined,
-                    transition: "opacity 0.2s",
-                    lineHeight: 1.2,
-                  }}
-                  className={isHome ? undefined : "nav-link"}
-                >
-                  {link.title}
-                </a>
-              );
-            })}
-
-            {/* CONTACT US Pill Button */}
-            <a
-              href={S("header").ctaLink || "/contact"}
-              style={{
-                background: "#BA8E43",
-                color: "#FFFFFF",
-                fontFamily: "var(--font-serif)",
-                fontSize: "12.5px",
-                fontWeight: 700,
-                letterSpacing: "0.8px",
-                textTransform: "uppercase",
-                padding: "11px 28px",
-                borderRadius: "9999px",
-                boxShadow: "0 2px 10px rgba(186, 142, 67, 0.25)",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transition: "all 0.25s ease",
-              }}
-              className="primary-btn"
-            >
-              {S("header").ctaText || "CONTACT US"}
-            </a>
-
-            {/* Search Icon */}
-            <a
-              href="/search"
-              aria-label="Search"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#5A2035",
-                padding: "4px",
-                transition: "transform 0.2s ease",
-              }}
-            >
-              <FiSearch size={22} strokeWidth={2} />
-            </a>
-
-            {/* Cart Icon */}
-            <Link
-              href="/cart"
-              aria-label="Shopping Cart"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#5A2035",
-                padding: "4px",
-                transition: "transform 0.2s ease",
-              }}
-            >
-              <FiShoppingCart size={22} strokeWidth={2} />
-            </Link>
-          </nav>
-
-          {/* Mobile Right Actions: Search + Cart + Hamburger */}
-          <div
-            style={{
-              display: "none",
-              alignItems: "center",
-              gap: "8px",
-            }}
-            className="mobile-header-actions"
-          >
-            <a
-              href="/search"
-              aria-label="Search"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#5A2035",
-                padding: "6px",
-              }}
-            >
-              <FiSearch size={21} strokeWidth={2} />
-            </a>
-            <Link
-              href="/cart"
-              aria-label="Shopping Cart"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#5A2035",
-                padding: "6px",
-                position: "relative",
-              }}
-            >
-              <FiShoppingCart size={21} strokeWidth={2} />
-            </Link>
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Toggle menu"
-              style={{
-                padding: "6px",
-                color: "#2F2C24",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-              }}
-              className="mobile-hamburger"
-            >
-              {mobileMenuOpen ? <FiX size={25} /> : <FiMenu size={25} />}
-            </button>
-          </div>
-        </header>
-      </div>
-
-      {/* Mobile Drawer */}
-      {mobileMenuOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100vh",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            zIndex: 100,
-            display: "flex",
-            justifyContent: "flex-end",
-          }}
-          onClick={() => setMobileMenuOpen(false)}
-        >
-          <div
-            style={{
-              width: "290px",
-              height: "100%",
-              backgroundColor: "#FCF8F2",
-              padding: "30px 24px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "20px",
-              boxShadow: "-4px 0 20px rgba(0,0,0,0.15)",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <img src={S("header").secondaryMediaUrl || "/homepage/logo2.png"} alt="Logo" style={{ height: "48px" }} />
-              <button onClick={() => setMobileMenuOpen(false)}>
-                <FiX size={24} />
-              </button>
-            </div>
-            <nav style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "20px" }}>
-              {navLinks.map((link) => (
-                <a
-                  key={link.itemId}
-                  href={link.linkUrl}
-                  onClick={() => setMobileMenuOpen(false)}
-                  style={{ fontSize: "16px", fontWeight: link.itemId === "nav-home" ? 600 : 500 }}
-                >
-                  {link.title}
-                </a>
-              ))}
-              <a
-                href={S("header").ctaLink || "/contact"}
-                onClick={() => setMobileMenuOpen(false)}
-                style={{ fontSize: "16px", fontWeight: 500 }}
-              >
-                {S("header").ctaText || "Contact Us"}
-              </a>
-            </nav>
-          </div>
-        </div>
-      )}
-
-      {/* =========================================================================
-          2. HERO SECTION
+          HERO SECTION
           Exact Match with Figma Reference:
           - Background Watermark: Clean SC circular emblem (no text)
           - Left-Aligned Heading:
@@ -907,6 +692,7 @@ export default function HomePage() {
                 Truck: /homepage/img4.png
          ========================================================================= */}
       <section
+        className="delivery-section"
         style={{
           width: "100%",
           maxWidth: "1540px",
@@ -1044,6 +830,7 @@ export default function HomePage() {
       <CategoriesMosaicShowcase
         sectionTitle={S("categories-mosaic").title || "Explore Our World of Styles"}
         sectionSubtitle={S("categories-mosaic").subtitle || "Discover By Category"}
+        cmsItems={items("categories-mosaic")}
       />
 
       {/* =========================================================================
@@ -1243,6 +1030,7 @@ export default function HomePage() {
           10. WHATSAPP SHOPPING BANNER — "Shopping Made Personal"
          ========================================================================= */}
       <section
+        className="whatsapp-section"
         style={{
           width: "100%",
           maxWidth: "1280px",
@@ -1328,10 +1116,12 @@ export default function HomePage() {
                 marginBottom: "32px",
                 boxSizing: "border-box",
                 cursor: "pointer",
+                whiteSpace: "nowrap",
               }}
               className="whatsapp-cta-btn"
             >
               <div
+                className="whatsapp-cta-icon-wrap"
                 style={{
                   width: "26px",
                   height: "26px",
@@ -1346,6 +1136,7 @@ export default function HomePage() {
                 <FaWhatsapp size={16} color="#FFFFFF" />
               </div>
               <span
+                className="whatsapp-cta-text"
                 style={{
                   fontFamily: "'Blacker Display', Georgia, serif",
                   fontWeight: 700,
@@ -1354,6 +1145,8 @@ export default function HomePage() {
                   letterSpacing: "0%",
                   textTransform: "uppercase",
                   color: "#FFFFFF",
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
                 }}
               >
                 CHECKOUT ON WHATSAPP
@@ -1365,44 +1158,45 @@ export default function HomePage() {
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "12px",
                 flexWrap: "nowrap",
                 fontFamily: "'Turnkey Lite', 'Plus Jakarta Sans', var(--font-sans), sans-serif",
                 fontWeight: 400,
-                fontSize: "clamp(14px, 1.35vw, 22px)",
+                fontSize: "clamp(13px, 1.25vw, 20px)",
                 lineHeight: "100%",
                 letterSpacing: "0%",
                 color: "#2F2C24",
+                width: "100%",
+                maxWidth: "100%",
               }}
               className="whatsapp-steps-flow"
             >
-              <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", whiteSpace: "nowrap" }}>
+              <div className="whatsapp-step-item">
                 <img
                   src="/homepage/step_cart.png"
                   alt="Cart"
-                  style={{ width: "24px", height: "24px", objectFit: "contain", flexShrink: 0 }}
+                  className="whatsapp-step-icon"
                 />
                 <span>Add to Cart</span>
               </div>
 
-              <span style={{ color: "#BA8E43", fontSize: "1.1em", fontWeight: 400, margin: "0 2px" }}>→</span>
+              <span className="whatsapp-step-arrow">→</span>
 
-              <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", whiteSpace: "nowrap" }}>
+              <div className="whatsapp-step-item">
                 <img
                   src="/homepage/step_whatsapp.png"
                   alt="WhatsApp"
-                  style={{ width: "22px", height: "22px", objectFit: "contain", flexShrink: 0 }}
+                  className="whatsapp-step-icon"
                 />
                 <span>WhatsApp</span>
               </div>
 
-              <span style={{ color: "#BA8E43", fontSize: "1.1em", fontWeight: 400, margin: "0 2px" }}>→</span>
+              <span className="whatsapp-step-arrow">→</span>
 
-              <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", whiteSpace: "nowrap" }}>
+              <div className="whatsapp-step-item">
                 <img
                   src="/homepage/step_check.png"
                   alt="Order Confirmed"
-                  style={{ width: "20px", height: "16px", objectFit: "contain", flexShrink: 0 }}
+                  className="whatsapp-step-icon"
                 />
                 <span>Order Confirmed</span>
               </div>
@@ -1440,6 +1234,7 @@ export default function HomePage() {
           11. TESTIMONIALS SECTION — "What our Customer says"
          ========================================================================= */}
       <section
+        className="testimonials-section"
         style={{
           width: "100%",
           maxWidth: "1140px",
@@ -1663,121 +1458,57 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      {/* Responsive Styles */}
+{/* Responsive Styles */}
       <style>{`
-        @media (min-width: 1400px) {
-          .hero-main-title,
-          .hero-second-title {
-            font-size: 86px !important;
-          }
+        /* ═══════════════════════════════════════════════════════════
+           BASE DESKTOP STYLES
+           ═══════════════════════════════════════════════════════════ */
+        .desktop-nav {
+          display: flex !important;
         }
-        @media (min-width: 992px) {
-          .desktop-nav {
-            display: flex !important;
-          }
-          .mobile-header-actions {
-            display: none !important;
-          }
+        .mobile-header-actions {
+          display: none !important;
         }
-        /* Tablet — compress text/images; laptop (≥992) unchanged */
-        @media (max-width: 991px) {
-          .desktop-nav {
-            display: none !important;
-          }
-          .mobile-header-actions {
-            display: flex !important;
-          }
-          .mobile-hamburger {
-            display: flex !important;
-          }
-          .home-logo {
-            height: 52px !important;
-            max-width: 220px !important;
-          }
-          .hero-main-title,
-          .hero-second-title {
-            font-size: 36px !important;
-            line-height: 1.15 !important;
-          }
-          .home-section-title {
-            font-size: 28px !important;
-          }
-          .delivery-title {
-            font-size: 36px !important;
-          }
-          .delivery-subtitle {
-            font-size: 20px !important;
-          }
-          .editorial-banner-text {
-            font-size: 30px !important;
-            line-height: 130% !important;
-          }
-          .editorial-banner-img {
-            width: 140px !important;
-            height: 40px !important;
-          }
-          .testimonial-title-sm {
-            font-size: 24px !important;
-          }
-          .testimonial-title-lg {
-            font-size: 32px !important;
-          }
-          .hero-frame-svg {
-            display: none !important;
-          }
-          .hero-grid-outer {
-            border: 1.5px solid #DECDBE;
-            border-radius: 20px;
-          }
-          .hero-three-cols {
-            grid-template-columns: 1fr !important;
-          }
-          .mosaic-top-container {
-            grid-template-columns: 1fr !important;
-          }
-          .mosaic-bottom-container {
-            grid-template-columns: 1fr !important;
-          }
-          .delivery-banner {
-            padding: 28px 18px !important;
-            text-align: center;
-          }
-          .whatsapp-banner {
-            padding: 28px 18px !important;
-            text-align: center;
-          }
-          .testimonial-card {
-            padding: 28px 18px !important;
-            border-radius: 20px !important;
-          }
-          .delivery-truck {
-            max-width: 220px !important;
-            height: auto !important;
-          }
-          .mosaic-left-column > a.mosaic-split-card {
-            height: auto !important;
-            min-height: 0 !important;
-            flex-direction: column !important;
-          }
-          .mosaic-split-card .mosaic-card-text-wrap {
-            width: 100% !important;
-            flex: none !important;
-            padding: 18px 16px 14px !important;
-          }
-          .mosaic-split-card .mosaic-card-img-wrap {
-            width: 100% !important;
-            height: 200px !important;
-            order: -1 !important;
-          }
-          .mosaic-split-card .mosaic-card-title {
-            font-size: 22px !important;
-          }
-          .mosaic-split-card .mosaic-card-badge {
-            font-size: 12px !important;
-          }
-          .mosaic-split-card .mosaic-card-cta {
-            font-size: 13px !important;
-          }
+        .mobile-hamburger {
+          display: none !important;
+        }
+
+        /* WhatsApp Steps Flow — horizontal single line */
+        .whatsapp-steps-flow {
+          display: flex !important;
+          flex-direction: row !important;
+          flex-wrap: nowrap !important;
+          align-items: center !important;
+          justify-content: flex-start !important;
+          gap: clamp(10px, 1.3vw, 16px) !important;
+          width: 100% !important;
+          max-width: 100% !important;
+          box-sizing: border-box !important;
+        }
+        .whatsapp-step-item {
+          display: inline-flex !important;
+          align-items: center !important;
+          gap: 8px !important;
+          white-space: nowrap !important;
+          flex-shrink: 0 !important;
+        }
+        .whatsapp-step-icon {
+          width: 24px !important;
+          height: 24px !important;
+          object-fit: contain !important;
+          flex-shrink: 0 !important;
+          display: block !important;
+        }
+        .whatsapp-step-arrow {
+          color: #BA8E43 !important;
+          font-weight: 400 !important;
+          font-size: 1.15em !important;
+          margin: 0 2px !important;
+          display: inline-flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          flex-shrink: 0 !important;
+          line-height: 1 !important;
         }
 
         .mosaic-top-container {
@@ -1787,14 +1518,12 @@ export default function HomePage() {
           justify-content: center;
           margin-bottom: 44px;
         }
-
         .mosaic-left-column {
           display: flex;
           flex-direction: column;
           gap: 28px;
           width: 605.85px;
         }
-
         .mosaic-right-tall {
           width: 660.45px;
           height: 605.5px;
@@ -1805,14 +1534,12 @@ export default function HomePage() {
           box-shadow: 0 16px 40px rgba(10, 28, 26, 0.25);
           transition: all 0.4s ease;
         }
-
         .mosaic-bottom-container {
           display: grid;
           grid-template-columns: 271.95px 665.70px 271.95px;
           gap: 50.35px;
           justify-content: center;
         }
-
         .mosaic-bottom-small {
           width: 271.95px;
           height: auto;
@@ -1825,7 +1552,6 @@ export default function HomePage() {
           box-shadow: 0 10px 24px rgba(0,0,0,0.04);
           transition: all 0.35s ease;
         }
-
         .mosaic-bottom-wide {
           width: 665.70px;
           height: 357px;
@@ -1837,7 +1563,20 @@ export default function HomePage() {
           transition: all 0.35s ease;
         }
 
-        @media (max-width: 1400px) {
+        /* ═══════════════════════════════════════════════════════════
+           LARGE DESKTOP (≥ 1400px)
+           ═══════════════════════════════════════════════════════════ */
+        @media (min-width: 1400px) {
+          .hero-main-title,
+          .hero-second-title {
+            font-size: 86px !important;
+          }
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           STANDARD DESKTOP / LAPTOP (1024px – 1399px)
+           ═══════════════════════════════════════════════════════════ */
+        @media (max-width: 1399px) {
           .mosaic-top-container {
             grid-template-columns: 1fr 1fr;
             gap: 24px;
@@ -1858,17 +1597,254 @@ export default function HomePage() {
           }
         }
 
-        .cat-explore-pill-btn:hover {
-          background-color: #BB8E43 !important;
-          color: #FFFFFF !important;
-          transform: translateY(-2px);
-          box-shadow: 0 6px 18px rgba(187, 142, 67, 0.25);
+        @media (max-width: 1150px) and (min-width: 992px) {
+          .desktop-nav {
+            gap: 20px !important;
+          }
+          .home-logo {
+            max-width: 260px !important;
+            height: 60px !important;
+          }
+          .mosaic-card-text-wrap {
+            padding: 24px 20px !important;
+          }
+          .mosaic-bottom-text-wrap {
+            padding: 24px 20px !important;
+          }
         }
 
+        /* ═══════════════════════════════════════════════════════════
+           TABLET BREAKPOINT (≤ 991px)
+           ═══════════════════════════════════════════════════════════ */
+        @media (max-width: 991px) {
+          .desktop-nav {
+            display: none !important;
+          }
+          .mobile-header-actions {
+            display: flex !important;
+          }
+          .mobile-hamburger {
+            display: flex !important;
+          }
+          .home-logo {
+            height: 52px !important;
+            max-width: 220px !important;
+          }
+
+          /* Section spacing & padding */
+          .delivery-section,
+          .whatsapp-section,
+          .testimonials-section,
+          .editorial-section,
+          .categories-mosaic-section {
+            padding-left: 20px !important;
+            padding-right: 20px !important;
+            margin-bottom: 60px !important;
+          }
+
+          /* Hero */
+          .hero-main-title,
+          .hero-second-title {
+            font-size: 38px !important;
+            line-height: 1.15 !important;
+          }
+          .home-section-title {
+            font-size: 30px !important;
+          }
+          .hero-frame-svg {
+            display: none !important;
+          }
+          .hero-grid-outer {
+            border: 1.5px solid #DECDBE;
+            border-radius: 20px;
+          }
+          .hero-three-cols {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+          }
+
+          /* Delivery Banner */
+          .delivery-banner {
+            padding: 28px 20px !important;
+            text-align: center;
+          }
+          .delivery-banner > div {
+            flex: 1 1 100% !important;
+            max-width: 100% !important;
+          }
+          .delivery-title {
+            font-size: 38px !important;
+          }
+          .delivery-subtitle {
+            font-size: 22px !important;
+          }
+          .delivery-truck {
+            max-width: 220px !important;
+            height: auto !important;
+          }
+
+          /* Editorial Banner */
+          .editorial-banner-text {
+            font-size: 32px !important;
+            line-height: 130% !important;
+          }
+          .editorial-banner-img {
+            width: 140px !important;
+            height: 40px !important;
+          }
+
+          /* Mosaic */
+          .mosaic-top-container {
+            grid-template-columns: 1fr !important;
+            gap: 20px !important;
+            margin-bottom: 20px !important;
+          }
+          .mosaic-bottom-container {
+            grid-template-columns: 1fr !important;
+            gap: 20px !important;
+          }
+          .mosaic-left-column {
+            width: 100% !important;
+          }
+          .mosaic-right-tall {
+            width: 100% !important;
+            height: clamp(260px, 65vw, 420px) !important;
+          }
+          .mosaic-bottom-small {
+            width: 100% !important;
+            min-height: 320px !important;
+          }
+          .mosaic-bottom-wide {
+            width: 100% !important;
+            min-height: 220px !important;
+            flex-direction: column !important;
+          }
+          .mosaic-bottom-wide .mosaic-bottom-text-wrap {
+            width: 100% !important;
+            padding: 24px 18px !important;
+          }
+          .mosaic-bottom-wide .mosaic-bottom-img-wrap {
+            width: 100% !important;
+            height: 180px !important;
+          }
+          .mosaic-left-column > a.mosaic-split-card {
+            height: auto !important;
+            min-height: 0 !important;
+            flex-direction: column !important;
+          }
+          .mosaic-split-card .mosaic-card-text-wrap {
+            width: 100% !important;
+            flex: none !important;
+            padding: 20px 16px 14px !important;
+          }
+          .mosaic-split-card .mosaic-card-img-wrap {
+            width: 100% !important;
+            height: 200px !important;
+            order: -1 !important;
+          }
+          .mosaic-split-card .mosaic-card-title {
+            font-size: 22px !important;
+          }
+          .mosaic-split-card .mosaic-card-badge {
+            font-size: 12px !important;
+          }
+          .mosaic-split-card .mosaic-card-cta {
+            font-size: 13px !important;
+          }
+
+          /* WhatsApp Banner */
+          .whatsapp-banner {
+            padding: 32px 20px !important;
+            text-align: center;
+          }
+          .whatsapp-banner > div {
+            flex: 1 1 100% !important;
+            max-width: 100% !important;
+          }
+          .whatsapp-cta-btn {
+            width: auto !important;
+            max-width: 340px !important;
+            height: 54px !important;
+            padding: 12px 24px !important;
+            margin: 0 auto 24px auto !important;
+            gap: 10px !important;
+            white-space: nowrap !important;
+          }
+          .whatsapp-cta-text {
+            font-size: 14px !important;
+            white-space: nowrap !important;
+          }
+          .whatsapp-cta-icon-wrap {
+            width: 24px !important;
+            height: 24px !important;
+          }
+          .whatsapp-steps-flow {
+            flex-wrap: nowrap !important;
+            justify-content: center !important;
+            gap: clamp(8px, 1.6vw, 14px) !important;
+            font-size: clamp(13px, 1.8vw, 17px) !important;
+          }
+          .whatsapp-step-item {
+            gap: 6px !important;
+          }
+          .whatsapp-step-icon {
+            width: 20px !important;
+            height: 20px !important;
+          }
+          .whatsapp-step-arrow {
+            font-size: 1.05em !important;
+            margin: 0 1px !important;
+          }
+
+          /* Testimonials */
+          .testimonial-card {
+            padding: 28px 20px !important;
+            border-radius: 20px !important;
+          }
+          .testimonial-title-sm {
+            font-size: 24px !important;
+          }
+          .testimonial-title-lg {
+            font-size: 32px !important;
+          }
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           TABLET PORTRAIT / SMALL TABLET (≤ 768px)
+           ═══════════════════════════════════════════════════════════ */
         @media (max-width: 768px) {
+          .whatsapp-cta-btn {
+            width: auto !important;
+            max-width: min(320px, 94%) !important;
+            height: 48px !important;
+            padding: 10px 22px !important;
+            margin: 0 auto 20px auto !important;
+            gap: 8px !important;
+            white-space: nowrap !important;
+            border-radius: 9999px !important;
+          }
+          .whatsapp-cta-text {
+            font-size: 13.5px !important;
+            white-space: nowrap !important;
+          }
+          .whatsapp-cta-icon-wrap {
+            width: 22px !important;
+            height: 22px !important;
+          }
           .home-logo {
             height: 46px !important;
             max-width: 190px !important;
+          }
+          .hero-watermark {
+            width: clamp(260px, 80vw, 420px) !important;
+            height: clamp(260px, 80vw, 420px) !important;
+            top: 260px !important;
+          }
+          .hero-three-cols > div:first-child img,
+          .hero-three-cols > div:last-child img {
+            max-height: 220px !important;
+            width: 100% !important;
+            object-fit: cover !important;
           }
           .hero-main-title,
           .hero-second-title {
@@ -1886,6 +1862,9 @@ export default function HomePage() {
             flex-wrap: wrap !important;
             justify-content: center !important;
           }
+          .delivery-truck {
+            max-width: 160px !important;
+          }
           .editorial-banner-text {
             font-size: 24px !important;
             line-height: 125% !important;
@@ -1894,49 +1873,15 @@ export default function HomePage() {
             width: 110px !important;
             height: 34px !important;
           }
+          .editorial-banner-row {
+            flex-wrap: wrap !important;
+            justify-content: center !important;
+          }
           .testimonial-title-sm {
             font-size: 20px !important;
           }
           .testimonial-title-lg {
             font-size: 26px !important;
-          }
-          .category-section-header {
-            flex-direction: column !important;
-            gap: 16px !important;
-          }
-          .category-section-header .header-text-right {
-            text-align: left !important;
-          }
-          .category-section-grid {
-            grid-template-columns: 1fr !important;
-            gap: 32px !important;
-          }
-          .spotlight-grid {
-            grid-template-columns: 1fr !important;
-            gap: 40px !important;
-          }
-          .saree-grid .spotlight-right-col {
-            order: 1 !important;
-          }
-          .saree-grid .spotlight-offset-col {
-            order: 2 !important;
-          }
-          .spotlight-right-col {
-            align-items: flex-start !important;
-          }
-          .spotlight-header-right {
-            align-items: flex-start !important;
-            text-align: left !important;
-          }
-          .spotlight-header-right p {
-            text-align: left !important;
-          }
-          .spotlight-offset-col {
-            padding-top: 0 !important;
-            margin-top: 0 !important;
-          }
-          .saree-line {
-            margin-left: 0 !important;
           }
           .testimonial-review-text {
             max-width: 100% !important;
@@ -1944,94 +1889,31 @@ export default function HomePage() {
             font-size: 15px !important;
           }
           .testimonials-header {
-            align-items: flex-start !important;
+            align-items: center !important;
+            text-align: center !important;
           }
-          .testimonials-header > div {
-            justify-content: flex-start !important;
+          .whatsapp-steps-flow {
+            flex-wrap: nowrap !important;
+            justify-content: space-between !important;
+            gap: clamp(4px, 1.2vw, 10px) !important;
+            font-size: clamp(11.5px, 2.1vw, 14px) !important;
           }
-          .testimonials-header p {
-            text-align: left !important;
+          .whatsapp-step-item {
+            gap: 5px !important;
           }
-          .mosaic-split-card {
-            height: auto !important;
-            min-height: 0 !important;
-            flex-direction: column !important;
+          .whatsapp-step-icon {
+            width: 18px !important;
+            height: 18px !important;
           }
-          .mosaic-split-card .mosaic-card-text-wrap {
-            width: 100% !important;
-            flex: none !important;
-            padding: 16px 14px 12px !important;
-            gap: 10px !important;
-          }
-          .mosaic-split-card .mosaic-card-img-wrap {
-            width: 100% !important;
-            height: 170px !important;
-            order: -1 !important;
-          }
-          .mosaic-split-card .mosaic-card-title {
-            font-size: 20px !important;
-          }
-          .mosaic-split-card .mosaic-card-badge {
-            font-size: 11px !important;
-            margin-bottom: 6px !important;
-          }
-          .mosaic-split-card .mosaic-card-cta {
-            font-size: 12px !important;
-          }
-          .mosaic-split-card .mosaic-card-desc {
-            font-size: 12px !important;
-            margin-bottom: 10px !important;
-          }
-          .mosaic-right-tall {
-            height: 300px !important;
-          }
-          .mosaic-bottom-wide {
-            height: auto !important;
-            min-height: 220px !important;
-            flex-direction: column !important;
-          }
-          .mosaic-bottom-wide .mosaic-bottom-text-wrap {
-            width: 100% !important;
-            padding: 20px 16px !important;
-          }
-          .mosaic-bottom-wide .mosaic-bottom-img-wrap {
-            width: 100% !important;
-            height: 160px !important;
-          }
-          .mosaic-bottom-small {
-            height: auto !important;
-            min-height: 330px !important;
-          }
-          .delivery-truck {
-            max-width: 160px !important;
+          .whatsapp-step-arrow {
+            font-size: 1em !important;
+            margin: 0 !important;
           }
         }
 
-        @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-
-        .editorial-shop-btn:hover {
-          background: #A97E37 !important;
-          transform: translateY(-2px);
-          box-shadow: 0 8px 24px rgba(187, 142, 67, 0.35);
-        }
-
-        @media (max-width: 768px) {
-          .hero-watermark {
-            width: clamp(260px, 80vw, 420px) !important;
-            height: clamp(260px, 80vw, 420px) !important;
-            top: 260px !important;
-          }
-          .hero-three-cols > div:first-child img,
-          .hero-three-cols > div:last-child img {
-            max-height: 380px !important;
-            width: 100% !important;
-            object-fit: cover !important;
-          }
-        }
-
+        /* ═══════════════════════════════════════════════════════════
+           MOBILE STANDARD (≤ 640px)
+           ═══════════════════════════════════════════════════════════ */
         @media (max-width: 640px) {
           .home-logo {
             height: 42px !important;
@@ -2051,6 +1933,9 @@ export default function HomePage() {
           .delivery-subtitle {
             font-size: 14px !important;
           }
+          .delivery-truck {
+            max-width: 130px !important;
+          }
           .editorial-banner-text {
             font-size: 20px !important;
             line-height: 125% !important;
@@ -2069,18 +1954,8 @@ export default function HomePage() {
             padding: 10px 20px !important;
             font-size: 13px !important;
           }
-          .testimonial-title-sm {
-            font-size: 18px !important;
-          }
-          .testimonial-title-lg {
-            font-size: 22px !important;
-          }
-          .testimonial-card {
-            padding: 22px 14px !important;
-            border-radius: 16px !important;
-          }
           .mosaic-right-tall {
-            height: 240px !important;
+            height: 260px !important;
           }
           .mosaic-bottom-small {
             height: auto !important;
@@ -2088,53 +1963,116 @@ export default function HomePage() {
           }
           .mosaic-split-card .mosaic-card-img-wrap,
           .mosaic-bottom-wide .mosaic-bottom-img-wrap {
-            height: 150px !important;
+            height: 160px !important;
           }
           .mosaic-split-card .mosaic-card-title {
             font-size: 18px !important;
           }
-          .mosaic-left-column > a {
-            height: auto !important;
-          }
           .whatsapp-cta-btn {
-            height: 52px !important;
-            padding: 12px 16px !important;
-            max-width: 100% !important;
-            font-size: 14px !important;
+            width: auto !important;
+            max-width: min(290px, 92%) !important;
+            height: 44px !important;
+            padding: 8px 18px !important;
+            margin: 0 auto 18px auto !important;
+            gap: 8px !important;
+            white-space: nowrap !important;
+            border-radius: 9999px !important;
+          }
+          .whatsapp-cta-text {
+            font-size: 12.5px !important;
+            white-space: nowrap !important;
+          }
+          .whatsapp-cta-icon-wrap {
+            width: 20px !important;
+            height: 20px !important;
           }
           .whatsapp-steps-flow {
-            flex-wrap: wrap !important;
-            justify-content: center !important;
-            font-size: 12px !important;
-            gap: 6px !important;
+            flex-wrap: nowrap !important;
+            justify-content: space-between !important;
+            gap: clamp(3px, 1vw, 6px) !important;
+            font-size: clamp(10px, 2.5vw, 12px) !important;
           }
-          .delivery-truck {
-            max-width: 130px !important;
+          .whatsapp-step-item {
+            gap: 4px !important;
+          }
+          .whatsapp-step-icon {
+            width: 16px !important;
+            height: 16px !important;
+          }
+          .whatsapp-step-arrow {
+            font-size: 11px !important;
+            margin: 0 !important;
+          }
+          .testimonial-card {
+            padding: 22px 14px !important;
+            border-radius: 16px !important;
+          }
+          .testimonial-title-sm {
+            font-size: 18px !important;
+          }
+          .testimonial-title-lg {
+            font-size: 22px !important;
           }
         }
 
+        /* ═══════════════════════════════════════════════════════════
+           SMALL MOBILE (≤ 480px)
+           ═══════════════════════════════════════════════════════════ */
         @media (max-width: 480px) {
-          #home, #featured {
+          .whatsapp-cta-btn {
+            width: auto !important;
+            max-width: min(270px, 92%) !important;
+            height: 42px !important;
+            padding: 8px 16px !important;
+            margin: 0 auto 16px auto !important;
+            gap: 7px !important;
+            white-space: nowrap !important;
+            border-radius: 9999px !important;
+          }
+          .whatsapp-cta-text {
+            font-size: 11.5px !important;
+            white-space: nowrap !important;
+            letter-spacing: 0.2px !important;
+          }
+          .whatsapp-cta-icon-wrap {
+            width: 19px !important;
+            height: 19px !important;
+          }
+          #home, #featured,
+          .delivery-section,
+          .whatsapp-section,
+          .testimonials-section,
+          .editorial-section,
+          .categories-mosaic-section {
             padding-left: 12px !important;
             padding-right: 12px !important;
             margin-bottom: 40px !important;
           }
+          .home-logo {
+            height: 38px !important;
+            max-width: 150px !important;
+          }
           .hero-watermark {
             width: 240px !important;
             height: 240px !important;
+            top: 200px !important;
           }
           .hero-three-cols {
             padding: 8px !important;
-            gap: 12px !important;
+            gap: 10px !important;
           }
           .hero-three-cols > div:first-child img,
           .hero-three-cols > div:last-child img {
-            max-height: 300px !important;
+            max-height: 190px !important;
           }
           .hero-main-title,
           .hero-second-title {
             font-size: 21px !important;
             line-height: 1.2 !important;
+          }
+          .delivery-banner {
+            padding: 20px 12px !important;
+            margin-bottom: 30px !important;
           }
           .editorial-banner-text {
             font-size: 17px !important;
@@ -2144,18 +2082,102 @@ export default function HomePage() {
             height: 22px !important;
           }
           .whatsapp-banner {
-            padding: 20px 14px !important;
-            margin-bottom: 40px !important;
-          }
-          .delivery-banner {
             padding: 20px 12px !important;
-            margin-bottom: 40px !important;
+            margin-bottom: 30px !important;
+          }
+          .whatsapp-steps-flow {
+            flex-wrap: nowrap !important;
+            justify-content: space-between !important;
+            gap: 2px !important;
+            font-size: clamp(9px, 2.6vw, 11px) !important;
+            width: 100% !important;
+          }
+          .whatsapp-step-item {
+            gap: 3px !important;
+          }
+          .whatsapp-step-icon {
+            width: 14px !important;
+            height: 14px !important;
+          }
+          .whatsapp-step-arrow {
+            font-size: 10px !important;
+            margin: 0 !important;
           }
           .testimonial-card {
             padding: 18px 12px !important;
           }
         }
 
+        /* ═══════════════════════════════════════════════════════════
+           EXTRA SMALL MOBILE (≤ 360px)
+           ═══════════════════════════════════════════════════════════ */
+        @media (max-width: 360px) {
+          .whatsapp-cta-btn {
+            width: auto !important;
+            max-width: 95% !important;
+            height: 38px !important;
+            padding: 6px 12px !important;
+            margin: 0 auto 14px auto !important;
+            gap: 6px !important;
+            white-space: nowrap !important;
+          }
+          .whatsapp-cta-text {
+            font-size: 10.5px !important;
+            white-space: nowrap !important;
+            letter-spacing: 0 !important;
+          }
+          .whatsapp-cta-icon-wrap {
+            width: 17px !important;
+            height: 17px !important;
+          }
+          .home-logo {
+            height: 34px !important;
+            max-width: 135px !important;
+          }
+          .hero-main-title,
+          .hero-second-title {
+            font-size: 19px !important;
+          }
+          .delivery-title {
+            font-size: 22px !important;
+          }
+          .delivery-subtitle {
+            font-size: 13px !important;
+          }
+          .whatsapp-steps-flow {
+            flex-wrap: nowrap !important;
+            justify-content: space-between !important;
+            gap: 1px !important;
+            font-size: 8.5px !important;
+            letter-spacing: -0.2px !important;
+          }
+          .whatsapp-step-item {
+            gap: 2px !important;
+          }
+          .whatsapp-step-icon {
+            width: 12px !important;
+            height: 12px !important;
+          }
+          .whatsapp-step-arrow {
+            font-size: 9px !important;
+            margin: 0 !important;
+          }
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           BUTTON HOVERS & INTERACTIONS
+           ═══════════════════════════════════════════════════════════ */
+        .cat-explore-pill-btn:hover {
+          background-color: #BB8E43 !important;
+          color: #FFFFFF !important;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 18px rgba(187, 142, 67, 0.25);
+        }
+        .editorial-shop-btn:hover {
+          background: #A97E37 !important;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(187, 142, 67, 0.35);
+        }
         .nav-link:hover {
           color: #5D2030 !important;
         }

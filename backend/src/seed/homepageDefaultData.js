@@ -388,32 +388,30 @@ export const defaultHomepageSections = [
   // ─────────────────────────────────────────────────────────
   {
     sectionId: 'footer',
-    displayName: 'Footer & Social Links',
-    mediaUrl: '/homepage/logo2.png',
+    displayName: 'Footer & Contact Info',
+    mediaUrl: '/homepage/logo2_trans.png',
     mediaAlt: 'Sree Collections',
-    description: 'Celebrating timeless Indian royalty with handpicked silk sarees, designer ethnic sets, and authentic temple jewellery crafted for extraordinary celebrations.',
     displayOrder: 12,
     isActive: true,
     settings: {
-      phone: '+91 98765 43210',
-      email: 'support@sreecollections.com',
-      copyright: 'Sree Collections. All Rights Reserved.',
+      address: '345 Faulconer Drive, Suite 4, Charlottesville, CA, 12345',
+      phone: '+19526830741',
+      email: 'Sreecollections007@gmail.com',
+      copyright: 'kitsacitsolutions',
     },
     items: [
-      // Collections links
-      { itemId: 'footer-col-1', title: 'Kanjeevaram Pure Silk', linkUrl: '#featured', displayOrder: 1, isActive: true, metadata: { group: 'collections' } },
-      { itemId: 'footer-col-2', title: 'Banarasi Heritage Weaves', linkUrl: '#featured', displayOrder: 2, isActive: true, metadata: { group: 'collections' } },
-      { itemId: 'footer-col-3', title: 'Bridal Lehengas & Kurtas', linkUrl: '#featured', displayOrder: 3, isActive: true, metadata: { group: 'collections' } },
-      { itemId: 'footer-col-4', title: 'Temple Jewellery Sets', linkUrl: '#featured', displayOrder: 4, isActive: true, metadata: { group: 'collections' } },
-      { itemId: 'footer-col-5', title: 'Everyday Casuals & Denims', linkUrl: '#featured', displayOrder: 5, isActive: true, metadata: { group: 'collections' } },
-      { itemId: 'footer-col-6', title: 'Festive Home Decor', linkUrl: '#featured', displayOrder: 6, isActive: true, metadata: { group: 'collections' } },
-      // Customer care links
-      { itemId: 'footer-care-1', title: 'Track Your Order', linkUrl: '#home', displayOrder: 1, isActive: true, metadata: { group: 'customer-care' } },
-      { itemId: 'footer-care-2', title: 'Shipping & Global Delivery', linkUrl: '#home', displayOrder: 2, isActive: true, metadata: { group: 'customer-care' } },
-      { itemId: 'footer-care-3', title: 'Custom Blouse Stitching', linkUrl: '#home', displayOrder: 3, isActive: true, metadata: { group: 'customer-care' } },
-      { itemId: 'footer-care-4', title: 'WhatsApp Live Video Call', linkUrl: '#home', displayOrder: 4, isActive: true, metadata: { group: 'customer-care' } },
-      { itemId: 'footer-care-5', title: 'Returns & Exchanges', linkUrl: '#home', displayOrder: 5, isActive: true, metadata: { group: 'customer-care' } },
-      { itemId: 'footer-care-6', title: 'Authenticity Certificate', linkUrl: '#home', displayOrder: 6, isActive: true, metadata: { group: 'customer-care' } },
+      // ── Social Links ──────────────────────────────────────
+      { itemId: 'social-facebook',  title: 'Facebook',  linkUrl: '#',                                                                                                            displayOrder: 1, isActive: true, metadata: { type: 'social', icon: 'facebook'  } },
+      { itemId: 'social-youtube',   title: 'YouTube',   linkUrl: '#',                                                                                                            displayOrder: 2, isActive: true, metadata: { type: 'social', icon: 'youtube'   } },
+      { itemId: 'social-instagram', title: 'Instagram', linkUrl: 'https://www.instagram.com/sreecollections007?utm_source=ig_web_button_share_sheet&cplk=ZDNlZDc0MzIxNw==',     displayOrder: 3, isActive: true, metadata: { type: 'social', icon: 'instagram' } },
+      { itemId: 'social-google',    title: 'Google',    linkUrl: '#',                                                                                                            displayOrder: 4, isActive: true, metadata: { type: 'social', icon: 'google'    } },
+      { itemId: 'social-whatsapp',  title: 'WhatsApp',  linkUrl: 'https://chat.whatsapp.com/C0d3jaOJF2DD7fvujaTesb',                                                             displayOrder: 5, isActive: true, metadata: { type: 'social', icon: 'whatsapp'  } },
+      // ── Nav Links ─────────────────────────────────────────
+      { itemId: 'nav-about',   title: 'ABOUT US',          linkUrl: '/about',                  displayOrder: 1, isActive: true, metadata: { type: 'nav-link' } },
+      { itemId: 'nav-contact', title: 'CONTACT US',         linkUrl: '/contact',                displayOrder: 2, isActive: true, metadata: { type: 'nav-link' } },
+      { itemId: 'nav-cat',     title: 'CATEGORY',           linkUrl: '/categories',             displayOrder: 3, isActive: true, metadata: { type: 'nav-link' } },
+      { itemId: 'nav-privacy', title: 'PRIVACY POLICY',     linkUrl: '/privacy-policy',         displayOrder: 4, isActive: true, metadata: { type: 'nav-link' } },
+      { itemId: 'nav-terms',   title: 'TERMS & CONDITIONS', linkUrl: '/terms-and-conditions',   displayOrder: 5, isActive: true, metadata: { type: 'nav-link' } },
     ],
   },
 ];

@@ -196,7 +196,7 @@ export const updateAdminSection = async (req, res, next) => {
       'mediaUrl', 'mediaAlt', 'secondaryMediaUrl', 'secondaryMediaAlt',
       'tertiaryMediaUrl', 'tertiaryMediaAlt',
       'ctaText', 'ctaLink', 'secondaryCtaText', 'secondaryCtaLink',
-      'displayOrder', 'isActive', 'settings',
+      'displayOrder', 'isActive', 'settings', 'items',
     ];
 
     const updates = {};

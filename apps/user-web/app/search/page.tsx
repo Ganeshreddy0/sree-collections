@@ -193,34 +193,37 @@ function ProductCard({
       </div>
 
       {/* Card Details */}
-      <div style={{ padding: "14px 14px 16px 14px" }}>
+      <div className="srch-card-details" style={{ padding: "12px 12px 14px 12px" }}>
         <p
+          className="srch-card-category"
           style={{
-            fontSize: "12px",
-            color: "#A08060",
-            margin: "0 0 4px 0",
+            fontSize: "10.5px",
+            color: "#9E7A54",
+            margin: "0 0 3px 0",
             fontFamily: "'Plus Jakarta Sans', sans-serif",
-            fontWeight: 600,
+            fontWeight: 700,
             textTransform: "uppercase",
-            letterSpacing: "0.5px",
+            letterSpacing: "0.8px",
           }}
         >
           {product.category || "Collection"}
         </p>
 
         <h3
+          className="srch-card-title"
           style={{
-            fontFamily: "'Playfair Display', Georgia, serif",
-            fontSize: "15px",
-            fontWeight: 700,
-            color: "#2F2C24",
-            margin: "0 0 10px 0",
+            fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif",
+            fontSize: "13.5px",
+            fontWeight: 600,
+            color: "#2C2520",
+            margin: "0 0 8px 0",
             lineHeight: 1.35,
-            minHeight: "38px",
+            minHeight: "36px",
             display: "-webkit-box",
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
+            letterSpacing: "-0.1px",
           }}
           title={product.name}
         >
@@ -229,11 +232,13 @@ function ProductCard({
 
         {/* Action Row */}
         <div
+          className="srch-card-action-row"
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             marginTop: "6px",
+            gap: "6px",
           }}
         >
           <button
@@ -242,41 +247,44 @@ function ProductCard({
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "6px",
+              gap: "4px",
               backgroundColor: addedAnim ? "#5A2035" : "transparent",
               border: `1.5px solid ${addedAnim ? "#5A2035" : "#BB8E43"}`,
               color: addedAnim ? "#FFFFFF" : "#BB8E43",
               fontFamily: "'Plus Jakarta Sans', sans-serif",
-              fontSize: "11px",
+              fontSize: "10.5px",
               fontWeight: 700,
-              letterSpacing: "0.5px",
-              padding: "7px 14px",
+              letterSpacing: "0.4px",
+              padding: "5px 10px",
               borderRadius: "999px",
               cursor: "pointer",
               transition: "all 0.22s ease",
               textTransform: "uppercase",
+              flexShrink: 0,
             }}
             aria-label="Add to cart"
           >
-            {addedAnim ? <FiCheck size={13} strokeWidth={2.5} /> : <FiShoppingBag size={13} />}
+            {addedAnim ? <FiCheck size={12} strokeWidth={2.5} /> : <FiShoppingBag size={12} />}
             {addedAnim ? "Added" : "Add"}
           </button>
 
-          <div style={{ display: "flex", alignItems: "baseline", gap: "6px" }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: "5px", flexWrap: "wrap", justifyContent: "flex-end" }}>
             <span
+              className="srch-card-price"
               style={{
-                fontSize: "14px",
+                fontSize: "13.5px",
                 fontWeight: 700,
                 color: "#5A2035",
-                fontFamily: "'Playfair Display', Georgia, serif",
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
               }}
             >
               {fmtPrice(product.price)}
             </span>
             {product.mrp > product.price && (
               <span
+                className="srch-card-mrp"
                 style={{
-                  fontSize: "11px",
+                  fontSize: "10.5px",
                   color: "#9A8A7A",
                   textDecoration: "line-through",
                   fontFamily: "'Plus Jakarta Sans', sans-serif",
@@ -306,6 +314,7 @@ function SearchPageInner() {
   const [inputVal, setInputVal] = useState(urlQuery);
   const [activeCategory, setActiveCategory] = useState<string | null>(urlCategory);
   const [categories, setCategories] = useState<string[]>([]);
+  const [subCategories, setSubCategories] = useState<string[]>([]);
   const [products, setProducts] = useState<BackendProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -328,14 +337,21 @@ function SearchPageInner() {
     }
   }, []);
 
-  // 1. Fetch any 5 categories from backend ONLY
+  // 1. Fetch categories AND sub-categories from backend
   useEffect(() => {
     let isMounted = true;
     async function loadCategories() {
       try {
-        const res = await fetch(`${API_BASE}/categories?status=Active`);
-        if (res.ok) {
-          const json = await res.json();
+        const [catsRes, facetRes] = await Promise.all([
+          fetch(`${API_BASE}/categories?status=Active`),
+          fetch(`${API_BASE}/products/filters`),
+        ]);
+
+        const allCatNames: string[] = [];
+        const allSubCatNames: string[] = [];
+
+        if (catsRes.ok) {
+          const json = await catsRes.json();
           const items: any[] = json.data || json || [];
           const sorted = items
             .filter((c: any) => {
@@ -347,29 +363,35 @@ function SearchPageInner() {
               const countB = typeof b.itemCount === "number" ? b.itemCount : 0;
               return countB - countA;
             });
-
-          const catNames: string[] = sorted.map((c: any) => (typeof c === "string" ? c : c.name));
-          // Take any 5 categories from backend
-          const fiveCategories = catNames.slice(0, 5);
-          if (isMounted && fiveCategories.length > 0) {
-            setCategories(fiveCategories);
-            return;
-          }
+          sorted.forEach((c: any) => {
+            const name = typeof c === "string" ? c : c.name;
+            if (name) allCatNames.push(name);
+          });
         }
 
-        // Fallback: fetch from /products/filters
-        const facetRes = await fetch(`${API_BASE}/products/filters`);
         if (facetRes.ok) {
           const facetJson = await facetRes.json();
           const facetData = facetJson?.data || facetJson || {};
-          const facetCats: string[] = (facetData.categories || [])
-            .map((c: any) => c.name)
-            .filter((name: string) => Boolean(name) && name !== "All Products" && !name.toLowerCase().includes("test"));
+          // Extra categories from facets
+          (facetData.categories || []).forEach((c: any) => {
+            const name = c.name || c;
+            if (name && !allCatNames.includes(name) && !name.toLowerCase().includes("test")) {
+              allCatNames.push(name);
+            }
+          });
+          // Sub-categories from facets
+          (facetData.subCategories || []).forEach((s: any) => {
+            const name = typeof s === "string" ? s : s.name || s;
+            if (name && !name.toLowerCase().includes("test")) {
+              allSubCatNames.push(name);
+            }
+          });
+        }
 
-          const fiveCategories = facetCats.slice(0, 5);
-          if (isMounted && fiveCategories.length > 0) {
-            setCategories(fiveCategories);
-          }
+        if (isMounted) {
+          // Show up to 6 categories as chips
+          setCategories(allCatNames.slice(0, 6));
+          setSubCategories(allSubCatNames);
         }
       } catch {
         /* ignore */
@@ -382,7 +404,52 @@ function SearchPageInner() {
     };
   }, []);
 
-  // 2. Fetch products from MongoDB database based on search query and category
+  // Helper: map raw product from API to BackendProduct shape
+  const mapProduct = (p: any, idx: number): BackendProduct => {
+    const selling =
+      Number(p.sellingPrice) ||
+      Number(p.rawPrice) ||
+      (typeof p.price === "number" ? p.price : 0) ||
+      0;
+    const mrp = Number(p.mrp) || 0;
+
+    let badge: string | null = p.badge || null;
+    if (!badge) {
+      if (mrp > selling && selling > 0) badge = "SALE";
+      else if (p.isNewArrival) badge = "NEW";
+      else if (p.featured) badge = "FEATURED";
+      else if (p.isBestSeller) badge = "BESTSELLER";
+    }
+
+    const mainImg =
+      p.featuredImage ||
+      p.image ||
+      p.img ||
+      (Array.isArray(p.images) && p.images[0]) ||
+      (Array.isArray(p.colourImages) && p.colourImages[0]?.primaryImage) ||
+      "/Categories/product_formal_shirt.jpg";
+
+    return {
+      id: String(p.id || p._id || `item_${idx}`),
+      code: p.productCode || p.sku || `PRD-${idx + 1}`,
+      name: p.productName || p.name || p.title || "Product",
+      price: selling,
+      rawPrice: selling,
+      mrp,
+      category: p.categoryName || (typeof p.category === "string" ? p.category : "Collection"),
+      categoryName: p.categoryName || (typeof p.category === "string" ? p.category : "Collection"),
+      subCategory: p.subCategory || "",
+      brand: p.brand || "",
+      image: mainImg,
+      images: Array.isArray(p.images) ? p.images : [],
+      badge,
+      featured: Boolean(p.featured),
+      isNewArrival: Boolean(p.isNewArrival),
+      isBestSeller: Boolean(p.isBestSeller),
+    };
+  };
+
+  // 2. Smart search: detect if query matches a category or sub-category name
   const loadProducts = useCallback(async (queryStr: string, catStr: string | null) => {
     setLoading(true);
     try {
@@ -390,11 +457,50 @@ function SearchPageInner() {
       params.append("status", "Active");
       params.append("limit", "100");
 
-      if (queryStr.trim()) {
-        params.append("search", queryStr.trim());
-      }
+      const q = queryStr.trim();
+
       if (catStr && catStr !== "All Products") {
+        // Category chip selected: filter by category, plus text search if any
         params.append("category", catStr);
+        if (q) params.append("search", q);
+      } else if (q) {
+        // Check if the query exactly matches a known category (case-insensitive)
+        const matchedCat = categories.find(
+          (c) => c.toLowerCase() === q.toLowerCase()
+        );
+        // Check if the query matches a known sub-category
+        const matchedSub = subCategories.find(
+          (s) => s.toLowerCase() === q.toLowerCase()
+        );
+
+        if (matchedCat) {
+          // Query is a category name → filter by category
+          params.append("category", matchedCat);
+        } else if (matchedSub) {
+          // Query is a sub-category name → filter by sub-category
+          params.append("subCategory", matchedSub);
+        } else {
+          // Partial match: check if query is a substring of a category or sub-category
+          const partialCat = categories.find((c) =>
+            c.toLowerCase().includes(q.toLowerCase()) ||
+            q.toLowerCase().includes(c.toLowerCase())
+          );
+          const partialSub = subCategories.find((s) =>
+            s.toLowerCase().includes(q.toLowerCase()) ||
+            q.toLowerCase().includes(s.toLowerCase())
+          );
+
+          if (partialCat && q.length >= 3) {
+            // Likely searching for a category
+            params.append("category", partialCat);
+          } else if (partialSub && q.length >= 3) {
+            // Likely searching for a sub-category
+            params.append("subCategory", partialSub);
+          } else {
+            // Generic product text search
+            params.append("search", q);
+          }
+        }
       }
 
       const res = await fetch(`${API_BASE}/products?${params.toString()}`);
@@ -402,62 +508,14 @@ function SearchPageInner() {
       const json = await res.json();
 
       const rawItems: any[] = json.data || json.products || [];
-      const mapped: BackendProduct[] = rawItems.map((p: any, idx: number) => {
-        const selling =
-          Number(p.sellingPrice) ||
-          Number(p.rawPrice) ||
-          (typeof p.price === "number" ? p.price : 0) ||
-          0;
-        const mrp = Number(p.mrp) || 0;
-
-        let badge: string | null = p.badge || null;
-        if (!badge) {
-          if (mrp > selling && selling > 0) {
-            badge = "SALE";
-          } else if (p.isNewArrival) {
-            badge = "NEW";
-          } else if (p.featured) {
-            badge = "FEATURED";
-          } else if (p.isBestSeller) {
-            badge = "BESTSELLER";
-          }
-        }
-
-        const mainImg =
-          p.featuredImage ||
-          p.image ||
-          p.img ||
-          (Array.isArray(p.images) && p.images[0]) ||
-          (Array.isArray(p.colourImages) && p.colourImages[0]?.primaryImage) ||
-          "/Categories/product_formal_shirt.jpg";
-
-        return {
-          id: String(p.id || p._id || `item_${idx}`),
-          code: p.productCode || p.sku || `PRD-${idx + 1}`,
-          name: p.productName || p.name || p.title || "Product",
-          price: selling,
-          rawPrice: selling,
-          mrp,
-          category: p.categoryName || (typeof p.category === "string" ? p.category : "Collection"),
-          categoryName: p.categoryName || (typeof p.category === "string" ? p.category : "Collection"),
-          subCategory: p.subCategory || "",
-          brand: p.brand || "",
-          image: mainImg,
-          images: Array.isArray(p.images) ? p.images : [],
-          badge,
-          featured: Boolean(p.featured),
-          isNewArrival: Boolean(p.isNewArrival),
-          isBestSeller: Boolean(p.isBestSeller),
-        };
-      });
-
-      setProducts(mapped);
+      setProducts(rawItems.map(mapProduct));
     } catch {
       setProducts([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categories, subCategories]);
 
   // Fetch when URL params change
   useEffect(() => {
@@ -573,279 +631,11 @@ function SearchPageInner() {
         </div>
       )}
 
-      {/* ═══════════ HEADER ═══════════ */}
-      <header
-        style={{
-          width: "100%",
-          maxWidth: "1360px",
-          margin: "0 auto",
-          padding: "18px 32px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          boxSizing: "border-box",
-          position: "relative",
-          zIndex: 50,
-        }}
-      >
-        {/* Logo */}
-        <a href="/" style={{ display: "inline-block", flexShrink: 0 }}>
-          <img
-            src="/homepage/logo2_trans.png"
-            alt="Sree Collections"
-            style={{ height: "66px", width: "auto", objectFit: "contain" }}
-          />
-        </a>
-
-        {/* Desktop Nav */}
-        <nav
-          className="srch-desktop-nav"
-          style={{ display: "none", alignItems: "center", gap: "36px" }}
-        >
-          {[
-            { label: "Home", href: "/" },
-            { label: "About", href: "/about" },
-            { label: "Categories", href: "/categories" },
-          ].map(({ label, href }) => (
-            <a
-              key={label}
-              href={href}
-              className="srch-nav-link"
-              style={{
-                fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: "17px",
-                fontWeight: 700,
-                color: "#5A2035",
-                textDecoration: "none",
-                transition: "opacity 0.2s",
-              }}
-            >
-              {label}
-            </a>
-          ))}
-
-          <a
-            href="/contact"
-            className="srch-contact-btn"
-            style={{
-              backgroundColor: "#BB8E43",
-              color: "#FFFFFF",
-              fontFamily: "'Playfair Display', Georgia, serif",
-              fontSize: "12px",
-              fontWeight: 700,
-              letterSpacing: "1px",
-              textTransform: "uppercase",
-              padding: "11px 26px",
-              borderRadius: "999px",
-              textDecoration: "none",
-              boxShadow: "0 4px 14px rgba(187,142,67,0.25)",
-              transition: "all 0.2s ease",
-            }}
-          >
-            Contact Us
-          </a>
-
-          {/* Search Icon — active on this page */}
-          <button
-            aria-label="Search"
-            onClick={() => inputRef.current?.focus()}
-            style={{
-              color: "#BB8E43",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              padding: "4px",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <FiSearch size={21} strokeWidth={2.5} />
-          </button>
-
-          {/* Cart Icon */}
-          <a
-            href="/cart"
-            aria-label="Cart"
-            style={{
-              color: "#5A2035",
-              display: "flex",
-              alignItems: "center",
-              padding: "4px",
-              position: "relative",
-              textDecoration: "none",
-            }}
-          >
-            <FiShoppingCart size={21} />
-            {cartCount > 0 && (
-              <span
-                style={{
-                  position: "absolute",
-                  top: "-4px",
-                  right: "-8px",
-                  backgroundColor: "#BB8E43",
-                  color: "#FFFFFF",
-                  fontSize: "11px",
-                  fontWeight: 700,
-                  width: "18px",
-                  height: "18px",
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  boxShadow: "0 2px 6px rgba(187,142,67,0.4)",
-                }}
-              >
-                {cartCount}
-              </span>
-            )}
-          </a>
-        </nav>
-
-        {/* Mobile Right Actions: Cart + Hamburger */}
-        <div
-          className="mobile-header-actions"
-          style={{
-            display: "none",
-            alignItems: "center",
-            gap: "8px",
-          }}
-        >
-          <a
-            href="/cart"
-            aria-label="Cart"
-            style={{
-              color: "#5A2035",
-              display: "flex",
-              alignItems: "center",
-              padding: "6px",
-              position: "relative",
-              textDecoration: "none",
-            }}
-          >
-            <FiShoppingCart size={21} />
-            {cartCount > 0 && (
-              <span
-                style={{
-                  position: "absolute",
-                  top: "-2px",
-                  right: "-4px",
-                  backgroundColor: "#BB8E43",
-                  color: "#FFFFFF",
-                  fontSize: "10px",
-                  fontWeight: 700,
-                  width: "17px",
-                  height: "17px",
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  boxShadow: "0 2px 6px rgba(187,142,67,0.4)",
-                }}
-              >
-                {cartCount}
-              </span>
-            )}
-          </a>
-
-          <button
-            className="srch-hamburger mobile-hamburger"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle navigation"
-            style={{
-              color: "#5A2035",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              padding: "6px",
-            }}
-          >
-            {mobileMenuOpen ? <FiX size={25} /> : <FiMenu size={25} />}
-          </button>
-        </div>
-      </header>
-
-      {/* Mobile Nav Overlay */}
-      {mobileMenuOpen && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            backgroundColor: "rgba(0,0,0,0.45)",
-            zIndex: 200,
-            display: "flex",
-            justifyContent: "flex-end",
-          }}
-          onClick={() => setMobileMenuOpen(false)}
-        >
-          <div
-            style={{
-              width: "280px",
-              height: "100%",
-              backgroundColor: "#FAF6EE",
-              padding: "28px 24px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "20px",
-              boxShadow: "-4px 0 20px rgba(0,0,0,0.15)",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <img
-                src="/homepage/logo2_trans.png"
-                alt="Logo"
-                style={{ height: "48px" }}
-              />
-              <button
-                onClick={() => setMobileMenuOpen(false)}
-                style={{ background: "none", border: "none", cursor: "pointer" }}
-              >
-                <FiX size={22} color="#5A2035" />
-              </button>
-            </div>
-            <nav
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "18px",
-                marginTop: "10px",
-              }}
-            >
-              {[
-                { label: "Home", href: "/" },
-                { label: "About", href: "/about" },
-                { label: "Categories", href: "/categories" },
-                { label: "Cart", href: "/cart" },
-                { label: "Contact Us", href: "/contact" },
-              ].map(({ label, href }) => (
-                <a
-                  key={label}
-                  href={href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  style={{
-                    fontSize: "17px",
-                    fontFamily: "'Playfair Display', Georgia, serif",
-                    fontWeight: 500,
-                    color: "#3D3028",
-                    textDecoration: "none",
-                  }}
-                >
-                  {label}
-                </a>
-              ))}
-            </nav>
-          </div>
-        </div>
-      )}
+      {/* Global SiteHeader is handled by layout.tsx */}
 
       {/* ═══════════ HERO SEARCH SECTION ═══════════ */}
       <section
+        className="srch-hero-section"
         style={{
           width: "100%",
           maxWidth: "860px",
@@ -859,7 +649,7 @@ function SearchPageInner() {
         <h1
           style={{
             fontFamily: "'Playfair Display', Georgia, serif",
-            fontSize: "clamp(26px, 4.5vw, 44px)",
+            fontSize: "clamp(24px, 4.5vw, 42px)",
             fontWeight: 700,
             color: "#5A2035",
             lineHeight: 1.25,
@@ -878,7 +668,7 @@ function SearchPageInner() {
             fontSize: "14px",
             color: "#8A7B6F",
             lineHeight: 1.65,
-            margin: "0 0 32px 0",
+            margin: "0 0 28px 0",
             maxWidth: "540px",
             marginLeft: "auto",
             marginRight: "auto",
@@ -891,38 +681,46 @@ function SearchPageInner() {
         {/* ── Search Bar ── */}
         <form
           onSubmit={handleSearch}
+          className="srch-hero-form"
           style={{
             display: "flex",
             alignItems: "center",
             gap: "0",
             maxWidth: "680px",
+            width: "100%",
             margin: "0 auto 28px auto",
             boxShadow: "0 6px 26px rgba(90,32,53,0.08)",
             borderRadius: "16px",
             overflow: "hidden",
             border: "1.5px solid #E4D7C8",
             backgroundColor: "#FFFFFF",
+            boxSizing: "border-box",
           }}
         >
           <div
+            className="srch-input-wrapper"
             style={{
               display: "flex",
               alignItems: "center",
               flex: 1,
+              minWidth: 0,
               padding: "0 20px",
               gap: "12px",
+              boxSizing: "border-box",
             }}
           >
-            <FiSearch size={20} color="#BB8E43" strokeWidth={2.2} />
+            <FiSearch size={20} color="#BB8E43" strokeWidth={2.2} style={{ flexShrink: 0 }} />
             <input
               ref={inputRef}
               type="text"
               id="srch-input"
-              placeholder="Search"
+              placeholder="Search by product, category or type..."
               value={inputVal}
               onChange={(e) => setInputVal(e.target.value)}
               style={{
                 flex: 1,
+                minWidth: 0,
+                width: "100%",
                 border: "none",
                 outline: "none",
                 backgroundColor: "transparent",
@@ -947,6 +745,7 @@ function SearchPageInner() {
                   padding: "6px",
                   borderRadius: "50%",
                   transition: "background 0.2s",
+                  flexShrink: 0,
                 }}
                 aria-label="Clear search"
               >
@@ -972,6 +771,7 @@ function SearchPageInner() {
               whiteSpace: "nowrap",
               transition: "background 0.2s ease",
               flexShrink: 0,
+              boxSizing: "border-box",
             }}
             className="srch-submit-btn"
           >
@@ -1081,26 +881,21 @@ function SearchPageInner() {
             style={{
               textAlign: "center",
               padding: "70px 20px",
-              color: "#5A2035",
               display: "flex",
-              flexDirection: "column",
+              justifyContent: "center",
               alignItems: "center",
-              gap: "14px",
             }}
           >
             <div
               style={{
-                width: "36px",
-                height: "36px",
+                width: "40px",
+                height: "40px",
                 border: "3px solid #E8D9C5",
                 borderTopColor: "#BB8E43",
                 borderRadius: "50%",
                 animation: "srchSpin 0.8s linear infinite",
               }}
             />
-            <span style={{ fontSize: "14px", fontWeight: 500 }}>
-              Searching products in database...
-            </span>
           </div>
         )}
 
@@ -1196,13 +991,37 @@ function SearchPageInner() {
           .srch-footer-contact { align-items: flex-start !important; }
         }
         @media (max-width: 640px) {
-          .srch-masonry-grid { columns: 2 !important; column-gap: 14px !important; }
-          main { padding: 0 16px 60px !important; }
-          section { padding: 0 16px !important; }
-          .srch-chip { font-size: 12px !important; padding: 7px 14px !important; }
+          .srch-hero-section { padding: 0 16px !important; margin: 16px auto 26px auto !important; }
+          .srch-hero-form { border-radius: 14px !important; margin-bottom: 20px !important; }
+          .srch-input-wrapper { padding: 0 12px !important; gap: 8px !important; }
+          .srch-input-wrapper input { font-size: 13.5px !important; padding: 12px 0 !important; }
+          .srch-submit-btn { padding: 12px 18px !important; font-size: 12.5px !important; letter-spacing: 0.5px !important; }
+          .srch-masonry-grid { columns: 2 !important; column-gap: 10px !important; }
+          main { padding: 0 12px 60px !important; }
+          section { padding: 0 12px !important; }
+          .srch-chip { font-size: 11px !important; padding: 6px 12px !important; }
+          .srch-card { margin-bottom: 10px !important; border-radius: 12px !important; }
+          .srch-card-details { padding: 8px 8px 10px !important; }
+          .srch-card-category { font-size: 9.5px !important; margin-bottom: 2px !important; }
+          .srch-card-title { font-size: 12px !important; min-height: 30px !important; line-height: 1.25 !important; margin-bottom: 5px !important; }
+          .srch-card-price { font-size: 12.5px !important; }
+          .srch-card-mrp { font-size: 10px !important; }
+          .srch-add-btn { padding: 4px 7px !important; font-size: 9.5px !important; gap: 3px !important; }
+          .srch-wish-btn { width: 26px !important; height: 26px !important; top: 5px !important; right: 5px !important; }
         }
         @media (max-width: 420px) {
-          .srch-masonry-grid { columns: 1 !important; }
+          .srch-hero-section { padding: 0 12px !important; }
+          .srch-input-wrapper { padding: 0 8px !important; gap: 6px !important; }
+          .srch-input-wrapper input { font-size: 13px !important; }
+          .srch-submit-btn { padding: 10px 14px !important; font-size: 11.5px !important; }
+          .srch-masonry-grid { columns: 2 !important; column-gap: 8px !important; }
+          main { padding: 0 10px 60px !important; }
+          .srch-card { margin-bottom: 8px !important; }
+          .srch-card-details { padding: 6px 6px 8px !important; }
+          .srch-card-title { font-size: 11px !important; line-height: 1.2 !important; min-height: 28px !important; }
+          .srch-card-price { font-size: 11.5px !important; }
+          .srch-card-mrp { font-size: 9.5px !important; }
+          .srch-add-btn { padding: 3px 6px !important; font-size: 9px !important; }
         }
 
         .srch-nav-link:hover { opacity: 0.72; }

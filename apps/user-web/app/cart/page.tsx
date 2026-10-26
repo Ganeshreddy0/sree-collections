@@ -141,222 +141,10 @@ export default function CartPage() {
         paddingBottom: "80px",
       }}
     >
-      {/* =========================================================================
-          1. HEADER / NAVBAR — Identical to Home Page (Sticky / Fixed)
-         ========================================================================= */}
-      <div style={{ width: "100%", display: "flex", justifyContent: "center", position: "sticky", top: 0, zIndex: 100, backgroundColor: "#FCF8F2" }}>
-        <header
-          style={{
-            width: "100%",
-            maxWidth: "1360px",
-            minHeight: "95px",
-            margin: "0 auto",
-            padding: "0 20px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            boxSizing: "border-box",
-            position: "relative",
-            zIndex: 50,
-          }}
-        >
-          {/* Brand Logo */}
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <Link href="/" style={{ display: "inline-block" }}>
-              <img
-                src="/homepage/logo2_trans.png"
-                alt="Sree Collections"
-                style={{
-                  height: "72px",
-                  width: "auto",
-                  objectFit: "contain",
-                  maxWidth: "340px",
-                  display: "block",
-                }}
-              />
-            </Link>
-          </div>
-
-          {/* Desktop Navigation */}
-          <nav
-            className="cart-desktop-nav"
-            style={{ display: "none", alignItems: "center", gap: "36px" }}
-          >
-            <NavLink href="/">Home</NavLink>
-            <NavLink href="/about">About</NavLink>
-            <NavLink href="/categories">Categories</NavLink>
-
-            {/* CONTACT US Pill Button */}
-            <Link
-              href="/contact"
-              className="cart-contact-btn primary-btn"
-              style={{
-                background: "#BA8E43",
-                color: "#FFFFFF",
-                fontFamily: "var(--font-serif)",
-                fontSize: "12.5px",
-                fontWeight: 700,
-                letterSpacing: "0.8px",
-                textTransform: "uppercase",
-                padding: "11px 28px",
-                borderRadius: "9999px",
-                boxShadow: "0 2px 10px rgba(186, 142, 67, 0.25)",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transition: "all 0.25s ease",
-                textDecoration: "none",
-              }}
-            >
-              CONTACT US
-            </Link>
-
-            {/* Search Icon */}
-            <Link
-              href="/search"
-              aria-label="Search"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#5A2035",
-                padding: "4px",
-                transition: "transform 0.2s ease",
-              }}
-            >
-              <FiSearch size={22} strokeWidth={2} />
-            </Link>
-
-            {/* Cart Icon */}
-            <Link
-              href="/cart"
-              aria-label="Shopping Cart"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#5A2035",
-                padding: "4px",
-                transition: "transform 0.2s ease",
-                position: "relative",
-                borderBottom: "2.5px solid #5A2035",
-                paddingBottom: "3px",
-              }}
-            >
-              <FiShoppingCart size={22} strokeWidth={2} />
-              {items.length > 0 && (
-                <span
-                  style={{
-                    position: "absolute",
-                    top: "-6px",
-                    right: "-10px",
-                    backgroundColor: "#BA8E43",
-                    color: "#FFFFFF",
-                    fontSize: "10px",
-                    fontWeight: 700,
-                    width: "18px",
-                    height: "18px",
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                  }}
-                >
-                  {items.reduce((acc, it) => acc + (it.quantity || 1), 0)}
-                </span>
-              )}
-            </Link>
-          </nav>
-
-          {/* Mobile Right Actions: Search + Hamburger */}
-          <div
-            style={{
-              display: "none",
-              alignItems: "center",
-              gap: "8px",
-            }}
-            className="mobile-header-actions"
-          >
-            <a
-              href="/search"
-              aria-label="Search"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#5A2035",
-                padding: "6px",
-              }}
-            >
-              <FiSearch size={21} strokeWidth={2} />
-            </a>
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Toggle menu"
-              style={{
-                padding: "6px",
-                color: "#2F2C24",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-              }}
-              className="cart-hamburger mobile-hamburger"
-            >
-              {mobileMenuOpen ? <FiX size={25} /> : <FiMenu size={25} />}
-            </button>
-          </div>
-        </header>
-      </div>
-
-      {/* Mobile Drawer */}
-      {mobileMenuOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100vh",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            zIndex: 200,
-            display: "flex",
-            justifyContent: "flex-end",
-          }}
-          onClick={() => setMobileMenuOpen(false)}
-        >
-          <div
-            style={{
-              width: "290px",
-              height: "100%",
-              backgroundColor: "#FCF8F2",
-              padding: "30px 24px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "20px",
-              boxShadow: "-4px 0 20px rgba(0,0,0,0.15)",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <img src="/homepage/logo2_trans.png" alt="Logo" style={{ height: "48px" }} />
-              <button onClick={() => setMobileMenuOpen(false)} style={{ background: "none", border: "none", cursor: "pointer" }}>
-                <FiX size={24} />
-              </button>
-            </div>
-            <nav style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "20px" }}>
-              <Link href="/" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 600, color: "#5A2035", fontFamily: "var(--font-serif)" }}>Home</Link>
-              <Link href="/about" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500, color: "#5A2035", fontFamily: "var(--font-serif)" }}>About</Link>
-              <Link href="/categories" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500, color: "#5A2035", fontFamily: "var(--font-serif)" }}>Categories</Link>
-              <Link href="/contact" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500, color: "#5A2035", fontFamily: "var(--font-serif)" }}>Contact Us</Link>
-              <Link href="/cart" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 700, color: "#BA8E43", fontFamily: "var(--font-serif)" }}>Cart ({items.reduce((acc, it) => acc + (it.quantity || 1), 0)})</Link>
-            </nav>
-          </div>
-        </div>
-      )}
+      {/* Global SiteHeader is handled by layout.tsx */}
 
       {/* Main Container */}
-      <main style={{ maxWidth: "1200px", margin: "28px auto 0 auto", padding: "0 24px" }}>
+      <main className="cart-main-content" style={{ maxWidth: "1200px", margin: "28px auto 0 auto", padding: "0 24px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
           <Link
             href="/"
@@ -378,6 +166,7 @@ export default function CartPage() {
           </div>
         </div>
         <h2
+          className="cart-page-title"
           style={{
             fontFamily: "'Playfair Display', Georgia, serif",
             fontSize: "30px",
@@ -446,6 +235,7 @@ export default function CartPage() {
           >
             {/* Left Column: Items */}
             <div
+              className="cart-items-container"
               style={{
                 backgroundColor: "#FFFFFF",
                 borderRadius: "18px",
@@ -469,7 +259,9 @@ export default function CartPage() {
                     paddingBottom: idx !== items.length - 1 ? "20px" : "0",
                   }}
                 >
+                  {/* Left: Product Image */}
                   <div
+                    className="cart-item-img-box"
                     style={{
                       width: "80px",
                       height: "100px",
@@ -489,20 +281,43 @@ export default function CartPage() {
                     />
                   </div>
 
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <h4
-                      style={{
-                        fontFamily: "'Playfair Display', Georgia, serif",
-                        fontSize: "17px",
-                        fontWeight: 700,
-                        color: "#5D2030",
-                        margin: "0 0 6px 0",
-                      }}
-                    >
-                      {item.name || item.title || "Saree"}
-                    </h4>
+                  {/* Right: Product Details */}
+                  <div className="cart-item-info" style={{ flex: 1, minWidth: 0 }}>
+                    <div className="cart-item-header-row">
+                      <h4
+                        className="cart-item-title"
+                        style={{
+                          fontFamily: "'Playfair Display', Georgia, serif",
+                          fontSize: "17px",
+                          fontWeight: 700,
+                          color: "#5D2030",
+                          margin: "0 0 6px 0",
+                        }}
+                      >
+                        {item.name || item.title || "Saree"}
+                      </h4>
 
-                    <div style={{ display: "flex", gap: "10px", fontSize: "13px", color: "#7A6858", marginBottom: "10px" }}>
+                      {/* Mobile Delete Button */}
+                      <button
+                        type="button"
+                        onClick={() => removeItem(idx)}
+                        title="Remove Item"
+                        className="cart-item-delete-btn mobile-delete-btn"
+                        style={{
+                          color: "#A83232",
+                          padding: "4px",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          background: "transparent",
+                          border: "none",
+                        }}
+                      >
+                        <FiTrash2 size={17} />
+                      </button>
+                    </div>
+
+                    <div className="cart-item-variants" style={{ display: "flex", flexWrap: "wrap", gap: "10px", fontSize: "13px", color: "#7A6858", marginBottom: "8px" }}>
                       {item.colour && (
                         <span
                           style={{
@@ -519,7 +334,9 @@ export default function CartPage() {
                       {item.size && item.size !== "Free Size" && <span>Size: {item.size}</span>}
                     </div>
 
+                    {/* Desktop Price */}
                     <div
+                      className="cart-item-price desktop-price"
                       style={{
                         fontFamily: "'Playfair Display', Georgia, serif",
                         fontWeight: 700,
@@ -529,11 +346,73 @@ export default function CartPage() {
                     >
                       ₹{item.price.toLocaleString("en-IN")}
                     </div>
+
+                    {/* Mobile Bottom Row: Price + Mobile Stepper */}
+                    <div className="cart-item-bottom-row">
+                      <div
+                        className="cart-item-price mobile-price"
+                        style={{
+                          fontFamily: "'Playfair Display', Georgia, serif",
+                          fontWeight: 700,
+                          fontSize: "16px",
+                          color: "#BB8E43",
+                        }}
+                      >
+                        ₹{item.price.toLocaleString("en-IN")}
+                      </div>
+
+                      <div className="cart-item-qty-stepper mobile-stepper">
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(idx, -1)}
+                          style={{
+                            width: "30px",
+                            height: "30px",
+                            borderRadius: "6px",
+                            border: "1px solid #D8CAB8",
+                            backgroundColor: "#FDFAF5",
+                            color: "#5D2030",
+                            fontWeight: 700,
+                            fontSize: "15px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "pointer",
+                          }}
+                        >
+                          -
+                        </button>
+                        <span style={{ fontSize: "14px", fontWeight: 700, minWidth: "18px", textAlign: "center", color: "#5D2030" }}>
+                          {item.quantity || 1}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(idx, 1)}
+                          style={{
+                            width: "30px",
+                            height: "30px",
+                            borderRadius: "6px",
+                            border: "1px solid #D8CAB8",
+                            backgroundColor: "#FDFAF5",
+                            color: "#5D2030",
+                            fontWeight: 700,
+                            fontSize: "15px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "pointer",
+                          }}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Quantity adjustment */}
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  {/* Desktop Quantity adjustment */}
+                  <div className="cart-item-qty-stepper desktop-qty-stepper" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                     <button
+                      type="button"
                       onClick={() => updateQuantity(idx, -1)}
                       style={{
                         width: "32px",
@@ -547,6 +426,7 @@ export default function CartPage() {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
+                        cursor: "pointer",
                       }}
                     >
                       -
@@ -555,6 +435,7 @@ export default function CartPage() {
                       {item.quantity || 1}
                     </span>
                     <button
+                      type="button"
                       onClick={() => updateQuantity(idx, 1)}
                       style={{
                         width: "32px",
@@ -568,22 +449,27 @@ export default function CartPage() {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
+                        cursor: "pointer",
                       }}
                     >
                       +
                     </button>
                   </div>
 
-                  {/* Delete Item */}
+                  {/* Desktop Delete Item */}
                   <button
+                    type="button"
                     onClick={() => removeItem(idx)}
                     title="Remove Item"
+                    className="cart-item-delete-btn desktop-delete-btn"
                     style={{
                       color: "#A83232",
                       padding: "8px",
                       cursor: "pointer",
                       display: "flex",
                       alignItems: "center",
+                      background: "transparent",
+                      border: "none",
                     }}
                   >
                     <FiTrash2 size={18} />
@@ -594,6 +480,7 @@ export default function CartPage() {
 
             {/* Right Column: Order Summary */}
             <div
+              className="cart-summary-card"
               style={{
                 backgroundColor: "#FFFFFF",
                 borderRadius: "18px",
@@ -719,36 +606,168 @@ export default function CartPage() {
             display: flex !important;
           }
         }
+        @media (min-width: 769px) {
+          .desktop-qty-stepper {
+            display: flex !important;
+          }
+          .desktop-delete-btn {
+            display: flex !important;
+          }
+          .desktop-price {
+            display: block !important;
+          }
+          .mobile-delete-btn {
+            display: none !important;
+          }
+          .cart-item-bottom-row {
+            display: none !important;
+          }
+        }
         @media (max-width: 768px) {
-          .cart-main-grid {
-            grid-template-columns: 1fr !important;
+          .desktop-qty-stepper {
+            display: none !important;
+          }
+          .desktop-delete-btn {
+            display: none !important;
+          }
+          .desktop-price {
+            display: none !important;
+          }
+          .mobile-delete-btn {
+            display: flex !important;
+            padding: 2px 4px !important;
           }
           .cart-main-content {
             padding: 0 16px !important;
-            margin-top: 20px !important;
+            margin-top: 14px !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            overflow-x: hidden !important;
           }
-        }
-        @media (max-width: 600px) {
-          .cart-item-row {
-            flex-wrap: wrap !important;
-            gap: 12px !important;
+          .cart-page-title {
+            font-size: 24px !important;
+            margin-bottom: 18px !important;
           }
-          .cart-item-row > div:first-child {
-            width: 72px !important;
-            height: 90px !important;
-          }
-          .cart-item-qty-controls {
+          .cart-main-grid {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 20px !important;
             width: 100% !important;
-            justify-content: flex-start !important;
+          }
+          .cart-items-container {
+            padding: 16px !important;
+            border-radius: 16px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+          }
+          .cart-summary-card {
+            padding: 20px 16px !important;
+            border-radius: 16px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+          }
+          .cart-item-row {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: flex-start !important;
+            gap: 14px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            padding-bottom: 16px !important;
+          }
+          .cart-item-img-box {
+            width: 86px !important;
+            height: 108px !important;
+            border-radius: 10px !important;
+            flex-shrink: 0 !important;
+          }
+          .cart-item-info {
+            flex: 1 !important;
+            min-width: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+          }
+          .cart-item-header-row {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: flex-start !important;
+            gap: 8px !important;
+            width: 100% !important;
+            margin-bottom: 4px !important;
+          }
+          .cart-item-title {
+            font-size: 15px !important;
+            line-height: 1.35 !important;
+            margin: 0 !important;
+            word-break: break-word !important;
+            overflow-wrap: break-word !important;
+          }
+          .cart-item-variants {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 6px !important;
+            margin-bottom: 8px !important;
+            font-size: 12px !important;
+          }
+          .cart-item-bottom-row {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-top: auto !important;
+            padding-top: 4px !important;
+            width: 100% !important;
+          }
+          .cart-item-price.mobile-price {
+            font-size: 16px !important;
+          }
+          .mobile-stepper {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
           }
         }
         @media (max-width: 480px) {
+          .cart-main-content {
+            padding: 0 12px !important;
+            margin-top: 10px !important;
+          }
+          .cart-page-title {
+            font-size: 21px !important;
+            margin-bottom: 14px !important;
+          }
+          .cart-items-container {
+            padding: 12px !important;
+            border-radius: 14px !important;
+            gap: 14px !important;
+          }
           .cart-item-row {
             gap: 10px !important;
+            padding-bottom: 14px !important;
           }
-          .cart-item-row > div:first-child {
-            width: 64px !important;
-            height: 80px !important;
+          .cart-item-img-box {
+            width: 74px !important;
+            height: 94px !important;
+            border-radius: 8px !important;
+          }
+          .cart-item-title {
+            font-size: 13.5px !important;
+            line-height: 1.3 !important;
+          }
+          .cart-item-price.mobile-price {
+            font-size: 15px !important;
+          }
+          .mobile-stepper button {
+            width: 27px !important;
+            height: 27px !important;
+            font-size: 14px !important;
+          }
+          .mobile-stepper span {
+            font-size: 13px !important;
+            min-width: 16px !important;
+          }
+          .cart-summary-card {
+            padding: 16px 12px !important;
+            border-radius: 14px !important;
           }
         }
         .cart-nav-link:hover {

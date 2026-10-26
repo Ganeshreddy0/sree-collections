@@ -340,7 +340,7 @@ function getItemGroupInfo(item: HomepageItem, sectionId: string): {
   const id = (item.itemId || "").toLowerCase();
   const img = (item.imageUrl || "").toLowerCase();
 
-  if (id.startsWith("social-") || ["instagram", "facebook", "whatsapp", "pinterest", "twitter", "youtube"].includes(img)) {
+  if (id.startsWith("social-") || ["instagram", "facebook", "whatsapp", "pinterest", "twitter", "youtube", "google"].includes(img) || item.metadata?.type === "social") {
     return {
       groupKey: "social",
       groupLabel: "Social Link",
@@ -348,7 +348,7 @@ function getItemGroupInfo(item: HomepageItem, sectionId: string): {
       badgeColor: "#9D174D",
     };
   }
-  if (id.startsWith("nav-")) {
+  if (id.startsWith("nav-") || item.metadata?.type === "nav-link") {
     return {
       groupKey: "nav",
       groupLabel: "Navigation",
@@ -1117,6 +1117,7 @@ function SectionEditor({
   useEffect(() => { setLocal({ ...section }); }, [section]);
 
   const isSpotlight = local.sectionId.startsWith("spotlight-");
+  const isFooter = local.sectionId === "footer";
 
   const handleSave = async () => {
     setSaving(true);
@@ -1317,122 +1318,253 @@ function SectionEditor({
         </div>
       )}
 
-      {/* Form Fields Grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 24px" }}>
-        <Field
-          label={isSpotlight ? "Category / Headline Title" : "Title / Heading"}
-          value={local.title}
-          onChange={v => set("title", v)}
-          placeholder="Main heading text"
-        />
-        <Field
-          label={isSpotlight ? "Category Subtitle (e.g. Collections)" : "Subtitle"}
-          value={local.subtitle}
-          onChange={v => set("subtitle", v)}
-          placeholder="Secondary heading or label"
-        />
-        <Field
-          label={isSpotlight ? "Tagline / Badge Text" : "Badge / Label Text"}
-          value={local.badgeText}
-          onChange={v => set("badgeText", v)}
-          placeholder="e.g. We consider your look and comfort..."
-        />
-        <Field
-          label="Display Order (Sorting on Page)"
-          value={String(local.displayOrder ?? "")}
-          onChange={v => set("displayOrder", parseInt(v) || 0)}
-          type="number"
-          placeholder="1-12"
-        />
-        <Field
-          label={isSpotlight ? "Button Text (e.g. Explore)" : "Primary CTA Text"}
-          value={local.ctaText}
-          onChange={v => set("ctaText", v)}
-          placeholder="Explore"
-        />
-        <Field
-          label={isSpotlight ? "Category Redirection Link" : "Primary CTA Link"}
-          value={local.ctaLink}
-          onChange={v => set("ctaLink", v)}
-          placeholder="/categories?category=Casual+Wear"
-        />
-        {!isSpotlight && (
-          <>
-            <Field label="Secondary CTA Text" value={local.secondaryCtaText} onChange={v => set("secondaryCtaText", v)} placeholder="EXPLORE MORE" />
-            <Field label="Secondary CTA Link" value={local.secondaryCtaLink} onChange={v => set("secondaryCtaLink", v)} placeholder="#categories" />
-          </>
-        )}
-      </div>
+      {/* Content Form Fields */}
+      {isFooter ? (
+        <div>
+          {/* Footer Guidance Banner */}
+          <div style={{ background: "linear-gradient(135deg, #FBF3E2 0%, #F5E4C4 100%)", border: "1px solid #DFBE7E", borderRadius: 10, padding: "14px 18px", marginBottom: 20 }}>
+            <strong style={{ color: "#5A2035", fontSize: 14, display: "flex", alignItems: "center", gap: 6 }}>
+              <span>🏛️</span> Storefront Footer &amp; Contact Management
+            </strong>
+            <p style={{ margin: "4px 0 0 0", fontSize: 12.5, color: "#685F53", lineHeight: 1.5 }}>
+              Manage your brand logo, business address, contact numbers, email, copyright notice, social media icons, and bottom policy navigation links. Changes saved here reflect immediately on the storefront.
+            </p>
+          </div>
 
-      <Field
-        label={isSpotlight ? "Primary Description Paragraph (Header Row)" : "Description / Body Text"}
-        value={local.description}
-        onChange={v => set("description", v)}
-        multiline
-        placeholder="Supporting text shown in this section"
-      />
-
-      {isSpotlight && (
-        <Field
-          label="Secondary Description Paragraph (Content Row next to button/cards)"
-          value={((local.settings?.secondaryDescription as string) || "")}
-          onChange={v => set("settings", { ...(local.settings || {}), secondaryDescription: v })}
-          multiline
-          placeholder="Secondary description shown beneath the card or button..."
-        />
-      )}
-
-      {/* Media Section */}
-      <div style={{ background: "#F7F1E8", borderRadius: 12, padding: 18, border: "1px solid #E5D7C5", marginBottom: 20 }}>
-        <h4 style={{ margin: "0 0 16px 0", fontSize: 14, fontWeight: 700, color: "#5A2035" }}>
-          {isSpotlight ? "Spotlight Media & Cards" : "Media & Images"}
-        </h4>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 24px" }}>
-          <ImageUploader
-            label={isSpotlight ? "Photo 1 (Main Card / Overlap Back)" : "Primary Media (Image / Logo)"}
-            value={local.mediaUrl}
-            onChange={v => set("mediaUrl", v)}
-            hint={isSpotlight ? "Main tall card or back overlapping photo" : "Main image, hero image, logo, or delivery truck"}
-          />
-          <ImageUploader
-            label={isSpotlight ? "Photo 2 (Overlapping Front/Back Photo)" : "Secondary Media"}
-            value={local.secondaryMediaUrl}
-            onChange={v => set("secondaryMediaUrl", v)}
-            hint={isSpotlight ? "Second photo for dual overlapping stack" : "Second image, hero column 2, pill image 2, etc."}
-          />
-          <Field label="Primary Media Alt Text" value={local.mediaAlt} onChange={v => set("mediaAlt", v)} placeholder="Accessible alt description" />
-          <Field label="Secondary Media Alt Text" value={local.secondaryMediaAlt} onChange={v => set("secondaryMediaAlt", v)} placeholder="Accessible alt description" />
-
-          {/* Tertiary Media */}
-          {(isSpotlight || local.tertiaryMediaUrl !== undefined) && (
-            <>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
+            {/* Brand Logo Card */}
+            <div style={{ background: "#F7F1E8", borderRadius: 12, padding: 18, border: "1px solid #E5D7C5" }}>
+              <h4 style={{ margin: "0 0 14px 0", fontSize: 14, fontWeight: 700, color: "#5A2035" }}>
+                Brand Logo &amp; Display Order
+              </h4>
               <ImageUploader
-                label={isSpotlight ? "Photo 3 (Front Overlap Photo for Layout A)" : "Tertiary Media (Hero Col 3, etc.)"}
-                value={local.tertiaryMediaUrl}
-                onChange={v => set("tertiaryMediaUrl", v)}
-                hint={isSpotlight ? "Front overlapping card in Layout A (e.g. sneakers / detail photo)" : "Third image slot (e.g. hero column 3)"}
+                label="Footer Brand Logo"
+                value={local.mediaUrl}
+                onChange={v => set("mediaUrl", v)}
+                hint="Upload or specify URL for the footer transparent logo (e.g. /homepage/logo2_trans.png)"
               />
-              <Field label="Tertiary Media Alt Text" value={local.tertiaryMediaAlt} onChange={v => set("tertiaryMediaAlt", v)} placeholder="Accessible alt description" />
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Settings (JSON) for non-spotlight advanced config */}
-      {!isSpotlight && Object.keys(local.settings || {}).length > 0 && (
-        <div style={{ background: "#F7F1E8", borderRadius: 12, padding: 18, border: "1px solid #E5D7C5", marginBottom: 20 }}>
-          <h4 style={{ margin: "0 0 10px 0", fontSize: 14, fontWeight: 700, color: "#5A2035" }}>Advanced Settings</h4>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 24px" }}>
-            {Object.entries(local.settings || {}).map(([key, val]) => (
               <Field
-                key={key}
-                label={key.replace(/_/g, ' ')}
-                value={String(val)}
-                onChange={v => set("settings", { ...(local.settings || {}), [key]: v })}
+                label="Logo Alt Description"
+                value={local.mediaAlt}
+                onChange={v => set("mediaAlt", v)}
+                placeholder="Sree Collections"
               />
-            ))}
+              <Field
+                label="Footer Display Order"
+                value={String(local.displayOrder ?? 12)}
+                onChange={v => set("displayOrder", parseInt(v) || 12)}
+                type="number"
+                placeholder="12"
+              />
+            </div>
+
+            {/* Contact Details Card */}
+            <div style={{ background: "#F7F1E8", borderRadius: 12, padding: 18, border: "1px solid #E5D7C5" }}>
+              <h4 style={{ margin: "0 0 14px 0", fontSize: 14, fontWeight: 700, color: "#5A2035" }}>
+                Contact Details &amp; Location
+              </h4>
+              <Field
+                label="Business Address (use newline for 2-line break)"
+                value={String(local.settings?.address || "")}
+                onChange={v => set("settings", { ...(local.settings || {}), address: v })}
+                multiline
+                placeholder="345 Faulconer Drive, Suite 4,&#10;Charlottesville, CA, 12345"
+              />
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 14px" }}>
+                <Field
+                  label="Phone Number"
+                  value={String(local.settings?.phone || "")}
+                  onChange={v => set("settings", { ...(local.settings || {}), phone: v })}
+                  placeholder="+19526830741"
+                />
+                <Field
+                  label="Email Address"
+                  value={String(local.settings?.email || "")}
+                  onChange={v => set("settings", { ...(local.settings || {}), email: v })}
+                  placeholder="Sreecollections007@gmail.com"
+                />
+              </div>
+              <Field
+                label="Copyright Agency / Credit"
+                value={String(local.settings?.copyright || "")}
+                onChange={v => set("settings", { ...(local.settings || {}), copyright: v })}
+                placeholder="kitsacitsolutions"
+              />
+            </div>
+          </div>
+
+          {/* Live Preview Card */}
+          <div style={{ background: "#FCF8F2", borderRadius: 12, padding: "20px 24px", border: "1px solid #DECDBE", marginBottom: 24, boxShadow: "0 2px 8px rgba(93, 32, 48, 0.04)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, borderBottom: "1px solid #DECDBE", paddingBottom: 8 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.7px", color: "#5D2030" }}>
+                Live Footer Preview (Storefront Style)
+              </span>
+              <span style={{ fontSize: 11, color: "#BA8E43", fontWeight: 600 }}>Active Preview</span>
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
+              <div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={local.mediaUrl ? normalizeImageSrc(local.mediaUrl) : "/homepage/logo2_trans.png"}
+                  alt={local.mediaAlt || "Logo"}
+                  style={{ height: 48, width: "auto", objectFit: "contain", display: "block" }}
+                  onError={(e) => { (e.target as HTMLElement).style.display = "none"; }}
+                />
+              </div>
+
+              <div style={{ textAlign: "right", fontSize: 12, color: "#5D2030", lineHeight: 1.5 }}>
+                <div style={{ fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 6 }}>
+                  <span>📍</span>
+                  <span>
+                    {String(local.settings?.address || "345 Faulconer Drive, Suite 4,\nCharlottesville, CA, 12345")
+                      .replace(/<br\s*\/?>/gi, "\n")
+                      .split("\n")
+                      .map((l, i) => (
+                        <React.Fragment key={i}>
+                          {l}
+                          {i === 0 && <br />}
+                        </React.Fragment>
+                      ))}
+                  </span>
+                </div>
+                <div style={{ marginTop: 4, display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 12, fontSize: 11.5 }}>
+                  <span>📞 {String(local.settings?.phone || "+19526830741")}</span>
+                  <span>✉️ {String(local.settings?.email || "Sreecollections007@gmail.com")}</span>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ borderTop: "1px solid #DECDBE", marginTop: 14, paddingTop: 10, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, fontSize: 11, color: "#5D2030" }}>
+              <div style={{ display: "flex", gap: 16, fontWeight: 600, textTransform: "uppercase" }}>
+                {(local.items?.filter(it => it.isActive !== false && (it.metadata?.type === "nav-link" || it.itemId?.startsWith("nav-"))) || []).map(it => (
+                  <span key={it.itemId}>{it.title}</span>
+                ))}
+              </div>
+              <span>Copyright © {new Date().getFullYear()} • {String(local.settings?.copyright || "kitsacitsolutions")}</span>
+            </div>
           </div>
         </div>
+      ) : (
+        <>
+          {/* Form Fields Grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 24px" }}>
+            <Field
+              label={isSpotlight ? "Category / Headline Title" : "Title / Heading"}
+              value={local.title}
+              onChange={v => set("title", v)}
+              placeholder="Main heading text"
+            />
+            <Field
+              label={isSpotlight ? "Category Subtitle (e.g. Collections)" : "Subtitle"}
+              value={local.subtitle}
+              onChange={v => set("subtitle", v)}
+              placeholder="Secondary heading or label"
+            />
+            <Field
+              label={isSpotlight ? "Tagline / Badge Text" : "Badge / Label Text"}
+              value={local.badgeText}
+              onChange={v => set("badgeText", v)}
+              placeholder="e.g. We consider your look and comfort..."
+            />
+            <Field
+              label="Display Order (Sorting on Page)"
+              value={String(local.displayOrder ?? "")}
+              onChange={v => set("displayOrder", parseInt(v) || 0)}
+              type="number"
+              placeholder="1-12"
+            />
+            <Field
+              label={isSpotlight ? "Button Text (e.g. Explore)" : "Primary CTA Text"}
+              value={local.ctaText}
+              onChange={v => set("ctaText", v)}
+              placeholder="Explore"
+            />
+            <Field
+              label={isSpotlight ? "Category Redirection Link" : "Primary CTA Link"}
+              value={local.ctaLink}
+              onChange={v => set("ctaLink", v)}
+              placeholder="/categories?category=Casual+Wear"
+            />
+            {!isSpotlight && (
+              <>
+                <Field label="Secondary CTA Text" value={local.secondaryCtaText} onChange={v => set("secondaryCtaText", v)} placeholder="EXPLORE MORE" />
+                <Field label="Secondary CTA Link" value={local.secondaryCtaLink} onChange={v => set("secondaryCtaLink", v)} placeholder="#categories" />
+              </>
+            )}
+          </div>
+
+          <Field
+            label={isSpotlight ? "Primary Description Paragraph (Header Row)" : "Description / Body Text"}
+            value={local.description}
+            onChange={v => set("description", v)}
+            multiline
+            placeholder="Supporting text shown in this section"
+          />
+
+          {isSpotlight && (
+            <Field
+              label="Secondary Description Paragraph (Content Row next to button/cards)"
+              value={((local.settings?.secondaryDescription as string) || "")}
+              onChange={v => set("settings", { ...(local.settings || {}), secondaryDescription: v })}
+              multiline
+              placeholder="Secondary description shown beneath the card or button..."
+            />
+          )}
+
+          {/* Media Section */}
+          <div style={{ background: "#F7F1E8", borderRadius: 12, padding: 18, border: "1px solid #E5D7C5", marginBottom: 20 }}>
+            <h4 style={{ margin: "0 0 16px 0", fontSize: 14, fontWeight: 700, color: "#5A2035" }}>
+              {isSpotlight ? "Spotlight Media & Cards" : "Media & Images"}
+            </h4>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 24px" }}>
+              <ImageUploader
+                label={isSpotlight ? "Photo 1 (Main Card / Overlap Back)" : "Primary Media (Image / Logo)"}
+                value={local.mediaUrl}
+                onChange={v => set("mediaUrl", v)}
+                hint={isSpotlight ? "Main tall card or back overlapping photo" : "Main image, hero image, logo, or delivery truck"}
+              />
+              <ImageUploader
+                label={isSpotlight ? "Photo 2 (Overlapping Front/Back Photo)" : "Secondary Media"}
+                value={local.secondaryMediaUrl}
+                onChange={v => set("secondaryMediaUrl", v)}
+                hint={isSpotlight ? "Second photo for dual overlapping stack" : "Second image, hero column 2, pill image 2, etc."}
+              />
+              <Field label="Primary Media Alt Text" value={local.mediaAlt} onChange={v => set("mediaAlt", v)} placeholder="Accessible alt description" />
+              <Field label="Secondary Media Alt Text" value={local.secondaryMediaAlt} onChange={v => set("secondaryMediaAlt", v)} placeholder="Accessible alt description" />
+
+              {/* Tertiary Media */}
+              {(isSpotlight || local.tertiaryMediaUrl !== undefined) && (
+                <>
+                  <ImageUploader
+                    label={isSpotlight ? "Photo 3 (Front Overlap Photo for Layout A)" : "Tertiary Media (Hero Col 3, etc.)"}
+                    value={local.tertiaryMediaUrl}
+                    onChange={v => set("tertiaryMediaUrl", v)}
+                    hint={isSpotlight ? "Front overlapping card in Layout A (e.g. sneakers / detail photo)" : "Third image slot (e.g. hero column 3)"}
+                  />
+                  <Field label="Tertiary Media Alt Text" value={local.tertiaryMediaAlt} onChange={v => set("tertiaryMediaAlt", v)} placeholder="Accessible alt description" />
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Settings (JSON) for non-spotlight advanced config */}
+          {!isSpotlight && Object.keys(local.settings || {}).length > 0 && (
+            <div style={{ background: "#F7F1E8", borderRadius: 12, padding: 18, border: "1px solid #E5D7C5", marginBottom: 20 }}>
+              <h4 style={{ margin: "0 0 10px 0", fontSize: 14, fontWeight: 700, color: "#5A2035" }}>Advanced Settings</h4>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 24px" }}>
+                {Object.entries(local.settings || {}).map(([key, val]) => (
+                  <Field
+                    key={key}
+                    label={key.replace(/_/g, ' ')}
+                    value={String(val)}
+                    onChange={v => set("settings", { ...(local.settings || {}), [key]: v })}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       {/* Items Manager */}

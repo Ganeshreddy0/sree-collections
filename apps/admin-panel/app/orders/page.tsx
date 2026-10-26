@@ -89,8 +89,9 @@ export default function AdminOrdersPage() {
   const [newStatus, setNewStatus] = useState("");
   const [notifyWhatsApp, setNotifyWhatsApp] = useState(true);
   const [updatingStatus, setUpdatingStatus] = useState(false);
-  const [retryingWa, setRetryingWa] = useState(false);
   const [actionMessage, setActionMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [sendingAlertOrderId, setSendingAlertOrderId] = useState<string | null>(null);
+  const [retryingWa, setRetryingWa] = useState(false);
 
   // Fetch orders from backend
   const fetchOrders = useCallback(async () => {
@@ -176,6 +177,7 @@ export default function AdminOrdersPage() {
 
   // Trigger owner WhatsApp alert manually
   const handleSendOwnerAlert = async (orderId: string) => {
+    setSendingAlertOrderId(orderId);
     try {
       const res = await fetch(`${API_BASE}/orders/${orderId}/owner-alert`, {
         method: "POST",
@@ -195,6 +197,8 @@ export default function AdminOrdersPage() {
       }
     } catch (err: any) {
       setActionMessage({ type: "error", text: err.message || "Owner alert network error" });
+    } finally {
+      setSendingAlertOrderId(null);
     }
   };
 
@@ -277,6 +281,60 @@ export default function AdminOrdersPage() {
 
   return (
     <AdminShell>
+      <style>{`
+        @keyframes spinSlow {
+          to { transform: rotate(360deg); }
+        }
+        .spinning {
+          animation: spinSlow 0.8s linear infinite;
+        }
+        .action-btn-tooltip {
+          position: relative;
+          display: inline-flex;
+        }
+        .action-btn-tooltip .action-tooltip-text {
+          visibility: hidden;
+          opacity: 0;
+          position: absolute;
+          bottom: calc(100% + 7px);
+          left: 50%;
+          transform: translateX(-50%) translateY(4px);
+          background: #1E293B;
+          color: #FFFFFF;
+          padding: 6px 10px;
+          border-radius: 6px;
+          font-size: 11.5px;
+          font-weight: 500;
+          white-space: nowrap;
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+          pointer-events: none;
+          transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+          z-index: 100;
+          line-height: 1.3;
+        }
+        .action-btn-tooltip .action-tooltip-text::after {
+          content: "";
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          transform: translateX(-50%);
+          border-width: 4px;
+          border-style: solid;
+          border-color: #1E293B transparent transparent transparent;
+        }
+        .action-btn-tooltip:hover .action-tooltip-text {
+          visibility: visible;
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+        .action-btn-interactive {
+          transition: all 0.15s ease;
+        }
+        .action-btn-interactive:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+      `}</style>
       <div style={{ padding: "8px 0" }}>
         {/* Top Header */}
         <div style={{ marginBottom: "24px" }}>
@@ -698,69 +756,98 @@ export default function AdminOrdersPage() {
 
                       {/* Action buttons */}
                       <td style={{ padding: "12px 16px", textAlign: "center" }}>
-                        <div style={{ display: "flex", justifyContent: "center", gap: "6px", alignItems: "center" }}>
-                          <button
-                            onClick={() => handleOpenModal(ord)}
-                            title="View full order details & audit log"
-                            style={{
-                              padding: "6px 9px",
-                              borderRadius: "6px",
-                              backgroundColor: "#F3F4F6",
-                              color: "#374151",
-                              fontSize: "12px",
-                              fontWeight: 600,
-                              cursor: "pointer",
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "4px",
-                              border: "1px solid #E5E7EB",
-                            }}
-                          >
-                            <FiEye size={13} />
-                            <span>Manage</span>
-                          </button>
+                        <div style={{ display: "flex", justifyContent: "center", gap: "6px", alignItems: "center", whiteSpace: "nowrap" }}>
+                          {/* Manage Button */}
+                          <div className="action-btn-tooltip">
+                            <button
+                              onClick={() => handleOpenModal(ord)}
+                              className="action-btn-interactive"
+                              style={{
+                                padding: "6px 10px",
+                                borderRadius: "6px",
+                                backgroundColor: "#F3F4F6",
+                                color: "#374151",
+                                fontSize: "12px",
+                                fontWeight: 600,
+                                cursor: "pointer",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "4px",
+                                border: "1px solid #E5E7EB",
+                              }}
+                            >
+                              <FiEye size={13} />
+                              <span>Manage</span>
+                            </button>
+                            <span className="action-tooltip-text">
+                              👁 View order details &amp; status
+                            </span>
+                          </div>
 
-                          <a
-                            href={getCustomerWhatsAppLink(ord)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            title="Chat with Customer on WhatsApp"
-                            style={{
-                              padding: "6px 8px",
-                              borderRadius: "6px",
-                              backgroundColor: "rgba(37,211,102,0.14)",
-                              color: "#128C7E",
-                              fontSize: "12px",
-                              cursor: "pointer",
-                              display: "inline-flex",
-                              alignItems: "center",
-                              textDecoration: "none",
-                              border: "1px solid rgba(37,211,102,0.25)",
-                            }}
-                          >
-                            <FaWhatsapp size={14} color="#25D366" />
-                          </a>
+                          {/* WhatsApp Customer Button */}
+                          <div className="action-btn-tooltip">
+                            <a
+                              href={getCustomerWhatsAppLink(ord)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="action-btn-interactive"
+                              style={{
+                                padding: "6px 10px",
+                                borderRadius: "6px",
+                                backgroundColor: "#ECFDF5",
+                                color: "#065F46",
+                                fontSize: "11.5px",
+                                fontWeight: 600,
+                                cursor: "pointer",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "5px",
+                                textDecoration: "none",
+                                border: "1px solid #A7F3D0",
+                              }}
+                            >
+                              <FaWhatsapp size={13} color="#25D366" />
+                              <span>Msg Customer</span>
+                            </a>
+                            <span className="action-tooltip-text">
+                              💬 Open WhatsApp to chat with Customer (+{ord.whatsappNumber || ord.customerPhone})
+                            </span>
+                          </div>
 
-                          <button
-                            onClick={() => handleSendOwnerAlert(ord._id)}
-                            title="Send WhatsApp alert to Sree Collections Owner (+919948469132)"
-                            style={{
-                              padding: "6px 8px",
-                              borderRadius: "6px",
-                              backgroundColor: "#FEF3C7",
-                              color: "#92400E",
-                              fontSize: "11.5px",
-                              fontWeight: 600,
-                              cursor: "pointer",
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "3px",
-                              border: "1px solid #FDE68A",
-                            }}
-                          >
-                            <FiSend size={12} />
-                            <span>Owner</span>
-                          </button>
+                          {/* WhatsApp Owner Alert Button */}
+                          <div className="action-btn-tooltip">
+                            <button
+                              onClick={() => handleSendOwnerAlert(ord._id)}
+                              disabled={sendingAlertOrderId === ord._id}
+                              className="action-btn-interactive"
+                              style={{
+                                padding: "6px 10px",
+                                borderRadius: "6px",
+                                backgroundColor: "#FEF3C7",
+                                color: "#92400E",
+                                fontSize: "11.5px",
+                                fontWeight: 600,
+                                cursor: sendingAlertOrderId === ord._id ? "not-allowed" : "pointer",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "4px",
+                                border: "1px solid #FDE68A",
+                                opacity: sendingAlertOrderId === ord._id ? 0.7 : 1,
+                              }}
+                            >
+                              {sendingAlertOrderId === ord._id ? (
+                                <FiRefreshCw size={12} className="spinning" />
+                              ) : (
+                                <FiSend size={12} />
+                              )}
+                              <span>
+                                {sendingAlertOrderId === ord._id ? "Sending…" : "Alert Owner"}
+                              </span>
+                            </button>
+                            <span className="action-tooltip-text">
+                              📲 Send WhatsApp order alert to Owner (+919948469132)
+                            </span>
+                          </div>
                         </div>
                       </td>
                     </tr>
@@ -1037,42 +1124,71 @@ export default function AdminOrdersPage() {
                   </span>
                 </div>
 
-                <div>
+                <div style={{ marginTop: "4px", marginBottom: "4px" }}>
                   <strong>Customer WhatsApp: </strong>
                   <span>+{selectedOrder.whatsappNumber || selectedOrder.customerPhone}</span>
+                </div>
+
+                <div style={{ marginBottom: "12px" }}>
+                  <strong>Owner WhatsApp: </strong>
+                  <span>+919948469132 (Sree Collections Owner)</span>
+                </div>
+
+                {/* Quick WhatsApp Action Buttons in Modal */}
+                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "14px" }}>
                   <a
                     href={getCustomerWhatsAppLink(selectedOrder)}
                     target="_blank"
                     rel="noopener noreferrer"
+                    className="action-btn-interactive"
                     style={{
-                      marginLeft: "10px",
-                      color: "#059669",
-                      textDecoration: "underline",
+                      padding: "7px 12px",
+                      borderRadius: "6px",
+                      backgroundColor: "#ECFDF5",
+                      color: "#065F46",
                       fontSize: "12px",
                       fontWeight: 600,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      textDecoration: "none",
+                      border: "1px solid #A7F3D0",
                     }}
                   >
-                    Open Chat with Customer ↗
+                    <FaWhatsapp size={14} color="#25D366" />
+                    <span>Open WhatsApp Chat with Customer ↗</span>
                   </a>
-                </div>
 
-                <div>
-                  <strong>Owner WhatsApp: </strong>
-                  <span>+919948469132 (Sree Collections Owner)</span>
-                  <a
-                    href={getOwnerWhatsAppLink(selectedOrder)}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={() => handleSendOwnerAlert(selectedOrder._id)}
+                    disabled={sendingAlertOrderId === selectedOrder._id}
+                    className="action-btn-interactive"
                     style={{
-                      marginLeft: "10px",
-                      color: "#B45309",
-                      textDecoration: "underline",
+                      padding: "7px 12px",
+                      borderRadius: "6px",
+                      backgroundColor: "#FEF3C7",
+                      color: "#92400E",
                       fontSize: "12px",
                       fontWeight: 600,
+                      cursor: sendingAlertOrderId === selectedOrder._id ? "not-allowed" : "pointer",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      border: "1px solid #FDE68A",
+                      opacity: sendingAlertOrderId === selectedOrder._id ? 0.7 : 1,
                     }}
                   >
-                    Open Chat with Owner ↗
-                  </a>
+                    {sendingAlertOrderId === selectedOrder._id ? (
+                      <FiRefreshCw size={12} className="spinning" />
+                    ) : (
+                      <FiSend size={12} />
+                    )}
+                    <span>
+                      {sendingAlertOrderId === selectedOrder._id
+                        ? "Sending Alert to Owner…"
+                        : "Send WhatsApp Alert to Owner (+919948469132)"}
+                    </span>
+                  </button>
                 </div>
 
                 {selectedOrder.whatsappNotification.messageId && (
