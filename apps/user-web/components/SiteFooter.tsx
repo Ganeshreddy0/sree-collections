@@ -364,8 +364,8 @@ export default function SiteFooter() {
         .sf-social:hover { color: #BB8E43 !important; transform: translateY(-2px); transition: all 0.2s; }
         .sf-link:hover   { color: #BB8E43 !important; }
 
-        /* ── MOBILE (≤ 640px) ── */
-        @media (max-width: 640px) {
+        /* ── MOBILE (≤ 768px) ── */
+        @media (max-width: 768px) {
           .sf-main {
             flex-direction: column !important;
             align-items: center !important;

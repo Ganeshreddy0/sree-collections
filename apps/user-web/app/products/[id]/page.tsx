@@ -527,6 +527,7 @@ export default function ProductDetailPage() {
 
   return (
     <div
+      className="pdp-page-container"
       style={{
         minHeight: "100vh",
         backgroundColor: "#FAF6EE",
@@ -535,13 +536,14 @@ export default function ProductDetailPage() {
     >
       {cartSuccess && (
         <div
+          className="pdp-toast"
           style={{
             position: "fixed",
             bottom: 28,
             right: 28,
             backgroundColor: "#5D2030",
             color: "#FFF",
-            padding: "14px 22px",
+            padding: "12px 20px",
             borderRadius: 12,
             border: "1.5px solid #BB8E43",
             zIndex: 999,
@@ -552,15 +554,17 @@ export default function ProductDetailPage() {
             fontSize: 14,
             fontWeight: 600,
             maxWidth: 360,
+            boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
           }}
         >
-          <FiCheckCircle size={18} color="#BB8E43" />
+          <FiCheckCircle size={18} color="#BB8E43" style={{ flexShrink: 0 }} />
           <span>{cartSuccess}</span>
         </div>
       )}
 
       {/* HEADER */}
       <header
+        className="pdp-header"
         style={{
           width: "100%",
           maxWidth: 1440,
@@ -576,9 +580,10 @@ export default function ProductDetailPage() {
       >
         <a href="/" style={{ display: "inline-block", flexShrink: 0 }}>
           <img
+            className="pdp-logo"
             src="/homepage/logo2_trans.png"
             alt="Sree Collections"
-            style={{ height: 68, width: "auto", objectFit: "contain" }}
+            style={{ height: 68, width: "auto", objectFit: "contain", display: "block" }}
           />
         </a>
         <nav
@@ -607,17 +612,20 @@ export default function ProductDetailPage() {
           >
             Contact Us
           </a>
-          <button
+          <a
+            href="/search"
             aria-label="Search"
             style={{
               color: "#5A2035",
               background: "none",
               border: "none",
               cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
             }}
           >
             <FiSearch size={22} />
-          </button>
+          </a>
           <a
             href="/cart"
             aria-label="Cart"
@@ -654,13 +662,25 @@ export default function ProductDetailPage() {
         </nav>
         {/* Mobile Right Actions: Cart + Hamburger */}
         <div
-          className="mobile-header-actions"
+          className="mobile-header-actions pdp-mobile-actions"
           style={{
             display: "none",
             alignItems: "center",
-            gap: 8,
+            gap: 12,
           }}
         >
+          <a
+            href="/search"
+            aria-label="Search"
+            style={{
+              color: "#5A2035",
+              display: "flex",
+              alignItems: "center",
+              padding: 4,
+            }}
+          >
+            <FiSearch size={20} />
+          </a>
           <a
             href="/cart"
             aria-label="Cart"
@@ -669,7 +689,7 @@ export default function ProductDetailPage() {
               position: "relative",
               display: "flex",
               alignItems: "center",
-              padding: "6px",
+              padding: "4px",
             }}
           >
             <FiShoppingCart size={21} />
@@ -677,8 +697,8 @@ export default function ProductDetailPage() {
               <span
                 style={{
                   position: "absolute",
-                  top: -2,
-                  right: -4,
+                  top: -4,
+                  right: -6,
                   backgroundColor: "#BB8E43",
                   color: "#FFF",
                   borderRadius: "50%",
@@ -698,15 +718,18 @@ export default function ProductDetailPage() {
           <button
             className="pdp-hamburger mobile-hamburger"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Menu"
             style={{
               color: "#5A2035",
               background: "none",
               border: "none",
               cursor: "pointer",
-              padding: 6,
+              padding: 4,
+              display: "flex",
+              alignItems: "center",
             }}
           >
-            {mobileMenuOpen ? <FiX size={25} /> : <FiMenu size={25} />}
+            {mobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
           </button>
         </div>
       </header>
@@ -716,7 +739,9 @@ export default function ProductDetailPage() {
           style={{
             position: "fixed",
             inset: 0,
-            backgroundColor: "rgba(0,0,0,0.45)",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            backdropFilter: "blur(4px)",
+            WebkitBackdropFilter: "blur(4px)",
             zIndex: 200,
             display: "flex",
             justifyContent: "flex-end",
@@ -725,26 +750,86 @@ export default function ProductDetailPage() {
         >
           <div
             style={{
-              width: 280,
+              width: "82%",
+              maxWidth: 300,
               height: "100%",
-              backgroundColor: "#FCF8F2",
-              padding: "28px 24px",
+              backgroundColor: "#FAF6EE",
+              padding: "24px 20px",
               display: "flex",
               flexDirection: "column",
               gap: 20,
+              boxShadow: "-8px 0 24px rgba(0,0,0,0.15)",
+              boxSizing: "border-box",
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              onClick={() => setMobileMenuOpen(false)}
-              style={{ alignSelf: "flex-end", background: "none", border: "none" }}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <img
+                src="/homepage/logo2_trans.png"
+                alt="Logo"
+                style={{ height: 42, width: "auto" }}
+              />
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                aria-label="Close menu"
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "#5D2030",
+                  cursor: "pointer",
+                  padding: 4,
+                }}
+              >
+                <FiX size={22} />
+              </button>
+            </div>
+            <nav
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 16,
+                marginTop: 10,
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: 17,
+                fontWeight: 600,
+              }}
             >
-              <FiX size={22} />
-            </button>
-            <a href="/">Home</a>
-            <a href="/categories">Categories</a>
-            <a href="/cart">Cart</a>
-            <a href="/contact">Contact Us</a>
+              <a
+                href="/"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ color: "#5D2030", textDecoration: "none" }}
+              >
+                Home
+              </a>
+              <a
+                href="/about"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ color: "#5D2030", textDecoration: "none" }}
+              >
+                About
+              </a>
+              <a
+                href="/categories"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ color: "#BB8E43", textDecoration: "none" }}
+              >
+                Categories
+              </a>
+              <a
+                href="/cart"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ color: "#5D2030", textDecoration: "none" }}
+              >
+                Cart ({cartCount})
+              </a>
+              <a
+                href="/contact"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ color: "#5D2030", textDecoration: "none" }}
+              >
+                Contact Us
+              </a>
+            </nav>
           </div>
         </div>
       )}
@@ -778,7 +863,16 @@ export default function ProductDetailPage() {
           {categoryName}
         </Link>
         <span>/</span>
-        <span style={{ color: "#5D2030", fontWeight: 600 }}>
+        <span
+          className="pdp-breadcrumb-active"
+          style={{
+            color: "#5D2030",
+            fontWeight: 600,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
           {product.productName || product.title}
         </span>
       </div>
@@ -799,7 +893,7 @@ export default function ProductDetailPage() {
         }}
       >
         {/* Gallery */}
-        <div>
+        <div className="pdp-gallery">
           <div
             className="pdp-main-img-box"
             style={{
@@ -830,17 +924,21 @@ export default function ProductDetailPage() {
             />
             {selectedColour && (
               <span
+                className="pdp-colour-badge"
                 style={{
                   position: "absolute",
                   bottom: 14,
                   left: 14,
                   background: "rgba(93,32,48,0.85)",
+                  backdropFilter: "blur(6px)",
+                  WebkitBackdropFilter: "blur(6px)",
                   color: "#FFF",
                   fontSize: 12,
                   fontWeight: 600,
-                  padding: "6px 12px",
+                  padding: "5px 12px",
                   borderRadius: 999,
                   fontFamily: "'Playfair Display', Georgia, serif",
+                  letterSpacing: "0.3px",
                 }}
               >
                 {selectedColour}
@@ -850,6 +948,7 @@ export default function ProductDetailPage() {
 
           {thumbnails.length > 1 && (
             <div
+              className="pdp-thumbnails"
               style={{
                 display: "grid",
                 gridTemplateColumns: `repeat(${Math.min(thumbnails.length, 3)}, 1fr)`,
@@ -860,6 +959,7 @@ export default function ProductDetailPage() {
               {thumbnails.map((src, idx) => (
                 <button
                   key={`${selectedColour}-${idx}-${src}`}
+                  className="pdp-thumb-btn"
                   type="button"
                   onClick={() => setActiveImage(src)}
                   style={{
@@ -874,6 +974,7 @@ export default function ProductDetailPage() {
                     backgroundColor: "#F5EFE5",
                     padding: 0,
                     boxSizing: "border-box",
+                    transition: "border-color 0.2s ease, transform 0.2s ease",
                   }}
                 >
                   <img
@@ -893,8 +994,9 @@ export default function ProductDetailPage() {
         </div>
 
         {/* Purchase info */}
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        <div className="pdp-info-col" style={{ display: "flex", flexDirection: "column" }}>
           <h1
+            className="pdp-title"
             style={{
               fontFamily: "'Playfair Display', Georgia, serif",
               fontWeight: 700,
@@ -908,6 +1010,7 @@ export default function ProductDetailPage() {
           </h1>
 
           <div
+            className="pdp-meta-row"
             style={{
               display: "flex",
               alignItems: "center",
@@ -917,13 +1020,13 @@ export default function ProductDetailPage() {
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <div style={{ color: "#BB8E43", fontSize: 16, letterSpacing: 2 }}>
+              <div style={{ color: "#BB8E43", fontSize: 15, letterSpacing: 1.5 }}>
                 ★★★★★
               </div>
               <span
                 style={{
                   fontFamily: "'Playfair Display', Georgia, serif",
-                  fontSize: 14,
+                  fontSize: 13,
                   fontWeight: 600,
                   color: "#5D2030",
                 }}
@@ -933,13 +1036,13 @@ export default function ProductDetailPage() {
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <FiCheckCircle
-                size={16}
+                size={15}
                 color={isOutOfStock ? "#DC2626" : "#16A34A"}
               />
               <span
                 style={{
                   fontFamily: "'Plus Jakarta Sans', sans-serif",
-                  fontSize: 14,
+                  fontSize: 13,
                   fontWeight: 600,
                   color: isOutOfStock ? "#DC2626" : "#16A34A",
                 }}
@@ -956,12 +1059,13 @@ export default function ProductDetailPage() {
           </div>
 
           <p
+            className="pdp-desc"
             style={{
               fontFamily: "'Plus Jakarta Sans', sans-serif",
               fontSize: 14,
               lineHeight: 1.65,
               color: "#756658",
-              margin: "0 0 24px 0",
+              margin: "0 0 20px 0",
             }}
           >
             {product.description?.trim() ||
@@ -974,6 +1078,7 @@ export default function ProductDetailPage() {
 
           {currentSku && (
             <p
+              className="pdp-sku"
               style={{
                 fontSize: 12,
                 color: "#8A796B",
@@ -987,33 +1092,35 @@ export default function ProductDetailPage() {
 
           {/* Qty + Price */}
           <div
+            className="pdp-price-qty-box"
             style={{
               display: "flex",
               alignItems: "flex-end",
               justifyContent: "space-between",
-              marginBottom: 26,
+              marginBottom: 24,
               gap: 16,
               flexWrap: "wrap",
             }}
           >
-            <div>
+            <div className="pdp-qty-wrapper">
               <div
                 style={{
                   fontFamily: "'Playfair Display', Georgia, serif",
-                  fontSize: 15,
+                  fontSize: 14,
                   fontWeight: 600,
                   color: "#5D2030",
-                  marginBottom: 8,
+                  marginBottom: 6,
                 }}
               >
                 Quantity
               </div>
               <div
+                className="pdp-qty-stepper"
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
                   border: "1px solid #D6C8B8",
-                  borderRadius: 4,
+                  borderRadius: 6,
                   overflow: "hidden",
                   backgroundColor: "#FAF6EE",
                 }}
@@ -1022,6 +1129,7 @@ export default function ProductDetailPage() {
                   type="button"
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                   disabled={quantity <= 1}
+                  aria-label="Decrease quantity"
                   style={{
                     width: 36,
                     height: 36,
@@ -1030,20 +1138,23 @@ export default function ProductDetailPage() {
                     fontSize: 16,
                     color: "#5D2030",
                     cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                 >
                   -
                 </button>
                 <span
                   style={{
-                    width: 40,
+                    width: 38,
                     height: 36,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     fontFamily: "'Playfair Display', Georgia, serif",
                     fontWeight: 600,
-                    fontSize: 15,
+                    fontSize: 14,
                     color: "#5D2030",
                     borderLeft: "1px solid #D6C8B8",
                     borderRight: "1px solid #D6C8B8",
@@ -1059,6 +1170,7 @@ export default function ProductDetailPage() {
                     )
                   }
                   disabled={isOutOfStock || quantity >= currentStock}
+                  aria-label="Increase quantity"
                   style={{
                     width: 36,
                     height: 36,
@@ -1067,6 +1179,9 @@ export default function ProductDetailPage() {
                     fontSize: 16,
                     color: "#5D2030",
                     cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                 >
                   +
@@ -1074,12 +1189,13 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            <div style={{ textAlign: "right" }}>
+            <div className="pdp-price-wrapper" style={{ textAlign: "right" }}>
               <div
+                className="pdp-price-text"
                 style={{
                   fontFamily: "'Playfair Display', Georgia, serif",
                   fontWeight: 700,
-                  fontSize: 36,
+                  fontSize: 34,
                   lineHeight: 1,
                   color: "#5D2030",
                 }}
@@ -1088,8 +1204,9 @@ export default function ProductDetailPage() {
               </div>
               {currentMrp > currentPrice && (
                 <div
+                  className="pdp-mrp-text"
                   style={{
-                    fontSize: 14,
+                    fontSize: 13,
                     color: "#9CA3AF",
                     textDecoration: "line-through",
                     marginTop: 4,
@@ -1099,11 +1216,12 @@ export default function ProductDetailPage() {
                 </div>
               )}
               <div
+                className="pdp-tax-text"
                 style={{
                   fontFamily: "'Plus Jakarta Sans', sans-serif",
-                  fontSize: 12,
+                  fontSize: 11,
                   color: "#8E7F73",
-                  marginTop: 4,
+                  marginTop: 3,
                 }}
               >
                 {taxLabel} included
@@ -1112,24 +1230,26 @@ export default function ProductDetailPage() {
           </div>
 
           <button
+            className="pdp-add-to-cart-btn"
             type="button"
             onClick={handleAddToCart}
             disabled={isOutOfStock}
             style={{
               width: "100%",
-              height: 54,
+              height: 52,
               borderRadius: 999,
               backgroundColor: isOutOfStock ? "#D1D5DB" : "#BB8E43",
               color: "#FFF",
               fontFamily: "'Playfair Display', Georgia, serif",
               fontWeight: 700,
-              fontSize: 16,
+              fontSize: 15,
               border: "none",
               cursor: isOutOfStock ? "not-allowed" : "pointer",
               boxShadow: isOutOfStock
                 ? "none"
                 : "0 6px 18px rgba(187,142,67,0.3)",
-              marginBottom: 32,
+              marginBottom: 26,
+              transition: "transform 0.15s ease, filter 0.15s ease",
             }}
           >
             {isOutOfStock ? "Out of Stock" : "Add to Cart"}
@@ -1137,25 +1257,27 @@ export default function ProductDetailPage() {
 
           {/* Sizes — does not change gallery */}
           {availableSizes.length > 0 && (
-            <div style={{ marginBottom: 28 }}>
+            <div className="pdp-options-section pdp-sizes-section" style={{ marginBottom: 24 }}>
               <h3
+                className="pdp-options-title"
                 style={{
                   fontFamily: "'Playfair Display', Georgia, serif",
-                  fontSize: 20,
+                  fontSize: 18,
                   fontWeight: 700,
                   color: "#5D2030",
-                  margin: "0 0 14px 0",
+                  margin: "0 0 12px 0",
                 }}
               >
                 Select Size
               </h3>
               <div
+                className="pdp-sizes-list"
                 style={{
                   display: "flex",
                   alignItems: "center",
                   flexWrap: "wrap",
                   gap: 8,
-                  maxWidth: 420,
+                  maxWidth: 440,
                 }}
               >
                 {availableSizes.map((s) => {
@@ -1164,6 +1286,7 @@ export default function ProductDetailPage() {
                   return (
                     <button
                       key={s}
+                      className={`pdp-size-btn ${active ? "active" : ""}`}
                       type="button"
                       disabled={!available}
                       onClick={() => handleSizeSelect(s)}
@@ -1173,23 +1296,24 @@ export default function ProductDetailPage() {
                               backgroundColor: "#BB8E43",
                               color: "#FFF",
                               borderRadius: 999,
-                              padding: "8px 24px",
+                              padding: "7px 20px",
                               fontFamily: "'Playfair Display', Georgia, serif",
                               fontWeight: 700,
-                              fontSize: 15,
+                              fontSize: 14,
                               border: "none",
                               cursor: "pointer",
                               boxShadow: "0 3px 10px rgba(187,142,67,0.25)",
                             }
                           : {
                               background: "none",
-                              border: "none",
+                              border: "1px solid #D6C8B8",
+                              borderRadius: 999,
                               color: available ? "#5D2030" : "#9CA3AF",
                               fontFamily: "'Playfair Display', Georgia, serif",
                               fontWeight: 600,
-                              fontSize: 15,
+                              fontSize: 14,
                               cursor: available ? "pointer" : "not-allowed",
-                              padding: "8px 12px",
+                              padding: "6px 16px",
                               textDecoration: available ? "none" : "line-through",
                             }
                       }
@@ -1204,31 +1328,35 @@ export default function ProductDetailPage() {
 
           {/* Colours — switches gallery */}
           {availableColours.length > 0 && (
-            <div style={{ marginBottom: 26 }}>
+            <div className="pdp-options-section pdp-colours-section" style={{ marginBottom: 24 }}>
               <h3
+                className="pdp-options-title"
                 style={{
                   fontFamily: "'Playfair Display', Georgia, serif",
-                  fontSize: 20,
+                  fontSize: 18,
                   fontWeight: 700,
                   color: "#5D2030",
-                  margin: "0 0 14px 0",
+                  margin: "0 0 12px 0",
                 }}
               >
                 Colours
                 {selectedColour && (
                   <span
                     style={{
-                      fontSize: 14,
+                      fontSize: 13,
                       fontWeight: 500,
                       color: "#BB8E43",
-                      marginLeft: 10,
+                      marginLeft: 8,
                     }}
                   >
-                    {selectedColour}
+                    ({selectedColour})
                   </span>
                 )}
               </h3>
-              <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+              <div
+                className="pdp-colours-list"
+                style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}
+              >
                 {availableColours.map((c) => {
                   const active =
                     selectedColour.toLowerCase() === c.toLowerCase();
@@ -1239,13 +1367,14 @@ export default function ProductDetailPage() {
                   return (
                     <button
                       key={c}
+                      className={`pdp-colour-btn ${active ? "active" : ""}`}
                       type="button"
                       aria-label={c}
                       title={c}
                       onClick={() => handleColourSelect(c)}
                       style={{
-                        width: 60,
-                        height: 36,
+                        width: 52,
+                        height: 32,
                         borderRadius: 999,
                         backgroundColor: hex,
                         border: light ? "1.5px solid #D6C8B8" : "none",
@@ -1256,8 +1385,8 @@ export default function ProductDetailPage() {
                         boxShadow: active
                           ? "0 4px 12px rgba(0,0,0,0.25)"
                           : "none",
-                        transform: active ? "scale(1.05)" : "scale(1)",
-                        transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                        transform: active ? "scale(1.06)" : "scale(1)",
+                        transition: "transform 0.15s ease, box-shadow 0.15s ease",
                       }}
                     >
                       {active && (
@@ -1273,25 +1402,26 @@ export default function ProductDetailPage() {
               </div>
               <p
                 style={{
-                  margin: "10px 0 0",
-                  fontSize: 12,
+                  margin: "8px 0 0",
+                  fontSize: 11,
                   color: "#8A796B",
                   fontFamily: "'Plus Jakarta Sans', sans-serif",
                 }}
               >
-                Selecting a colour updates the product images instantly
+                Selecting a colour updates the product gallery
               </p>
             </div>
           )}
 
           <div
+            className="pdp-trust-wishlist-row"
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              paddingTop: 20,
+              paddingTop: 16,
               borderTop: "1px solid #E6D8C8",
-              marginTop: 10,
+              marginTop: 6,
               gap: 16,
               flexWrap: "wrap",
             }}
@@ -1302,12 +1432,12 @@ export default function ProductDetailPage() {
                 alignItems: "center",
                 gap: 8,
                 fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: 14,
+                fontSize: 13,
                 color: "#5D2030",
               }}
             >
-              <FiTruck size={18} />
-              <span>Easy Return</span>
+              <FiTruck size={17} />
+              <span>Easy Return & Exchange</span>
             </div>
             <button
               type="button"
@@ -1315,9 +1445,9 @@ export default function ProductDetailPage() {
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 8,
+                gap: 7,
                 fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: 14,
+                fontSize: 13,
                 color: "#5D2030",
                 background: "none",
                 border: "none",
@@ -1325,7 +1455,7 @@ export default function ProductDetailPage() {
               }}
             >
               <FiHeart
-                size={18}
+                size={17}
                 color={wishlistActive ? "#BB8E43" : "#5D2030"}
                 fill={wishlistActive ? "#BB8E43" : "none"}
               />
@@ -1341,21 +1471,22 @@ export default function ProductDetailPage() {
         style={{
           width: "100%",
           maxWidth: 1440,
-          margin: "0 auto 60px",
+          margin: "0 auto 50px",
           padding: "0 40px",
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
-          gap: 32,
+          gap: 28,
           alignItems: "start",
           boxSizing: "border-box",
         }}
       >
         <div
+          className="pdp-details-card pdp-accordion-card"
           style={{
             backgroundColor: "#EFE1BC",
             borderRadius: 16,
-            border: "1px solid rgba(93,32,48,0.5)",
-            padding: "24px 28px",
+            border: "1px solid rgba(93,32,48,0.35)",
+            padding: "20px 24px",
           }}
         >
           {[
@@ -1408,14 +1539,16 @@ export default function ProductDetailPage() {
           ].map((section, i, arr) => (
             <div
               key={section.key}
+              className="pdp-accordion-item"
               style={{
                 borderBottom:
-                  i < arr.length - 1 ? "1px solid rgba(93,32,48,0.5)" : "none",
-                padding: i === 0 ? "0 0 16px" : "16px 0",
+                  i < arr.length - 1 ? "1px solid rgba(93,32,48,0.25)" : "none",
+                padding: i === 0 ? "0 0 14px" : "14px 0",
               }}
             >
               <button
                 type="button"
+                className="pdp-accordion-header"
                 onClick={() => section.set(!section.open)}
                 style={{
                   width: "100%",
@@ -1431,7 +1564,7 @@ export default function ProductDetailPage() {
                 <h3
                   style={{
                     fontFamily: "'Playfair Display', Georgia, serif",
-                    fontSize: 18,
+                    fontSize: 17,
                     fontWeight: 700,
                     color: "#5D2030",
                     margin: 0,
@@ -1439,16 +1572,17 @@ export default function ProductDetailPage() {
                 >
                   {section.title}
                 </h3>
-                <span style={{ fontSize: 18, color: "#5D2030", fontWeight: 700 }}>
+                <span style={{ fontSize: 17, color: "#5D2030", fontWeight: 700 }}>
                   {section.open ? "—" : "+"}
                 </span>
               </button>
               {section.open && (
                 <div
+                  className="pdp-accordion-body"
                   style={{
-                    marginTop: 12,
+                    marginTop: 10,
                     fontFamily: "'Plus Jakarta Sans', sans-serif",
-                    fontSize: 14,
+                    fontSize: 13,
                     lineHeight: 1.6,
                     color: "#5D2030",
                     whiteSpace: "pre-line",
@@ -1461,22 +1595,23 @@ export default function ProductDetailPage() {
           ))}
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+        <div className="pdp-side-cards-col" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <div
+            className="pdp-details-card pdp-side-card"
             style={{
               backgroundColor: "#EFE1BC",
               borderRadius: 16,
-              border: "1px solid rgba(93,32,48,0.5)",
-              padding: "24px 28px",
+              border: "1px solid rgba(93,32,48,0.35)",
+              padding: "20px 24px",
             }}
           >
             <h3
               style={{
                 fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: 22,
+                fontSize: 20,
                 fontWeight: 700,
                 color: "#5D2030",
-                margin: "0 0 12px 0",
+                margin: "0 0 10px 0",
               }}
             >
               {materialTitle.split(" ").slice(0, 3).join(" ")}
@@ -1484,10 +1619,10 @@ export default function ProductDetailPage() {
             <p
               style={{
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
-                fontSize: 14,
-                lineHeight: 1.65,
+                fontSize: 13,
+                lineHeight: 1.6,
                 color: "#5D2030",
-                margin: "0 0 16px 0",
+                margin: "0 0 14px 0",
               }}
             >
               {product.fabric
@@ -1498,7 +1633,7 @@ export default function ProductDetailPage() {
                   }`
                 : "A carefully selected piece from Sree Collections, made for comfort and lasting wear."}
             </p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
               {defaultTags.map((t) => (
                 <span
                   key={t}
@@ -1506,8 +1641,8 @@ export default function ProductDetailPage() {
                     background: "#FFF",
                     color: "#5D2030",
                     borderRadius: 999,
-                    padding: "6px 14px",
-                    fontSize: 12,
+                    padding: "5px 12px",
+                    fontSize: 11,
                     fontWeight: 600,
                     fontFamily: "'Plus Jakarta Sans', sans-serif",
                   }}
@@ -1519,20 +1654,21 @@ export default function ProductDetailPage() {
           </div>
 
           <div
+            className="pdp-details-card pdp-side-card"
             style={{
               backgroundColor: "#EFE1BC",
               borderRadius: 16,
-              border: "1px solid rgba(93,32,48,0.5)",
-              padding: "24px 28px",
+              border: "1px solid rgba(93,32,48,0.35)",
+              padding: "20px 24px",
             }}
           >
             <h3
               style={{
                 fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: 22,
+                fontSize: 20,
                 fontWeight: 700,
                 color: "#5D2030",
-                margin: "0 0 12px 0",
+                margin: "0 0 10px 0",
               }}
             >
               Return Policy
@@ -1542,8 +1678,8 @@ export default function ProductDetailPage() {
                 margin: 0,
                 paddingLeft: 18,
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
-                fontSize: 14,
-                lineHeight: 1.7,
+                fontSize: 13,
+                lineHeight: 1.65,
                 color: "#5D2030",
               }}
             >
@@ -1554,7 +1690,7 @@ export default function ProductDetailPage() {
                 .split("\n")
                 .filter(Boolean)
                 .map((line) => (
-                  <li key={line}>{line.replace(/^[-•]\s*/, "")}</li>
+                  <li key={line} style={{ marginBottom: 4 }}>{line.replace(/^[-•]\s*/, "")}</li>
                 ))}
             </ul>
           </div>
@@ -1564,28 +1700,31 @@ export default function ProductDetailPage() {
       {/* RELATED */}
       {related.length > 0 && (
         <div
+          className="pdp-related-section"
           style={{
             width: "100%",
             maxWidth: 1440,
-            margin: "0 auto 80px",
+            margin: "0 auto 70px",
             padding: "0 40px",
             boxSizing: "border-box",
           }}
         >
           <div
+            className="pdp-related-header"
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              marginBottom: 28,
-              gap: 16,
+              marginBottom: 24,
+              gap: 14,
               flexWrap: "wrap",
             }}
           >
             <h2
+              className="pdp-related-title"
               style={{
                 fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: 36,
+                fontSize: 32,
                 fontWeight: 700,
                 color: "#5D2030",
                 margin: 0,
@@ -1595,15 +1734,17 @@ export default function ProductDetailPage() {
             </h2>
             <a
               href={`/categories?category=${encodeURIComponent(categoryName)}`}
+              className="pdp-explore-btn"
               style={{
                 backgroundColor: "#BB8E43",
                 color: "#FFF",
                 fontFamily: "'Playfair Display', Georgia, serif",
                 fontWeight: 700,
-                fontSize: 14,
-                padding: "12px 28px",
+                fontSize: 13,
+                padding: "10px 24px",
                 borderRadius: 999,
                 textDecoration: "none",
+                display: "inline-block",
               }}
             >
               Explore More
@@ -1614,30 +1755,35 @@ export default function ProductDetailPage() {
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(4, 1fr)",
-              gap: 24,
+              gap: 20,
             }}
           >
             {related.map((r) => (
               <a
                 key={r.id}
                 href={`/products/${r.id}`}
+                className="pdp-related-card"
                 style={{
                   backgroundColor: "#FFF",
-                  borderRadius: 16,
+                  borderRadius: 14,
                   border: "1.5px solid #E3D7C5",
-                  padding: 12,
+                  padding: 10,
                   textDecoration: "none",
                   color: "inherit",
                   display: "block",
+                  minWidth: 0,
+                  boxSizing: "border-box",
+                  transition: "transform 0.2s ease, box-shadow 0.2s ease",
                 }}
               >
                 <div
+                  className="pdp-related-img-box"
                   style={{
-                    height: 220,
-                    borderRadius: 12,
+                    height: 200,
+                    borderRadius: 10,
                     overflow: "hidden",
                     backgroundColor: "#F5EFE5",
-                    marginBottom: 10,
+                    marginBottom: 8,
                   }}
                 >
                   <img
@@ -1647,16 +1793,18 @@ export default function ProductDetailPage() {
                       width: "100%",
                       height: "100%",
                       objectFit: "cover",
+                      display: "block",
                     }}
                   />
                 </div>
                 <div
+                  className="pdp-related-name"
                   style={{
                     fontFamily: "'Playfair Display', Georgia, serif",
                     fontWeight: 600,
-                    fontSize: 16,
+                    fontSize: 14,
                     color: "#5D2030",
-                    marginBottom: 4,
+                    marginBottom: 3,
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -1665,10 +1813,11 @@ export default function ProductDetailPage() {
                   {r.name}
                 </div>
                 <div
+                  className="pdp-related-price"
                   style={{
                     fontFamily: "'Playfair Display', Georgia, serif",
                     fontWeight: 700,
-                    fontSize: 15,
+                    fontSize: 14,
                     color: "#5D2030",
                   }}
                 >
@@ -1680,48 +1829,493 @@ export default function ProductDetailPage() {
         </div>
       )}
 
+      {/* MOBILE STICKY BOTTOM ACTION BAR */}
+      <div
+        className="pdp-mobile-sticky-bar"
+        style={{
+          display: "none",
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 100,
+          background: "rgba(250, 246, 238, 0.97)",
+          backdropFilter: "blur(10px)",
+          WebkitBackdropFilter: "blur(10px)",
+          borderTop: "1px solid #E6D8C8",
+          padding: "10px 16px",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          boxShadow: "0 -4px 18px rgba(93,32,48,0.08)",
+        }}
+      >
+        <div style={{ display: "flex", flexDirection: "column", minWidth: 0, flex: 1 }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+            <span
+              style={{
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontWeight: 700,
+                fontSize: 18,
+                color: "#5D2030",
+                lineHeight: 1,
+              }}
+            >
+              {formatInr(currentPrice)}
+            </span>
+            {currentMrp > currentPrice && (
+              <span
+                style={{
+                  fontSize: 11,
+                  color: "#9CA3AF",
+                  textDecoration: "line-through",
+                  lineHeight: 1,
+                }}
+              >
+                {formatInr(currentMrp)}
+              </span>
+            )}
+          </div>
+          <div
+            style={{
+              fontSize: 11,
+              color: "#8E7F73",
+              display: "flex",
+              gap: 4,
+              alignItems: "center",
+              marginTop: 3,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {selectedSize && <span>Size: <strong style={{ color: "#5D2030" }}>{selectedSize}</strong></span>}
+            {selectedSize && selectedColour && <span>•</span>}
+            {selectedColour && <span>Color: <strong style={{ color: "#5D2030" }}>{selectedColour}</strong></span>}
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={handleAddToCart}
+          disabled={isOutOfStock}
+          style={{
+            backgroundColor: isOutOfStock ? "#D1D5DB" : "#BB8E43",
+            color: "#FFF",
+            border: "none",
+            borderRadius: 999,
+            padding: "10px 22px",
+            fontFamily: "'Playfair Display', Georgia, serif",
+            fontWeight: 700,
+            fontSize: 13,
+            cursor: isOutOfStock ? "not-allowed" : "pointer",
+            boxShadow: isOutOfStock ? "none" : "0 3px 12px rgba(187,142,67,0.35)",
+            whiteSpace: "nowrap",
+            flexShrink: 0,
+          }}
+        >
+          {isOutOfStock ? "Out of Stock" : "Add to Cart"}
+        </button>
+      </div>
+
       <style>{`
+        /* Desktop styles */
         @media (min-width: 992px) {
           .pdp-desktop-nav { display: flex !important; }
-          .mobile-header-actions { display: none !important; }
+          .pdp-mobile-actions { display: none !important; }
+          .pdp-mobile-sticky-bar { display: none !important; }
         }
+
+        /* Mobile & Tablet responsive breakdown */
         @media (max-width: 991px) {
+          .pdp-page-container {
+            padding-bottom: 74px !important;
+          }
           .pdp-desktop-nav { display: none !important; }
-          .mobile-header-actions { display: flex !important; }
-          .pdp-hamburger { display: flex !important; }
+          .pdp-mobile-actions { display: flex !important; }
+
+          .pdp-header {
+            padding: 8px 14px !important;
+          }
+          .pdp-logo {
+            height: 40px !important;
+          }
+
+          .pdp-breadcrumbs {
+            margin: 6px auto 12px !important;
+            padding: 0 14px !important;
+            font-size: 11.5px !important;
+            gap: 5px !important;
+            white-space: nowrap !important;
+            overflow-x: auto !important;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+          }
+          .pdp-breadcrumbs::-webkit-scrollbar {
+            display: none !important;
+          }
+          .pdp-breadcrumb-active {
+            max-width: 140px !important;
+          }
+
+          /* Main showcase grid */
           .pdp-showcase {
             grid-template-columns: 1fr !important;
-            gap: 28px !important;
-            padding: 0 16px !important;
-            margin-bottom: 36px !important;
+            gap: 14px !important;
+            padding: 0 14px !important;
+            margin-bottom: 20px !important;
           }
-          .pdp-details {
-            grid-template-columns: 1fr !important;
-            padding: 0 16px !important;
-            margin-bottom: 40px !important;
+
+          /* Product Gallery: constrain width & height to fit perfectly on mobile screen */
+          .pdp-gallery {
+            width: 100% !important;
+            max-width: 320px !important;
+            margin: 0 auto !important;
           }
-          .pdp-breadcrumbs {
-            padding: 0 16px !important;
-            margin: 12px auto 20px !important;
+
+          .pdp-main-img-box {
+            width: 100% !important;
+            max-width: 300px !important;
+            height: clamp(210px, 58vw, 255px) !important;
+            margin: 0 auto !important;
+            border-radius: 14px !important;
+          }
+
+          .pdp-colour-badge {
+            bottom: 8px !important;
+            left: 8px !important;
+            font-size: 11px !important;
+            padding: 4px 10px !important;
+          }
+
+          /* Compact thumbnail strip */
+          .pdp-thumbnails {
+            display: flex !important;
+            justify-content: center !important;
+            overflow-x: auto !important;
+            gap: 8px !important;
+            margin-top: 8px !important;
+            padding-bottom: 4px !important;
+            scrollbar-width: none !important;
+            -webkit-overflow-scrolling: touch !important;
+          }
+          .pdp-thumbnails::-webkit-scrollbar {
+            display: none !important;
+          }
+          .pdp-thumb-btn {
+            flex: 0 0 50px !important;
+            width: 50px !important;
+            height: 50px !important;
+            border-radius: 8px !important;
+          }
+
+          /* Product Details column */
+          .pdp-info-col {
+            width: 100% !important;
+            max-width: 100% !important;
+          }
+
+          .pdp-title {
+            font-size: clamp(20px, 5.2vw, 25px) !important;
+            margin-bottom: 6px !important;
+            line-height: 1.25 !important;
+          }
+
+          .pdp-meta-row {
+            gap: 12px !important;
+            margin-bottom: 8px !important;
+          }
+
+          .pdp-desc {
+            font-size: 12.5px !important;
+            line-height: 1.5 !important;
+            margin-bottom: 10px !important;
+          }
+
+          .pdp-sku {
+            font-size: 11px !important;
+            margin-bottom: 8px !important;
+          }
+
+          .pdp-price-qty-box {
+            margin-bottom: 12px !important;
+            gap: 10px !important;
+            align-items: center !important;
+          }
+
+          .pdp-qty-wrapper > div:first-child {
+            font-size: 12.5px !important;
+            margin-bottom: 4px !important;
+          }
+
+          .pdp-qty-stepper button {
+            width: 32px !important;
+            height: 32px !important;
+            font-size: 15px !important;
+          }
+
+          .pdp-qty-stepper span {
+            width: 32px !important;
+            height: 32px !important;
+            font-size: 13px !important;
+          }
+
+          .pdp-price-text {
+            font-size: clamp(22px, 5.8vw, 26px) !important;
+          }
+
+          .pdp-mrp-text {
             font-size: 12px !important;
           }
-          .pdp-main-img-box {
-            height: clamp(280px, 88vw, 500px) !important;
+
+          .pdp-tax-text {
+            font-size: 10.5px !important;
+          }
+
+          .pdp-add-to-cart-btn {
+            height: 44px !important;
+            font-size: 14px !important;
+            margin-bottom: 16px !important;
+          }
+
+          .pdp-options-section {
+            margin-bottom: 14px !important;
+          }
+          .pdp-options-title {
+            font-size: 14px !important;
+            margin-bottom: 6px !important;
+          }
+          .pdp-size-btn {
+            padding: 5px 13px !important;
+            font-size: 12.5px !important;
+          }
+          .pdp-colour-btn {
+            width: 40px !important;
+            height: 28px !important;
+          }
+
+          .pdp-trust-wishlist-row {
+            padding-top: 10px !important;
+            margin-top: 4px !important;
+            font-size: 11.5px !important;
+          }
+
+          /* Details and Accordion */
+          .pdp-details {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+            padding: 0 14px !important;
+            margin-bottom: 22px !important;
+          }
+          .pdp-details-card {
+            padding: 14px 14px !important;
+            border-radius: 12px !important;
+          }
+          .pdp-details-card h3 {
+            font-size: 15px !important;
+          }
+          .pdp-accordion-item {
+            padding: 10px 0 !important;
+          }
+          .pdp-accordion-header h3 {
+            font-size: 15px !important;
+          }
+          .pdp-accordion-body {
+            font-size: 12px !important;
+            line-height: 1.5 !important;
+          }
+          .pdp-side-card p, .pdp-side-card ul {
+            font-size: 12px !important;
+            line-height: 1.5 !important;
+          }
+          .pdp-side-card li {
+            font-size: 12px !important;
+            margin-bottom: 3px !important;
+          }
+          .pdp-side-card span {
+            padding: 3px 9px !important;
+            font-size: 10px !important;
+          }
+
+          /* Related Products: Matching Categories page reference */
+          .pdp-related-section {
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 0 16px !important;
+            margin-bottom: 28px !important;
+            box-sizing: border-box !important;
+          }
+          .pdp-related-header {
+            margin-bottom: 12px !important;
+          }
+          .pdp-related-title {
+            font-size: 20px !important;
+          }
+          .pdp-explore-btn {
+            padding: 6px 14px !important;
+            font-size: 11.5px !important;
           }
           .pdp-related {
-            grid-template-columns: 1fr 1fr !important;
-            gap: 16px !important;
+            display: grid !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 12px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+          }
+          .pdp-related-card {
+            min-width: 0 !important;
+            width: 100% !important;
+            padding: 8px !important;
+            border-radius: 12px !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+          }
+          .pdp-related-img-box {
+            width: 100% !important;
+            height: 160px !important;
+            border-radius: 8px !important;
+            margin-bottom: 6px !important;
+            overflow: hidden !important;
+          }
+          .pdp-related-img-box img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            display: block !important;
+          }
+          .pdp-related-name {
+            font-size: 13.5px !important;
+            line-height: 18px !important;
+            height: 18px !important;
+            margin-bottom: 2px !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+          }
+          .pdp-related-price {
+            font-size: 13px !important;
+          }
+
+          /* Fixed Mobile Sticky Bar */
+          .pdp-mobile-sticky-bar {
+            display: flex !important;
+            justify-content: space-between !important;
+            padding: 8px 14px calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+          }
+
+          /* Adjust Toast above mobile bar */
+          .pdp-toast {
+            bottom: 70px !important;
+            left: 12px !important;
+            right: 12px !important;
+            max-width: calc(100% - 24px) !important;
+            padding: 9px 14px !important;
+            font-size: 12.5px !important;
           }
         }
+
+        /* Screen compression (phones <= 640px matching Categories page) */
         @media (max-width: 640px) {
-          .pdp-showcase h1 { font-size: clamp(22px, 6.5vw, 32px) !important; }
-          .pdp-details { padding: 0 12px !important; }
-          .pdp-related { grid-template-columns: 1fr 1fr !important; }
+          .pdp-related-section {
+            padding: 0 12px !important;
+            margin-bottom: 24px !important;
+          }
+          .pdp-related {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 10px !important;
+          }
+          .pdp-related-card {
+            padding: 6px !important;
+            border-radius: 10px !important;
+          }
+          .pdp-related-img-box {
+            height: 130px !important;
+            border-radius: 8px !important;
+          }
+          .pdp-related-name {
+            font-size: 12px !important;
+            line-height: 16px !important;
+            height: 16px !important;
+          }
+          .pdp-related-price {
+            font-size: 12px !important;
+          }
         }
+
+        /* Small screen compression (phones <= 480px) */
         @media (max-width: 480px) {
-          .pdp-showcase { padding: 0 12px !important; }
-          .pdp-main-img-box { height: clamp(240px, 90vw, 360px) !important; }
-          .pdp-related { grid-template-columns: 1fr !important; }
+          .pdp-header {
+            padding: 8px 10px !important;
+          }
+          .pdp-logo {
+            height: 36px !important;
+          }
+          .pdp-breadcrumbs {
+            padding: 0 10px !important;
+            margin: 4px auto 8px !important;
+          }
+          .pdp-showcase {
+            padding: 0 10px !important;
+            gap: 10px !important;
+          }
+          .pdp-gallery {
+            max-width: 270px !important;
+          }
+          .pdp-main-img-box {
+            max-width: 260px !important;
+            height: clamp(180px, 52vw, 225px) !important;
+            border-radius: 12px !important;
+          }
+          .pdp-thumbnails {
+            gap: 6px !important;
+            margin-top: 6px !important;
+          }
+          .pdp-thumb-btn {
+            flex: 0 0 42px !important;
+            width: 42px !important;
+            height: 42px !important;
+            border-radius: 6px !important;
+          }
+          .pdp-title {
+            font-size: 18px !important;
+          }
+          .pdp-details {
+            padding: 0 10px !important;
+          }
+          .pdp-details-card {
+            padding: 12px 10px !important;
+          }
+          .pdp-related-section {
+            padding: 0 10px !important;
+          }
+          .pdp-mobile-sticky-bar {
+            padding: 7px 10px calc(7px + env(safe-area-inset-bottom, 0px)) !important;
+          }
+        }
+
+        /* Extra small screens (<= 380px matching Categories page) */
+        @media (max-width: 380px) {
+          .pdp-related {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 8px !important;
+          }
+          .pdp-related-card {
+            padding: 5px !important;
+            border-radius: 8px !important;
+          }
+          .pdp-related-img-box {
+            height: 110px !important;
+          }
+          .pdp-gallery {
+            max-width: 230px !important;
+          }
+          .pdp-main-img-box {
+            max-width: 230px !important;
+            height: 180px !important;
+          }
+          .pdp-thumb-btn {
+            flex: 0 0 38px !important;
+            width: 38px !important;
+            height: 38px !important;
         }
       `}</style>
     </div>

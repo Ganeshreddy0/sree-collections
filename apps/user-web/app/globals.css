@@ -160,7 +160,7 @@ img {
   .mobile-hamburger {
     display: flex !important;
     align-items: center;
-    justifyContent: center;
+    justify-content: center;
     cursor: pointer;
     background: none;
     border: none;

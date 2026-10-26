@@ -17,6 +17,7 @@ import {
   FaInstagram,
   FaWhatsapp,
 } from "react-icons/fa";
+import SiteHeader from "@/components/SiteHeader";
 
 function NavLink({
   href,

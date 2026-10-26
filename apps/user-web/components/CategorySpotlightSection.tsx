@@ -346,7 +346,7 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
       >
         {/* Top Header Row */}
         <div
-          className="category-section-header"
+          className="category-section-header saree-header"
           style={{
             display: "flex",
             justifyContent: "space-between",
@@ -730,6 +730,9 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
           .category-section-header .header-text-right {
             text-align: left !important;
           }
+          .saree-header .header-text-right {
+            order: -1 !important;
+          }
           .category-section-grid {
             grid-template-columns: 1fr !important;
             gap: 32px !important;
@@ -738,6 +741,14 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
             max-width: 100% !important;
             height: clamp(260px, 68vw, 360px) !important;
             margin: 0 auto;
+          }
+          .category-spotlight-dual-wrap > div:first-child {
+            width: 65% !important;
+            height: 88% !important;
+          }
+          .category-spotlight-dual-wrap > div:last-child {
+            width: 58% !important;
+            height: 58% !important;
           }
           .category-tall-img-wrap {
             height: clamp(300px, 80vw, 440px) !important;
@@ -754,6 +765,14 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
           }
           .category-spotlight-dual-wrap {
             height: 250px !important;
+          }
+          .category-spotlight-dual-wrap > div:first-child {
+            width: 68% !important;
+            height: 88% !important;
+          }
+          .category-spotlight-dual-wrap > div:last-child {
+            width: 62% !important;
+            height: 60% !important;
           }
         }
       `}</style>
