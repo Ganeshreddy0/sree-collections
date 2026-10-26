@@ -181,36 +181,6 @@ function writeUrlFilters(state: {
   window.history.replaceState(null, "", next);
 }
 
-function NavLink({
-  href,
-  active,
-  children,
-}: {
-  href: string;
-  active?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <a
-      href={href}
-      style={{
-        fontFamily: "var(--font-serif)",
-        fontSize: "17px",
-        fontWeight: 700,
-        color: "#5A2035",
-        textDecoration: "none",
-        lineHeight: 1.2,
-        paddingBottom: active ? "3px" : undefined,
-        borderBottom: active ? "2.5px solid #5A2035" : undefined,
-        transition: "opacity 0.2s",
-      }}
-      className="cat-nav-link"
-    >
-      {children}
-    </a>
-  );
-}
-
 function ProductCard({
   product,
   qty,
@@ -338,11 +308,11 @@ function ProductCard({
         <h3
           className="cat-card-title"
           style={{
-            fontFamily: "'Blacker Display', 'Playfair Display', Georgia, serif",
+            fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif",
             fontWeight: 600,
-            fontSize: "17px",
-            lineHeight: "22px",
-            height: "22px",
+            fontSize: "13.5px",
+            lineHeight: "18px",
+            minHeight: "18px",
             color: "#5D2030",
             margin: "0 0 6px 0",
             whiteSpace: "nowrap",
@@ -384,7 +354,7 @@ function ProductCard({
                 style={{
                   fontSize: 11,
                   color: "#8A7B6F",
-                  fontFamily: "'Playfair Display', Georgia, serif",
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
                 }}
               >
                 +{product.colours.length - 5}
@@ -403,19 +373,21 @@ function ProductCard({
           <div style={{ display: "flex", alignItems: "baseline", gap: "6px", flexWrap: "wrap" }}>
             <span
               style={{
-                fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: "13px",
-                color: "#5D2030",
-                fontWeight: 400,
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontSize: "11px",
+                color: "#9E7A54",
+                fontWeight: 600,
+                textTransform: "uppercase",
+                letterSpacing: "0.5px",
               }}
             >
               Price:
             </span>
             <span
               style={{
-                fontFamily: "'Playfair Display', Georgia, serif",
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
                 fontWeight: 700,
-                fontSize: "15px",
+                fontSize: "14px",
                 color: "#5D2030",
               }}
             >
@@ -424,8 +396,8 @@ function ProductCard({
             {showMrp && (
               <span
                 style={{
-                  fontFamily: "'Playfair Display', Georgia, serif",
-                  fontSize: "12px",
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  fontSize: "11px",
                   color: "#8A7B6F",
                   textDecoration: "line-through",
                 }}
@@ -723,7 +695,7 @@ function SidebarHeading({ children }: { children: React.ReactNode }) {
 
 export default function CategoriesPage() {
   // Always use safe SSR defaults for initial state to avoid hydration mismatch
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const [selectedCategory, setSelectedCategory] = useState("All Products");
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
@@ -766,8 +738,19 @@ export default function CategoriesPage() {
     handleUrlChange();
     setMounted(true);
 
+    const handleCategorySearch = (e: any) => {
+      const q = typeof e?.detail === "string" ? e.detail : "";
+      setSearchQuery(q);
+      setSearchInput(q);
+      setSearchOpen(Boolean(q));
+    };
+
     window.addEventListener("popstate", handleUrlChange);
-    return () => window.removeEventListener("popstate", handleUrlChange);
+    window.addEventListener("sreeCategorySearch", handleCategorySearch);
+    return () => {
+      window.removeEventListener("popstate", handleUrlChange);
+      window.removeEventListener("sreeCategorySearch", handleCategorySearch);
+    };
   }, []);
 
   const [products, setProducts] = useState<Product[]>([]);
@@ -1170,6 +1153,7 @@ export default function CategoriesPage() {
     setCheckedPrices(["All Prices"]);
     setSearchQuery("");
     setSearchInput("");
+    window.dispatchEvent(new CustomEvent("sreeCategorySearchCleared"));
     setSortBy("Featured");
   };
 
@@ -1250,259 +1234,11 @@ export default function CategoriesPage() {
         </div>
       )}
 
-      {/* HEADER — Identical to Home Page */}
-      <div style={{ width: "100%", display: "flex", justifyContent: "center", position: "sticky", top: 0, zIndex: 100, backgroundColor: "#FCF8F2" }}>
-        <header
-          style={{
-            width: "100%",
-            maxWidth: "1360px",
-            minHeight: "95px",
-            margin: "0 auto",
-            padding: "0 20px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            boxSizing: "border-box",
-            position: "relative",
-            zIndex: 50,
-          }}
-        >
-          {/* Brand Logo */}
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <a href="/" style={{ display: "inline-block" }}>
-              <img
-                className="cat-logo"
-                src="/homepage/logo2_trans.png"
-                alt="Sree Collections"
-                style={{
-                  height: "72px",
-                  width: "auto",
-                  objectFit: "contain",
-                  maxWidth: "340px",
-                  display: "block",
-                }}
-              />
-            </a>
-          </div>
+      {/* Shared SiteHeader is rendered globally in layout.tsx */}
 
-          {/* Desktop Navigation */}
-          <nav
-            className="cat-desktop-nav"
-            style={{ display: "none", alignItems: "center", gap: "36px" }}
-          >
-            <NavLink href="/">Home</NavLink>
-            <NavLink href="/about">About</NavLink>
-            <NavLink href="/categories" active>Categories</NavLink>
+      {/* Mobile Expandable Search Bar (categories-specific product search) */}
 
-            {/* CONTACT US Pill Button */}
-            <a
-              href="/contact"
-              className="cat-contact-btn primary-btn"
-              style={{
-                background: "#BA8E43",
-                color: "#FFFFFF",
-                fontFamily: "var(--font-serif)",
-                fontSize: "12.5px",
-                fontWeight: 700,
-                letterSpacing: "0.8px",
-                textTransform: "uppercase",
-                padding: "11px 28px",
-                borderRadius: "9999px",
-                boxShadow: "0 2px 10px rgba(186, 142, 67, 0.25)",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transition: "all 0.25s ease",
-                textDecoration: "none",
-              }}
-            >
-              CONTACT US
-            </a>
 
-            {/* Search Link */}
-            <a
-              href="/search"
-              aria-label="Search"
-              style={{
-                color: "#5A2035",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "4px",
-                transition: "transform 0.2s ease, opacity 0.2s ease",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
-            >
-              <FiSearch size={22} strokeWidth={2} />
-            </a>
-
-            {/* Cart Icon */}
-            <a
-              href="/cart"
-              aria-label="Cart"
-              style={{
-                color: "#5A2035",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                textDecoration: "none",
-                position: "relative",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "4px",
-                transition: "transform 0.2s ease",
-              }}
-            >
-              <FiShoppingCart size={22} strokeWidth={2} />
-              {cartCount > 0 && (
-                <span
-                  style={{
-                    position: "absolute",
-                    top: "-7px",
-                    right: "-7px",
-                    backgroundColor: "#BB8E43",
-                    color: "#FFFFFF",
-                    fontSize: "10px",
-                    fontWeight: 700,
-                    width: "17px",
-                    height: "17px",
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontFamily: "var(--font-serif)",
-                  }}
-                >
-                  {cartCount > 9 ? "9+" : cartCount}
-                </span>
-              )}
-            </a>
-          </nav>
-
-          {/* Mobile Actions: Search + Cart + Hamburger */}
-          <div
-            className="mobile-header-actions"
-            style={{
-              display: "none",
-              alignItems: "center",
-              gap: "8px",
-            }}
-          >
-            <a
-              href="/search"
-              aria-label="Search"
-              style={{
-                color: "#5A2035",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "6px",
-              }}
-            >
-              <FiSearch size={21} strokeWidth={2} />
-            </a>
-
-            <a
-              href="/cart"
-              aria-label="Cart"
-              style={{
-                color: "#5A2035",
-                position: "relative",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "6px",
-              }}
-            >
-              <FiShoppingCart size={21} strokeWidth={2} />
-              {cartCount > 0 && (
-                <span
-                  style={{
-                    position: "absolute",
-                    top: "-2px",
-                    right: "-2px",
-                    backgroundColor: "#BB8E43",
-                    color: "#FFFFFF",
-                    fontSize: "10px",
-                    fontWeight: 700,
-                    width: "17px",
-                    height: "17px",
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontFamily: "var(--font-serif)",
-                  }}
-                >
-                  {cartCount > 9 ? "9+" : cartCount}
-                </span>
-              )}
-            </a>
-
-            <button
-              className="cat-hamburger mobile-hamburger"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Toggle menu"
-              style={{
-                padding: "6px",
-                color: "#2F2C24",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              {mobileMenuOpen ? <FiX size={25} /> : <FiMenu size={25} />}
-            </button>
-          </div>
-        </header>
-      </div>
-
-      {/* Mobile Drawer — same as home page */}
-      {mobileMenuOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100vh",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            zIndex: 200,
-            display: "flex",
-            justifyContent: "flex-end",
-          }}
-          onClick={() => setMobileMenuOpen(false)}
-        >
-          <div
-            style={{
-              width: "290px",
-              height: "100%",
-              backgroundColor: "#FCF8F2",
-              padding: "30px 24px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "20px",
-              boxShadow: "-4px 0 20px rgba(0,0,0,0.15)",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <img src="/homepage/logo2_trans.png" alt="Logo" style={{ height: "48px" }} />
-              <button onClick={() => setMobileMenuOpen(false)} style={{ background: "none", border: "none", cursor: "pointer" }}>
-                <FiX size={24} />
-              </button>
-            </div>
-            <nav style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "20px" }}>
-              <a href="/" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 600, color: "#5A2035", fontFamily: "var(--font-serif)", textDecoration: "none" }}>Home</a>
-              <a href="/about" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500, color: "#5A2035", fontFamily: "var(--font-serif)", textDecoration: "none" }}>About</a>
-              <a href="/categories" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 700, color: "#BA8E43", fontFamily: "var(--font-serif)", textDecoration: "none" }}>Categories</a>
-              <a href="/contact" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: "16px", fontWeight: 500, color: "#5A2035", fontFamily: "var(--font-serif)", textDecoration: "none" }}>Contact Us</a>
-            </nav>
-          </div>
-        </div>
-      )}
 
       {/* TOP BAR: Heading & Results inline */}
       <div
@@ -1554,6 +1290,50 @@ export default function CategoriesPage() {
           >
             Showing {totalCount} results
           </span>
+          {searchQuery && (
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "4px 12px",
+                borderRadius: "999px",
+                backgroundColor: "#FBF5EC",
+                border: "1.5px solid #BB8E43",
+                fontSize: "13px",
+                color: "#5D2030",
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontWeight: 600,
+              }}
+            >
+              <span>for &ldquo;{searchQuery}&rdquo;</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchInput("");
+                  setSearchQuery("");
+                  window.dispatchEvent(new CustomEvent("sreeCategorySearchCleared"));
+                  const sp = new URLSearchParams(window.location.search);
+                  sp.delete("search");
+                  const qs = sp.toString();
+                  window.history.replaceState(null, "", qs ? `/categories?${qs}` : "/categories");
+                }}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#BB8E43",
+                  display: "flex",
+                  alignItems: "center",
+                  padding: "0 2px",
+                }}
+                title="Clear search"
+                aria-label="Clear search"
+              >
+                <FiX size={14} />
+              </button>
+            </div>
+          )}
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", width: "100%", justifyContent: "flex-end" }}>
@@ -2492,6 +2272,7 @@ export default function CategoriesPage() {
       <style>{`
         @media (min-width: 992px) {
           .cat-desktop-nav { display: flex !important; }
+          .cat-mobile-inline-search { display: none !important; }
           .mobile-header-actions { display: none !important; }
           .cat-mobile-filter-btn { display: none !important; }
           .cat-mobile-pills-bar { display: none !important; }
@@ -2499,6 +2280,8 @@ export default function CategoriesPage() {
         }
         @media (max-width: 991px) {
           .cat-desktop-nav { display: none !important; }
+          .cat-desktop-search-expanded { display: none !important; }
+          .cat-mobile-inline-search { display: flex !important; }
           .mobile-header-actions { display: flex !important; }
           .cat-hamburger { display: flex !important; }
           .cat-mobile-filter-btn { display: inline-flex !important; }
@@ -2562,8 +2345,20 @@ export default function CategoriesPage() {
           .cat-card-short .cat-card-img { height: 220px !important; }
           .cat-card-title { font-size: 14px !important; line-height: 18px !important; height: 18px !important; }
         }
-        .cat-nav-link:hover { opacity: 0.75; }
-        .cat-contact-btn:hover { filter: brightness(1.08); transform: translateY(-2px); }
+        .cat-nav-link {
+          transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1) !important;
+        }
+        .cat-nav-link:hover {
+          background: rgba(186, 142, 67, 0.15) !important;
+          color: #BA8E43 !important;
+          border-radius: 9999px !important;
+          transform: translateY(-1px) !important;
+        }
+        .cat-active-nav-pill:hover {
+          background: #a47b36 !important;
+          transform: translateY(-1px) !important;
+          box-shadow: 0 4px 14px rgba(186, 142, 67, 0.35) !important;
+        }
         .cat-sort-btn:hover { background-color: #FBF5EC !important; }
         .cat-sort-item:hover { background-color: #FBF5EC !important; }
         .cat-sidebar-link:hover { color: #BB8E43 !important; transform: translateX(4px); }

@@ -16,7 +16,6 @@ import {
   FiX,
 } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
-import SiteHeader from "@/components/SiteHeader";
 
 function NavLink({
   href,
@@ -142,10 +141,7 @@ export default function CartPage() {
         paddingBottom: "80px",
       }}
     >
-      {/* =========================================================================
-          1. HEADER / NAVBAR — Centralized SiteHeader with Dynamic Active Nav
-         ========================================================================= */}
-      <SiteHeader />
+      {/* Global SiteHeader is handled by layout.tsx */}
 
       {/* Main Container */}
       <main className="cart-main-content" style={{ maxWidth: "1200px", margin: "28px auto 0 auto", padding: "0 24px" }}>
