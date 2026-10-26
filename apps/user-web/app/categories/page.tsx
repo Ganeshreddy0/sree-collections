@@ -814,13 +814,15 @@ export default function CategoriesPage() {
     let isMounted = true;
     async function fetchCategoriesList() {
       try {
-        const [filtersRes, catsRes] = await Promise.all([
+        const [filtersRes, catsRes, allSubsRes] = await Promise.all([
           fetch(`${API_BASE}/products/filters`),
           fetch(`${API_BASE}/categories?status=Active`),
+          fetch(`${API_BASE}/sub-categories?status=Active`),
         ]);
 
         const filtersJson = filtersRes.ok ? await filtersRes.json() : null;
         const catsJson = catsRes.ok ? await catsRes.json() : null;
+        const allSubsJson = allSubsRes.ok ? await allSubsRes.json() : null;
 
         if (!isMounted) return;
 
@@ -843,6 +845,30 @@ export default function CategoriesPage() {
           ])
         );
         setCategoriesList(mergedCats);
+
+        // Subcategory validation against active subcategories present in categories page
+        const allActiveSubs: Array<{ name: string; category: string }> = Array.isArray(allSubsJson?.data)
+          ? allSubsJson.data
+          : [];
+
+        const urlState = readUrlFilters();
+        if (urlState.subCategory && allActiveSubs.length > 0) {
+          const matched = allActiveSubs.find(
+            (s) => s.name.trim().toLowerCase() === urlState.subCategory.trim().toLowerCase()
+          );
+          if (!matched) {
+            // If subcategory is not matched with the subcategories present in categories page,
+            // open categories page! (Clear subcategory and show all products)
+            setSelectedSubCategory("");
+            setSelectedCategory("All Products");
+          } else {
+            // Matched! Ensure correct category is selected and normalize name
+            if (matched.category && (!urlState.category || urlState.category === "All Products")) {
+              setSelectedCategory(matched.category);
+            }
+            setSelectedSubCategory(matched.name);
+          }
+        }
       } catch {
         // Keep empty dynamic lists; products fetch still works
       }
@@ -910,6 +936,20 @@ export default function CategoriesPage() {
 
         const mergedSubs = Array.from(new Set([...subFromApi, ...subFromFacets]));
         setSubCategoriesList(mergedSubs);
+
+        // If a subcategory is currently selected, check if it matches the subcategories present in this category
+        if (selectedSubCategory && mergedSubs.length > 0) {
+          const matchedSub = mergedSubs.find(
+            (s) => s.trim().toLowerCase() === selectedSubCategory.trim().toLowerCase()
+          );
+          if (!matchedSub) {
+            // Not matched with the sub categories present in categories page:
+            // Clear subcategory to open the category/categories page instead of an empty product list
+            setSelectedSubCategory("");
+          } else if (matchedSub !== selectedSubCategory) {
+            setSelectedSubCategory(matchedSub);
+          }
+        }
       } catch {
         /* ignore */
       }
@@ -918,7 +958,7 @@ export default function CategoriesPage() {
     return () => {
       isMounted = false;
     };
-  }, [selectedCategory]);
+  }, [selectedCategory, selectedSubCategory]);
 
   // 2. Fetch products whenever filters or search change
   useEffect(() => {
@@ -1462,8 +1502,8 @@ export default function CategoriesPage() {
           display: "none",
           width: "100%",
           maxWidth: "1440px",
-          margin: "0 auto 16px auto",
-          padding: "0 16px",
+          margin: "0 auto 12px auto",
+          padding: "6px 16px 14px 16px",
           boxSizing: "border-box",
           overflowX: "auto",
           WebkitOverflowScrolling: "touch",

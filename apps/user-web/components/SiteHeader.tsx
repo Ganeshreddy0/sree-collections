@@ -173,6 +173,7 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
       }}
     >
       <div
+        className="site-header-main"
         style={{
           width: "100%",
           maxWidth: "1360px",
@@ -192,6 +193,7 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
             <img
               src={logoUrl || "/homepage/logo2_trans.png"}
               alt="Sree Collections"
+              className="site-logo-img"
               style={{
                 height: "72px",
                 width: "auto",
@@ -412,79 +414,31 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
           style={{
             display: "none",
             alignItems: "center",
-            gap: "8px",
+            gap: "6px",
           }}
         >
           {isCategoriesPage ? (
-            searchOpen ? (
-              <form
-                onSubmit={handleSearchSubmit}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  backgroundColor: "#FFFFFF",
-                  border: "1.5px solid #BA8E43",
-                  borderRadius: "9999px",
-                  padding: "3px 10px",
-                  height: "36px",
-                  boxSizing: "border-box",
-                  boxShadow: "0 2px 6px rgba(186, 142, 67, 0.18)",
-                }}
-              >
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={(e) => handleCategorySearchChange(e.target.value)}
-                  style={{
-                    border: "none",
-                    outline: "none",
-                    background: "transparent",
-                    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-                    fontSize: "13px",
-                    color: "#2F2C24",
-                    width: "110px",
-                    padding: 0,
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={handleClearOrClose}
-                  aria-label="Close search"
-                  style={{
-                    border: "none",
-                    background: "none",
-                    cursor: "pointer",
-                    padding: "2px",
-                    display: "flex",
-                    alignItems: "center",
-                    color: "#5A2035",
-                  }}
-                >
-                  <FiX size={15} />
-                </button>
-              </form>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setSearchOpen(true)}
-                aria-label="Search categories"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "#5A2035",
-                  padding: "6px",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              >
-                <FiSearch size={21} strokeWidth={2} />
-              </button>
-            )
+            <button
+              type="button"
+              onClick={() => setSearchOpen(!searchOpen)}
+              aria-label="Search categories"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: searchOpen ? "#BA8E43" : "#5A2035",
+                backgroundColor: searchOpen ? "rgba(186, 142, 67, 0.12)" : "transparent",
+                borderRadius: "50%",
+                width: "36px",
+                height: "36px",
+                padding: 0,
+                border: searchOpen ? "1px solid #BA8E43" : "none",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}
+            >
+              <FiSearch size={20} strokeWidth={2} />
+            </button>
           ) : (
             <Link
               href="/search"
@@ -494,10 +448,12 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
                 alignItems: "center",
                 justifyContent: "center",
                 color: "#5A2035",
-                padding: "6px",
+                width: "36px",
+                height: "36px",
+                padding: 0,
               }}
             >
-              <FiSearch size={21} strokeWidth={2} />
+              <FiSearch size={20} strokeWidth={2} />
             </Link>
           )}
 
@@ -509,28 +465,31 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
               alignItems: "center",
               justifyContent: "center",
               color: "#5A2035",
-              padding: "6px",
+              width: "36px",
+              height: "36px",
+              padding: 0,
               position: "relative",
             }}
           >
-            <FiShoppingCart size={21} strokeWidth={2} />
+            <FiShoppingCart size={20} strokeWidth={2} />
             {cartCount > 0 && (
               <span
                 style={{
                   position: "absolute",
-                  top: "-3px",
-                  right: "-3px",
+                  top: "0px",
+                  right: "-2px",
                   backgroundColor: "#BA8E43",
                   color: "#FFFFFF",
-                  fontSize: "10.5px",
+                  fontSize: "10px",
                   fontWeight: 700,
-                  width: "18px",
-                  height: "18px",
-                  borderRadius: "50%",
+                  minWidth: "16px",
+                  height: "16px",
+                  borderRadius: "999px",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+                  padding: "0 3px",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
                   fontFamily: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif",
                   lineHeight: 1,
                   userSelect: "none",
@@ -545,7 +504,12 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
             style={{
-              padding: "6px",
+              width: "36px",
+              height: "36px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 0,
               color: "#2F2C24",
               background: "none",
               border: "none",
@@ -553,10 +517,44 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
             }}
             className="mobile-hamburger"
           >
-            {mobileMenuOpen ? <FiX size={25} /> : <FiMenu size={25} />}
+            {mobileMenuOpen ? <FiX size={23} /> : <FiMenu size={23} />}
           </button>
         </div>
       </div>
+
+      {/* Mobile Expandable Search Bar (categories page specific) */}
+      {isCategoriesPage && searchOpen && (
+        <div className="site-mobile-search-bar-wrap">
+          <form onSubmit={handleSearchSubmit} className="site-mobile-search-bar">
+            <FiSearch size={17} color="#BA8E43" style={{ flexShrink: 0 }} />
+            <input
+              ref={searchInputRef}
+              type="text"
+              placeholder="Search products in categories..."
+              value={searchQuery}
+              onChange={(e) => handleCategorySearchChange(e.target.value)}
+            />
+            <button
+              type="button"
+              onClick={handleClearOrClose}
+              aria-label="Close or clear search"
+              style={{
+                border: "none",
+                background: "none",
+                cursor: "pointer",
+                padding: "4px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#5A2035",
+                flexShrink: 0,
+              }}
+            >
+              <FiX size={17} />
+            </button>
+          </form>
+        </div>
+      )}
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
@@ -675,13 +673,85 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
           .site-mobile-actions {
             display: none !important;
           }
+          .site-mobile-search-bar-wrap {
+            display: none !important;
+          }
         }
         @media (max-width: 991px) {
+          .site-header-main {
+            min-height: 64px !important;
+            height: 64px !important;
+            padding: 0 16px !important;
+          }
+          .site-logo-img {
+            height: 44px !important;
+            max-width: 170px !important;
+          }
           .site-desktop-nav {
             display: none !important;
           }
           .site-mobile-actions {
             display: flex !important;
+          }
+          .site-mobile-search-bar-wrap {
+            display: block !important;
+            width: 100% !important;
+            padding: 4px 16px 12px 16px !important;
+            box-sizing: border-box !important;
+            background-color: #FCF8F2 !important;
+            border-bottom: 1px solid rgba(186, 142, 67, 0.12) !important;
+            animation: scSlideDown 0.2s ease-out;
+          }
+          .site-mobile-search-bar {
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            width: 100% !important;
+            height: 42px !important;
+            background-color: #FFFFFF !important;
+            border: 1.5px solid #BA8E43 !important;
+            border-radius: 9999px !important;
+            padding: 0 14px !important;
+            box-sizing: border-box !important;
+            box-shadow: 0 2px 8px rgba(186, 142, 67, 0.15) !important;
+          }
+          .site-mobile-search-bar input {
+            flex: 1 !important;
+            min-width: 0 !important;
+            border: none !important;
+            outline: none !important;
+            background: transparent !important;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+            font-size: 14px !important;
+            color: #2F2C24 !important;
+            padding: 0 !important;
+          }
+        }
+        @media (max-width: 480px) {
+          .site-header-main {
+            min-height: 58px !important;
+            height: 58px !important;
+            padding: 0 12px !important;
+          }
+          .site-logo-img {
+            height: 38px !important;
+            max-width: 140px !important;
+          }
+          .site-mobile-search-bar-wrap {
+            padding: 2px 12px 10px 12px !important;
+          }
+          .site-mobile-search-bar {
+            height: 38px !important;
+          }
+        }
+        @keyframes scSlideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-6px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
           }
         }
         .nav-link:hover {
