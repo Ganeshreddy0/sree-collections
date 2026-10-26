@@ -738,8 +738,19 @@ export default function CategoriesPage() {
     handleUrlChange();
     setMounted(true);
 
+    const handleCategorySearch = (e: any) => {
+      const q = typeof e?.detail === "string" ? e.detail : "";
+      setSearchQuery(q);
+      setSearchInput(q);
+      setSearchOpen(Boolean(q));
+    };
+
     window.addEventListener("popstate", handleUrlChange);
-    return () => window.removeEventListener("popstate", handleUrlChange);
+    window.addEventListener("sreeCategorySearch", handleCategorySearch);
+    return () => {
+      window.removeEventListener("popstate", handleUrlChange);
+      window.removeEventListener("sreeCategorySearch", handleCategorySearch);
+    };
   }, []);
 
   const [products, setProducts] = useState<Product[]>([]);
@@ -1142,6 +1153,7 @@ export default function CategoriesPage() {
     setCheckedPrices(["All Prices"]);
     setSearchQuery("");
     setSearchInput("");
+    window.dispatchEvent(new CustomEvent("sreeCategorySearchCleared"));
     setSortBy("Featured");
   };
 
@@ -1300,6 +1312,11 @@ export default function CategoriesPage() {
                 onClick={() => {
                   setSearchInput("");
                   setSearchQuery("");
+                  window.dispatchEvent(new CustomEvent("sreeCategorySearchCleared"));
+                  const sp = new URLSearchParams(window.location.search);
+                  sp.delete("search");
+                  const qs = sp.toString();
+                  window.history.replaceState(null, "", qs ? `/categories?${qs}` : "/categories");
                 }}
                 style={{
                   background: "none",

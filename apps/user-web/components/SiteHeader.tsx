@@ -17,7 +17,10 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
   const [cartCount, setCartCount] = useState(0);
   const [activeItem, setActiveItem] = useState<string>("home");
 
-  // Inline Search state (icon-side search bar)
+  // Check if current page is categories page
+  const isCategoriesPage = pathname.startsWith("/categories");
+
+  // Inline Search state (only used when on categories page)
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -42,14 +45,38 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
     }
   }, [pathname, activePath]);
 
+  // Read URL query parameter on initial load if on categories page, or close search if on another page
+  useEffect(() => {
+    if (isCategoriesPage && typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      const q = sp.get("search") || "";
+      if (q) {
+        setSearchQuery(q);
+        setSearchOpen(true);
+      }
+    } else {
+      setSearchOpen(false);
+      setSearchQuery("");
+    }
+  }, [pathname, isCategoriesPage]);
+
   // Focus search input when expanded
   useEffect(() => {
-    if (searchOpen) {
+    if (searchOpen && isCategoriesPage) {
       setTimeout(() => {
         searchInputRef.current?.focus();
       }, 50);
     }
-  }, [searchOpen]);
+  }, [searchOpen, isCategoriesPage]);
+
+  // Listen for sreeCategorySearchCleared event from categories page
+  useEffect(() => {
+    const handleCleared = () => {
+      setSearchQuery("");
+    };
+    window.addEventListener("sreeCategorySearchCleared", handleCleared);
+    return () => window.removeEventListener("sreeCategorySearchCleared", handleCleared);
+  }, []);
 
   // Load and listen to cart updates from localStorage
   useEffect(() => {
@@ -82,14 +109,46 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
     };
   }, []);
 
+  const handleCategorySearchChange = (val: string) => {
+    setSearchQuery(val);
+    window.dispatchEvent(new CustomEvent("sreeCategorySearch", { detail: val }));
+    const sp = new URLSearchParams(window.location.search);
+    if (val.trim()) {
+      sp.set("search", val.trim());
+    } else {
+      sp.delete("search");
+    }
+    const qs = sp.toString();
+    window.history.replaceState(null, "", qs ? `/categories?${qs}` : "/categories");
+  };
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!searchQuery.trim()) return;
-
-    if (pathname.startsWith("/categories")) {
-      router.push(`/categories?search=${encodeURIComponent(searchQuery.trim())}`);
+    if (isCategoriesPage) {
+      window.dispatchEvent(new CustomEvent("sreeCategorySearch", { detail: searchQuery.trim() }));
+      const sp = new URLSearchParams(window.location.search);
+      if (searchQuery.trim()) {
+        sp.set("search", searchQuery.trim());
+      } else {
+        sp.delete("search");
+      }
+      const qs = sp.toString();
+      window.history.replaceState(null, "", qs ? `/categories?${qs}` : "/categories");
     } else {
-      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      router.push("/search");
+    }
+  };
+
+  const handleClearOrClose = () => {
+    if (searchQuery) {
+      setSearchQuery("");
+      window.dispatchEvent(new CustomEvent("sreeCategorySearch", { detail: "" }));
+      const sp = new URLSearchParams(window.location.search);
+      sp.delete("search");
+      const qs = sp.toString();
+      window.history.replaceState(null, "", qs ? `/categories?${qs}` : "/categories");
+    } else {
+      setSearchOpen(false);
     }
   };
 
@@ -205,71 +264,89 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
             );
           })}
 
-          {/* Search Icon & Expandable Search Field */}
+          {/* Search Action:
+              - On Categories Page: opens text field side to search products present in categories page
+              - On All Other Pages: directly opens /search page
+          */}
           <div style={{ display: "flex", alignItems: "center", position: "relative" }}>
-            {searchOpen ? (
-              <form
-                onSubmit={handleSearchSubmit}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  backgroundColor: "#FFFFFF",
-                  border: "1.5px solid #BA8E43",
-                  borderRadius: "9999px",
-                  padding: "4px 12px 4px 14px",
-                  height: "40px",
-                  boxSizing: "border-box",
-                  boxShadow: "0 2px 8px rgba(186, 142, 67, 0.2)",
-                  animation: "fadeIn 0.2s ease",
-                }}
-              >
-                <FiSearch size={17} color="#BA8E43" style={{ flexShrink: 0 }} />
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+            {isCategoriesPage ? (
+              searchOpen ? (
+                <form
+                  onSubmit={handleSearchSubmit}
                   style={{
-                    border: "none",
-                    outline: "none",
-                    background: "transparent",
-                    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-                    fontSize: "13.5px",
-                    color: "#2F2C24",
-                    width: "160px",
-                    padding: 0,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    backgroundColor: "#FFFFFF",
+                    border: "1.5px solid #BA8E43",
+                    borderRadius: "9999px",
+                    padding: "4px 12px 4px 14px",
+                    height: "40px",
+                    boxSizing: "border-box",
+                    boxShadow: "0 2px 8px rgba(186, 142, 67, 0.2)",
+                    animation: "fadeIn 0.2s ease",
                   }}
-                />
+                >
+                  <FiSearch size={17} color="#BA8E43" style={{ flexShrink: 0 }} />
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    placeholder="Search products..."
+                    value={searchQuery}
+                    onChange={(e) => handleCategorySearchChange(e.target.value)}
+                    style={{
+                      border: "none",
+                      outline: "none",
+                      background: "transparent",
+                      fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+                      fontSize: "13.5px",
+                      color: "#2F2C24",
+                      width: "160px",
+                      padding: 0,
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleClearOrClose}
+                    aria-label="Close search"
+                    style={{
+                      border: "none",
+                      background: "none",
+                      cursor: "pointer",
+                      padding: "2px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "#5A2035",
+                    }}
+                  >
+                    <FiX size={16} />
+                  </button>
+                </form>
+              ) : (
                 <button
                   type="button"
-                  onClick={() => {
-                    if (searchQuery) {
-                      setSearchQuery("");
-                    } else {
-                      setSearchOpen(false);
-                    }
-                  }}
-                  aria-label="Close search"
+                  onClick={() => setSearchOpen(true)}
+                  aria-label="Search products in categories"
                   style={{
-                    border: "none",
-                    background: "none",
-                    cursor: "pointer",
-                    padding: "2px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     color: "#5A2035",
+                    padding: "6px",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    transition: "color 0.2s ease, transform 0.2s ease",
                   }}
+                  className="header-icon-btn"
                 >
-                  <FiX size={16} />
+                  <FiSearch size={22} strokeWidth={2} />
                 </button>
-              </form>
+              )
             ) : (
-              <button
-                type="button"
-                onClick={() => setSearchOpen(true)}
+              <Link
+                href="/search"
                 aria-label="Search"
                 style={{
                   display: "flex",
@@ -277,15 +354,12 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
                   justifyContent: "center",
                   color: "#5A2035",
                   padding: "6px",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  transition: "color 0.2s ease",
+                  transition: "color 0.2s ease, transform 0.2s ease",
                 }}
                 className="header-icon-btn"
               >
                 <FiSearch size={22} strokeWidth={2} />
-              </button>
+              </Link>
             )}
           </div>
 
@@ -341,66 +415,79 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
             gap: "8px",
           }}
         >
-          {searchOpen ? (
-            <form
-              onSubmit={handleSearchSubmit}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                backgroundColor: "#FFFFFF",
-                border: "1.5px solid #BA8E43",
-                borderRadius: "9999px",
-                padding: "3px 10px",
-                height: "36px",
-                boxSizing: "border-box",
-                boxShadow: "0 2px 6px rgba(186, 142, 67, 0.18)",
-              }}
-            >
-              <input
-                ref={searchInputRef}
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+          {isCategoriesPage ? (
+            searchOpen ? (
+              <form
+                onSubmit={handleSearchSubmit}
                 style={{
-                  border: "none",
-                  outline: "none",
-                  background: "transparent",
-                  fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-                  fontSize: "13px",
-                  color: "#2F2C24",
-                  width: "110px",
-                  padding: 0,
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  if (searchQuery) {
-                    setSearchQuery("");
-                  } else {
-                    setSearchOpen(false);
-                  }
-                }}
-                aria-label="Close search"
-                style={{
-                  border: "none",
-                  background: "none",
-                  cursor: "pointer",
-                  padding: "2px",
-                  display: "flex",
+                  display: "inline-flex",
                   alignItems: "center",
-                  color: "#5A2035",
+                  gap: "6px",
+                  backgroundColor: "#FFFFFF",
+                  border: "1.5px solid #BA8E43",
+                  borderRadius: "9999px",
+                  padding: "3px 10px",
+                  height: "36px",
+                  boxSizing: "border-box",
+                  boxShadow: "0 2px 6px rgba(186, 142, 67, 0.18)",
                 }}
               >
-                <FiX size={15} />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => handleCategorySearchChange(e.target.value)}
+                  style={{
+                    border: "none",
+                    outline: "none",
+                    background: "transparent",
+                    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+                    fontSize: "13px",
+                    color: "#2F2C24",
+                    width: "110px",
+                    padding: 0,
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={handleClearOrClose}
+                  aria-label="Close search"
+                  style={{
+                    border: "none",
+                    background: "none",
+                    cursor: "pointer",
+                    padding: "2px",
+                    display: "flex",
+                    alignItems: "center",
+                    color: "#5A2035",
+                  }}
+                >
+                  <FiX size={15} />
+                </button>
+              </form>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setSearchOpen(true)}
+                aria-label="Search categories"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#5A2035",
+                  padding: "6px",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                <FiSearch size={21} strokeWidth={2} />
               </button>
-            </form>
+            )
           ) : (
-            <button
-              type="button"
-              onClick={() => setSearchOpen(true)}
+            <Link
+              href="/search"
               aria-label="Search"
               style={{
                 display: "flex",
@@ -408,13 +495,10 @@ export default function SiteHeader({ logoUrl, activePath }: SiteHeaderProps) {
                 justifyContent: "center",
                 color: "#5A2035",
                 padding: "6px",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
               }}
             >
               <FiSearch size={21} strokeWidth={2} />
-            </button>
+            </Link>
           )}
 
           <Link

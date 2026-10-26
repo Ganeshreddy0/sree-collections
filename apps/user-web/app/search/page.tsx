@@ -314,6 +314,7 @@ function SearchPageInner() {
   const [inputVal, setInputVal] = useState(urlQuery);
   const [activeCategory, setActiveCategory] = useState<string | null>(urlCategory);
   const [categories, setCategories] = useState<string[]>([]);
+  const [subCategories, setSubCategories] = useState<string[]>([]);
   const [products, setProducts] = useState<BackendProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -336,14 +337,21 @@ function SearchPageInner() {
     }
   }, []);
 
-  // 1. Fetch any 5 categories from backend ONLY
+  // 1. Fetch categories AND sub-categories from backend
   useEffect(() => {
     let isMounted = true;
     async function loadCategories() {
       try {
-        const res = await fetch(`${API_BASE}/categories?status=Active`);
-        if (res.ok) {
-          const json = await res.json();
+        const [catsRes, facetRes] = await Promise.all([
+          fetch(`${API_BASE}/categories?status=Active`),
+          fetch(`${API_BASE}/products/filters`),
+        ]);
+
+        const allCatNames: string[] = [];
+        const allSubCatNames: string[] = [];
+
+        if (catsRes.ok) {
+          const json = await catsRes.json();
           const items: any[] = json.data || json || [];
           const sorted = items
             .filter((c: any) => {
@@ -355,29 +363,35 @@ function SearchPageInner() {
               const countB = typeof b.itemCount === "number" ? b.itemCount : 0;
               return countB - countA;
             });
-
-          const catNames: string[] = sorted.map((c: any) => (typeof c === "string" ? c : c.name));
-          // Take any 5 categories from backend
-          const fiveCategories = catNames.slice(0, 5);
-          if (isMounted && fiveCategories.length > 0) {
-            setCategories(fiveCategories);
-            return;
-          }
+          sorted.forEach((c: any) => {
+            const name = typeof c === "string" ? c : c.name;
+            if (name) allCatNames.push(name);
+          });
         }
 
-        // Fallback: fetch from /products/filters
-        const facetRes = await fetch(`${API_BASE}/products/filters`);
         if (facetRes.ok) {
           const facetJson = await facetRes.json();
           const facetData = facetJson?.data || facetJson || {};
-          const facetCats: string[] = (facetData.categories || [])
-            .map((c: any) => c.name)
-            .filter((name: string) => Boolean(name) && name !== "All Products" && !name.toLowerCase().includes("test"));
+          // Extra categories from facets
+          (facetData.categories || []).forEach((c: any) => {
+            const name = c.name || c;
+            if (name && !allCatNames.includes(name) && !name.toLowerCase().includes("test")) {
+              allCatNames.push(name);
+            }
+          });
+          // Sub-categories from facets
+          (facetData.subCategories || []).forEach((s: any) => {
+            const name = typeof s === "string" ? s : s.name || s;
+            if (name && !name.toLowerCase().includes("test")) {
+              allSubCatNames.push(name);
+            }
+          });
+        }
 
-          const fiveCategories = facetCats.slice(0, 5);
-          if (isMounted && fiveCategories.length > 0) {
-            setCategories(fiveCategories);
-          }
+        if (isMounted) {
+          // Show up to 6 categories as chips
+          setCategories(allCatNames.slice(0, 6));
+          setSubCategories(allSubCatNames);
         }
       } catch {
         /* ignore */
@@ -390,7 +404,52 @@ function SearchPageInner() {
     };
   }, []);
 
-  // 2. Fetch products from MongoDB database based on search query and category
+  // Helper: map raw product from API to BackendProduct shape
+  const mapProduct = (p: any, idx: number): BackendProduct => {
+    const selling =
+      Number(p.sellingPrice) ||
+      Number(p.rawPrice) ||
+      (typeof p.price === "number" ? p.price : 0) ||
+      0;
+    const mrp = Number(p.mrp) || 0;
+
+    let badge: string | null = p.badge || null;
+    if (!badge) {
+      if (mrp > selling && selling > 0) badge = "SALE";
+      else if (p.isNewArrival) badge = "NEW";
+      else if (p.featured) badge = "FEATURED";
+      else if (p.isBestSeller) badge = "BESTSELLER";
+    }
+
+    const mainImg =
+      p.featuredImage ||
+      p.image ||
+      p.img ||
+      (Array.isArray(p.images) && p.images[0]) ||
+      (Array.isArray(p.colourImages) && p.colourImages[0]?.primaryImage) ||
+      "/Categories/product_formal_shirt.jpg";
+
+    return {
+      id: String(p.id || p._id || `item_${idx}`),
+      code: p.productCode || p.sku || `PRD-${idx + 1}`,
+      name: p.productName || p.name || p.title || "Product",
+      price: selling,
+      rawPrice: selling,
+      mrp,
+      category: p.categoryName || (typeof p.category === "string" ? p.category : "Collection"),
+      categoryName: p.categoryName || (typeof p.category === "string" ? p.category : "Collection"),
+      subCategory: p.subCategory || "",
+      brand: p.brand || "",
+      image: mainImg,
+      images: Array.isArray(p.images) ? p.images : [],
+      badge,
+      featured: Boolean(p.featured),
+      isNewArrival: Boolean(p.isNewArrival),
+      isBestSeller: Boolean(p.isBestSeller),
+    };
+  };
+
+  // 2. Smart search: detect if query matches a category or sub-category name
   const loadProducts = useCallback(async (queryStr: string, catStr: string | null) => {
     setLoading(true);
     try {
@@ -398,11 +457,50 @@ function SearchPageInner() {
       params.append("status", "Active");
       params.append("limit", "100");
 
-      if (queryStr.trim()) {
-        params.append("search", queryStr.trim());
-      }
+      const q = queryStr.trim();
+
       if (catStr && catStr !== "All Products") {
+        // Category chip selected: filter by category, plus text search if any
         params.append("category", catStr);
+        if (q) params.append("search", q);
+      } else if (q) {
+        // Check if the query exactly matches a known category (case-insensitive)
+        const matchedCat = categories.find(
+          (c) => c.toLowerCase() === q.toLowerCase()
+        );
+        // Check if the query matches a known sub-category
+        const matchedSub = subCategories.find(
+          (s) => s.toLowerCase() === q.toLowerCase()
+        );
+
+        if (matchedCat) {
+          // Query is a category name → filter by category
+          params.append("category", matchedCat);
+        } else if (matchedSub) {
+          // Query is a sub-category name → filter by sub-category
+          params.append("subCategory", matchedSub);
+        } else {
+          // Partial match: check if query is a substring of a category or sub-category
+          const partialCat = categories.find((c) =>
+            c.toLowerCase().includes(q.toLowerCase()) ||
+            q.toLowerCase().includes(c.toLowerCase())
+          );
+          const partialSub = subCategories.find((s) =>
+            s.toLowerCase().includes(q.toLowerCase()) ||
+            q.toLowerCase().includes(s.toLowerCase())
+          );
+
+          if (partialCat && q.length >= 3) {
+            // Likely searching for a category
+            params.append("category", partialCat);
+          } else if (partialSub && q.length >= 3) {
+            // Likely searching for a sub-category
+            params.append("subCategory", partialSub);
+          } else {
+            // Generic product text search
+            params.append("search", q);
+          }
+        }
       }
 
       const res = await fetch(`${API_BASE}/products?${params.toString()}`);
@@ -410,62 +508,14 @@ function SearchPageInner() {
       const json = await res.json();
 
       const rawItems: any[] = json.data || json.products || [];
-      const mapped: BackendProduct[] = rawItems.map((p: any, idx: number) => {
-        const selling =
-          Number(p.sellingPrice) ||
-          Number(p.rawPrice) ||
-          (typeof p.price === "number" ? p.price : 0) ||
-          0;
-        const mrp = Number(p.mrp) || 0;
-
-        let badge: string | null = p.badge || null;
-        if (!badge) {
-          if (mrp > selling && selling > 0) {
-            badge = "SALE";
-          } else if (p.isNewArrival) {
-            badge = "NEW";
-          } else if (p.featured) {
-            badge = "FEATURED";
-          } else if (p.isBestSeller) {
-            badge = "BESTSELLER";
-          }
-        }
-
-        const mainImg =
-          p.featuredImage ||
-          p.image ||
-          p.img ||
-          (Array.isArray(p.images) && p.images[0]) ||
-          (Array.isArray(p.colourImages) && p.colourImages[0]?.primaryImage) ||
-          "/Categories/product_formal_shirt.jpg";
-
-        return {
-          id: String(p.id || p._id || `item_${idx}`),
-          code: p.productCode || p.sku || `PRD-${idx + 1}`,
-          name: p.productName || p.name || p.title || "Product",
-          price: selling,
-          rawPrice: selling,
-          mrp,
-          category: p.categoryName || (typeof p.category === "string" ? p.category : "Collection"),
-          categoryName: p.categoryName || (typeof p.category === "string" ? p.category : "Collection"),
-          subCategory: p.subCategory || "",
-          brand: p.brand || "",
-          image: mainImg,
-          images: Array.isArray(p.images) ? p.images : [],
-          badge,
-          featured: Boolean(p.featured),
-          isNewArrival: Boolean(p.isNewArrival),
-          isBestSeller: Boolean(p.isBestSeller),
-        };
-      });
-
-      setProducts(mapped);
+      setProducts(rawItems.map(mapProduct));
     } catch {
       setProducts([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categories, subCategories]);
 
   // Fetch when URL params change
   useEffect(() => {
@@ -664,7 +714,7 @@ function SearchPageInner() {
               ref={inputRef}
               type="text"
               id="srch-input"
-              placeholder="Search products..."
+              placeholder="Search by product, category or type..."
               value={inputVal}
               onChange={(e) => setInputVal(e.target.value)}
               style={{
@@ -831,26 +881,21 @@ function SearchPageInner() {
             style={{
               textAlign: "center",
               padding: "70px 20px",
-              color: "#5A2035",
               display: "flex",
-              flexDirection: "column",
+              justifyContent: "center",
               alignItems: "center",
-              gap: "14px",
             }}
           >
             <div
               style={{
-                width: "36px",
-                height: "36px",
+                width: "40px",
+                height: "40px",
                 border: "3px solid #E8D9C5",
                 borderTopColor: "#BB8E43",
                 borderRadius: "50%",
                 animation: "srchSpin 0.8s linear infinite",
               }}
             />
-            <span style={{ fontSize: "14px", fontWeight: 500 }}>
-              Searching products in database...
-            </span>
           </div>
         )}
 
