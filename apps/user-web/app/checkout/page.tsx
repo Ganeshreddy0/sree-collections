@@ -106,8 +106,24 @@ export default function CheckoutPage() {
   const [city, setCity] = useState("");
   const [state, setState] = useState("Telangana");
   const [pincode, setPincode] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("COD");
   const [notes, setNotes] = useState("");
+
+  // Shipping fee from admin settings
+  const [shippingFee, setShippingFee] = useState(0);
+  const [freeShippingThreshold, setFreeShippingThreshold] = useState(0);
+
+  // Fetch store settings (shipping fee)
+  useEffect(() => {
+    fetch(`${API_BASE}/settings`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.data) {
+          setShippingFee(data.data.shippingFee ?? 0);
+          setFreeShippingThreshold(data.data.freeShippingThreshold ?? 0);
+        }
+      })
+      .catch(() => {}); // fail silently – default 0
+  }, []);
 
   // Load cart from localStorage
   useEffect(() => {
@@ -130,8 +146,10 @@ export default function CheckoutPage() {
     (sum, item) => sum + (Number(item.price) || 0) * (Number(item.quantity) || 1),
     0
   );
-  const shippingFee = subtotal >= 1999 ? 0 : 0; // Free delivery
-  const totalAmount = subtotal + shippingFee;
+  // Effective shipping fee: free if threshold is met, else admin-set fee
+  const effectiveShippingFee =
+    freeShippingThreshold > 0 && subtotal >= freeShippingThreshold ? 0 : shippingFee;
+  const totalAmount = subtotal + effectiveShippingFee;
 
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -197,7 +215,7 @@ export default function CheckoutPage() {
         price: item.price,
         image: item.image || "",
       })),
-      paymentMethod,
+      paymentMethod: "COD",
       notes: notes.trim(),
     };
 
@@ -845,7 +863,7 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* Section 3: Payment Method */}
+            {/* Section 3: Payment Method – COD Only */}
             <div
               className="checkout-section-card"
               style={{
@@ -875,84 +893,54 @@ export default function CheckoutPage() {
                 3. Payment Method
               </h3>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "12px", width: "100%", minWidth: 0 }}>
-                <label
+              {/* COD only banner */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: "14px",
+                  padding: "16px 18px",
+                  borderRadius: "12px",
+                  border: "2px solid #BB8E43",
+                  backgroundColor: "rgba(187,142,67,0.06)",
+                  boxSizing: "border-box",
+                  width: "100%",
+                }}
+              >
+                <div
                   style={{
+                    width: "38px",
+                    height: "38px",
+                    borderRadius: "50%",
+                    backgroundColor: "rgba(187,142,67,0.15)",
                     display: "flex",
-                    alignItems: "flex-start",
-                    gap: "12px",
-                    padding: "14px 16px",
-                    borderRadius: "12px",
-                    border: paymentMethod === "COD" ? "2px solid #BB8E43" : "1px solid #E5D9C8",
-                    backgroundColor: paymentMethod === "COD" ? "rgba(187,142,67,0.06)" : "#FFFFFF",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                    boxSizing: "border-box",
-                    width: "100%",
-                    minWidth: 0,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
                   }}
                 >
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="COD"
-                    checked={paymentMethod === "COD"}
-                    onChange={() => setPaymentMethod("COD")}
-                    style={{ accentColor: "#BB8E43", width: "18px", height: "18px", marginTop: "3px", flexShrink: 0 }}
-                  />
-                  <div style={{ flex: 1, minWidth: 0, wordBreak: "break-word" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                      <strong style={{ color: "#5D2030", fontSize: "15px" }}>Cash on Delivery (COD)</strong>
-                      <span
-                        style={{
-                          fontSize: "11px",
-                          backgroundColor: "#BB8E43",
-                          color: "#FFF",
-                          padding: "2px 8px",
-                          borderRadius: "999px",
-                          fontWeight: 600,
-                        }}
-                      >
-                        Popular
-                      </span>
-                    </div>
-                    <span style={{ fontSize: "12.5px", color: "#7A6858", display: "block", marginTop: "2px" }}>
-                      Pay in cash or scan UPI QR upon arrival at your doorstep.
+                  <FiShield size={18} color="#BB8E43" />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", marginBottom: "4px" }}>
+                    <strong style={{ color: "#5D2030", fontSize: "15px" }}>Cash on Delivery (COD)</strong>
+                    <span
+                      style={{
+                        fontSize: "11px",
+                        backgroundColor: "#BB8E43",
+                        color: "#FFF",
+                        padding: "2px 8px",
+                        borderRadius: "999px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      Only Payment Mode
                     </span>
                   </div>
-                </label>
-
-                <label
-                  style={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    gap: "12px",
-                    padding: "14px 16px",
-                    borderRadius: "12px",
-                    border: paymentMethod === "Online" ? "2px solid #BB8E43" : "1px solid #E5D9C8",
-                    backgroundColor: paymentMethod === "Online" ? "rgba(187,142,67,0.06)" : "#FFFFFF",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                    boxSizing: "border-box",
-                    width: "100%",
-                    minWidth: 0,
-                  }}
-                >
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="Online"
-                    checked={paymentMethod === "Online"}
-                    onChange={() => setPaymentMethod("Online")}
-                    style={{ accentColor: "#BB8E43", width: "18px", height: "18px", marginTop: "3px", flexShrink: 0 }}
-                  />
-                  <div style={{ flex: 1, minWidth: 0, wordBreak: "break-word" }}>
-                    <strong style={{ color: "#5D2030", fontSize: "15px" }}>UPI / Online Transfer</strong>
-                    <span style={{ display: "block", fontSize: "12.5px", color: "#7A6858", marginTop: "2px" }}>
-                      Instant payment via Google Pay, PhonePe, Paytm, or Net Banking.
-                    </span>
-                  </div>
-                </label>
+                  <span style={{ fontSize: "12.5px", color: "#7A6858", display: "block" }}>
+                    Pay in cash when your order arrives at your doorstep. Safe &amp; hassle-free.
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -1187,8 +1175,14 @@ export default function CheckoutPage() {
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "space-between", color: "#555" }}>
-                  <span>Insured Shipping</span>
-                  <span style={{ color: "#128C7E", fontWeight: 700 }}>FREE</span>
+                  <span>Shipping</span>
+                  {effectiveShippingFee === 0 ? (
+                    <span style={{ color: "#128C7E", fontWeight: 700 }}>FREE</span>
+                  ) : (
+                    <span style={{ fontWeight: 600, color: "#2F2C24" }}>
+                      ₹{effectiveShippingFee.toLocaleString("en-IN")}
+                    </span>
+                  )}
                 </div>
 
                 <div

@@ -17,9 +17,12 @@ import {
   FiKey,
   FiLogOut,
   FiUser,
+  FiCamera,
 } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import ChangePasswordModal from "./ChangePasswordModal";
+import EditProfileModal from "./EditProfileModal";
+import { API_BASE } from "@/lib/config";
 import {
   LuLayoutGrid,
   LuFolderTree,
@@ -42,7 +45,8 @@ export default function AdminShell({ children }: Props) {
 
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [adminUser, setAdminUser] = useState<{ name?: string; email?: string } | null>(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [adminUser, setAdminUser] = useState<{ _id?: string; name?: string; email?: string; role?: string; avatar?: string } | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
 
   // ─── Auth Guard ───────────────────────────────────────────────────────────
@@ -62,7 +66,29 @@ export default function AdminShell({ children }: Props) {
       // ignore JSON parse error
     }
     setAuthChecked(true);
+
+    // Refresh user profile with avatar in background
+    fetch(`${API_BASE}/admin-auth/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.success && data?.user) {
+          setAdminUser(data.user);
+          localStorage.setItem("admin_user", JSON.stringify(data.user));
+        }
+      })
+      .catch(() => {});
   }, [router]);
+
+  const getInitials = (str?: string) => {
+    if (!str) return "A";
+    const parts = str.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return parts[0].slice(0, 2).toUpperCase();
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("admin_token");
@@ -100,6 +126,7 @@ export default function AdminShell({ children }: Props) {
     { href: "/brands",            label: "Brands",            icon: <LuTag size={16} /> },
     { href: "/variants",          label: "Variant Attributes",icon: <LuSlidersHorizontal size={16} /> },
     { href: "/homepage",          label: "Homepage CMS",      icon: <LuLayoutDashboard size={16} /> },
+    { href: "/settings",          label: "Store Settings",    icon: <FiSettings size={16} /> },
   ];
 
   const sidebarWidth = isMobile ? 240 : (collapsed ? 64 : 240);
@@ -242,142 +269,261 @@ export default function AdminShell({ children }: Props) {
             <FiSettings size={16} />
           </button>
 
-          {/* User Avatar + Dropdown toggle */}
-          <div style={{ position: "relative" }}>
-            <button
-              onClick={() => setShowUserMenu(!showUserMenu)}
-              style={{
-                background: "none",
-                border: "none",
-                padding: 0,
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                borderRadius: "50%",
-              }}
-              title="Admin Menu"
-            >
-              <div className="sc-user-avatar" style={{ border: showUserMenu ? "2px solid #541A28" : "none" }}>
-                <Image
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
-                  alt="Admin"
-                  width={38}
-                  height={38}
-                  style={{ objectFit: "cover", width: "100%", height: "100%" }}
-                />
-              </div>
-            </button>
-
-            {/* Dropdown Menu */}
-            {showUserMenu && (
-              <>
+            {/* User Avatar + Dropdown toggle */}
+            <div style={{ position: "relative" }}>
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  padding: 0,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  borderRadius: "50%",
+                }}
+                title="Admin Profile Menu"
+              >
                 <div
-                  style={{ position: "fixed", inset: 0, zIndex: 90 }}
-                  onClick={() => setShowUserMenu(false)}
-                />
-                <div
+                  className="sc-user-avatar"
                   style={{
-                    position: "absolute",
-                    right: 0,
-                    top: "calc(100% + 8px)",
-                    background: "#FFFFFF",
-                    border: "1px solid #EFE8E0",
-                    borderRadius: 12,
-                    boxShadow: "0 10px 30px rgba(84, 26, 40, 0.12)",
-                    width: 220,
-                    zIndex: 100,
+                    border: showUserMenu ? "2px solid #541A28" : "2px solid #D8C4AA",
+                    width: 38,
+                    height: 38,
+                    borderRadius: "50%",
                     overflow: "hidden",
-                    animation: "fadeIn 0.15s ease",
+                    backgroundColor: "#FAF6EE",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    position: "relative",
+                    boxShadow: "0 2px 6px rgba(84, 26, 40, 0.12)",
+                    transition: "border-color 0.2s ease",
                   }}
                 >
-                  {/* User info */}
+                  {adminUser?.avatar ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={adminUser.avatar}
+                      alt={adminUser.name || "Admin"}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = "none";
+                      }}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background: "linear-gradient(135deg, #541A28 0%, #7D283C 100%)",
+                        color: "#E5C384",
+                        fontSize: 13,
+                        fontWeight: 700,
+                        letterSpacing: "0.5px",
+                      }}
+                    >
+                      {getInitials(adminUser?.name)}
+                    </div>
+                  )}
+                </div>
+              </button>
+
+              {/* Dropdown Menu */}
+              {showUserMenu && (
+                <>
+                  <div
+                    style={{ position: "fixed", inset: 0, zIndex: 90 }}
+                    onClick={() => setShowUserMenu(false)}
+                  />
                   <div
                     style={{
-                      padding: "14px 16px",
-                      borderBottom: "1px solid #F0EAE1",
-                      background: "#FDFAF5",
+                      position: "absolute",
+                      right: 0,
+                      top: "calc(100% + 8px)",
+                      background: "#FFFFFF",
+                      border: "1px solid #EFE8E0",
+                      borderRadius: 14,
+                      boxShadow: "0 10px 32px rgba(84, 26, 40, 0.16)",
+                      width: 240,
+                      zIndex: 100,
+                      overflow: "hidden",
+                      animation: "fadeIn 0.15s ease",
                     }}
                   >
-                    <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "#541A28" }}>
-                      {adminUser?.name || "Administrator"}
-                    </p>
-                    <p
+                    {/* User info card with avatar thumbnail */}
+                    <div
                       style={{
-                        margin: "2px 0 0",
-                        fontSize: 11,
-                        color: "#7E5664",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {adminUser?.email || "gr0184236@gmail.com"}
-                    </p>
-                  </div>
-
-                  {/* Options */}
-                  <div style={{ padding: "6px 0" }}>
-                    <button
-                      onClick={() => {
-                        setShowUserMenu(false);
-                        setShowPasswordModal(true);
-                      }}
-                      style={{
-                        width: "100%",
-                        padding: "10px 16px",
+                        padding: "16px",
+                        borderBottom: "1px solid #F0EAE1",
+                        background: "#FDFAF5",
                         display: "flex",
                         alignItems: "center",
-                        gap: 10,
-                        border: "none",
-                        background: "transparent",
-                        fontSize: 13,
-                        fontWeight: 500,
-                        color: "#333",
-                        cursor: "pointer",
-                        textAlign: "left",
-                        transition: "background 0.15s",
+                        gap: 12,
                       }}
-                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#FAF4EC")}
-                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
                     >
-                      <FiKey size={15} color="#541A28" />
-                      <span>Change Password</span>
-                    </button>
+                      <div
+                        style={{
+                          width: 44,
+                          height: 44,
+                          borderRadius: "50%",
+                          border: "2px solid #BB8E43",
+                          overflow: "hidden",
+                          backgroundColor: "#FAF6EE",
+                          flexShrink: 0,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {adminUser?.avatar ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={adminUser.avatar}
+                            alt={adminUser.name || "Admin"}
+                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                            onError={(e) => {
+                              (e.target as HTMLElement).style.display = "none";
+                            }}
+                          />
+                        ) : (
+                          <div
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              background: "linear-gradient(135deg, #541A28 0%, #7D283C 100%)",
+                              color: "#E5C384",
+                              fontSize: 14,
+                              fontWeight: 700,
+                            }}
+                          >
+                            {getInitials(adminUser?.name)}
+                          </div>
+                        )}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: "#541A28", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {adminUser?.name || "Administrator"}
+                        </p>
+                        <p
+                          style={{
+                            margin: "2px 0 0",
+                            fontSize: 11,
+                            color: "#7E5664",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {adminUser?.email || "gr0184236@gmail.com"}
+                        </p>
+                      </div>
+                    </div>
 
-                    <button
-                      onClick={handleLogout}
-                      style={{
-                        width: "100%",
-                        padding: "10px 16px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 10,
-                        border: "none",
-                        background: "transparent",
-                        fontSize: 13,
-                        fontWeight: 500,
-                        color: "#C53030",
-                        cursor: "pointer",
-                        textAlign: "left",
-                        transition: "background 0.15s",
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#FFF5F5")}
-                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-                    >
-                      <FiLogOut size={15} color="#C53030" />
-                      <span>Sign Out</span>
-                    </button>
+                    {/* Options */}
+                    <div style={{ padding: "6px 0" }}>
+                      <button
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          setShowProfileModal(true);
+                        }}
+                        style={{
+                          width: "100%",
+                          padding: "10px 16px",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 10,
+                          border: "none",
+                          background: "transparent",
+                          fontSize: 13,
+                          fontWeight: 600,
+                          color: "#541A28",
+                          cursor: "pointer",
+                          textAlign: "left",
+                          transition: "background 0.15s",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#FAF4EC")}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                      >
+                        <FiCamera size={15} color="#BB8E43" />
+                        <span>Change Profile Photo</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          setShowPasswordModal(true);
+                        }}
+                        style={{
+                          width: "100%",
+                          padding: "10px 16px",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 10,
+                          border: "none",
+                          background: "transparent",
+                          fontSize: 13,
+                          fontWeight: 500,
+                          color: "#333",
+                          cursor: "pointer",
+                          textAlign: "left",
+                          transition: "background 0.15s",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#FAF4EC")}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                      >
+                        <FiKey size={15} color="#541A28" />
+                        <span>Change Password</span>
+                      </button>
+
+                      <button
+                        onClick={handleLogout}
+                        style={{
+                          width: "100%",
+                          padding: "10px 16px",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 10,
+                          border: "none",
+                          background: "transparent",
+                          fontSize: 13,
+                          fontWeight: 500,
+                          color: "#C53030",
+                          cursor: "pointer",
+                          textAlign: "left",
+                          transition: "background 0.15s",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#FFF5F5")}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                      >
+                        <FiLogOut size={15} color="#C53030" />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </>
-            )}
+                </>
+              )}
+            </div>
           </div>
-        </div>
 
         {/* Change Password Modal */}
         <ChangePasswordModal
           isOpen={showPasswordModal}
           onClose={() => setShowPasswordModal(false)}
+        />
+
+        {/* Edit Profile & Photo Modal */}
+        <EditProfileModal
+          isOpen={showProfileModal}
+          onClose={() => setShowProfileModal(false)}
+          currentUser={adminUser}
+          onProfileUpdated={(updated) => setAdminUser(updated)}
         />
       </header>
 
