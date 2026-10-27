@@ -117,7 +117,7 @@ export const adminPasswordLogin = async (req, res) => {
     res.json({
       success: true,
       token,
-      user: { _id: user._id, name: user.name, email: user.email, role: user.role },
+      user: { _id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar || '' },
     });
   } catch (err) {
     console.error('[adminPasswordLogin]', err);
@@ -214,7 +214,7 @@ export const verifyLoginOtp = async (req, res) => {
     res.json({
       success: true,
       token,
-      user: { _id: user._id, name: user.name, email: user.email, role: user.role },
+      user: { _id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar || '' },
     });
   } catch (err) {
     console.error('[verifyLoginOtp]', err);
@@ -386,3 +386,76 @@ export const changePassword = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error.' });
   }
 };
+
+// ─── Admin Profile: Get & Update ──────────────────────────────────────────────
+
+// GET /api/admin-auth/me
+export const getAdminProfile = async (req, res) => {
+  try {
+    let user = null;
+    if (req.user && req.user._id) {
+      user = await User.findById(req.user._id).select('-password');
+    }
+    if (!user) {
+      user = await User.findOne({ role: 'admin' }).select('-password');
+    }
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Admin not found.' });
+    }
+    res.json({
+      success: true,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar || '',
+      },
+    });
+  } catch (err) {
+    console.error('[getAdminProfile]', err);
+    res.status(500).json({ success: false, message: 'Server error.' });
+  }
+};
+
+// PUT /api/admin-auth/profile
+export const updateAdminProfile = async (req, res) => {
+  try {
+    const { name, avatar } = req.body;
+    let user = null;
+    if (req.user && req.user._id) {
+      user = await User.findById(req.user._id);
+    }
+    if (!user) {
+      user = await User.findOne({ role: 'admin' });
+    }
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Admin not found.' });
+    }
+
+    if (typeof name === 'string' && name.trim()) {
+      user.name = name.trim();
+    }
+    if (typeof avatar === 'string') {
+      user.avatar = avatar.trim();
+    }
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Profile updated successfully.',
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar || '',
+      },
+    });
+  } catch (err) {
+    console.error('[updateAdminProfile]', err);
+    res.status(500).json({ success: false, message: 'Server error.' });
+  }
+};
+

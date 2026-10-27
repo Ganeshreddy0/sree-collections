@@ -21,6 +21,7 @@ import userRoutes from './routes/userRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
 import homepageRoutes from './routes/homepageRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
+import settingsRoutes from './routes/settingsRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -64,6 +65,7 @@ app.use('/api/homepage', (req, res, next) => {
 });
 app.use('/api/homepage', homepageRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // Error Handler
 app.use(errorHandler);

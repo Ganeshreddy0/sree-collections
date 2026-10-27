@@ -7,10 +7,16 @@ import {
   verifyResetOtp,
   resetPassword,
   changePassword,
+  getAdminProfile,
+  updateAdminProfile,
 } from '../controllers/adminAuthController.js';
 import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
+
+// ── Profile management (authenticated) ─────────────────────────────────────
+router.get('/me', protect, getAdminProfile);
+router.put('/profile', protect, updateAdminProfile);
 
 // ── Password login ─────────────────────────────────────────────────────────
 router.post('/login', adminPasswordLogin);

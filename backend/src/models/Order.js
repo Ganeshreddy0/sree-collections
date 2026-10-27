@@ -89,7 +89,7 @@ const orderSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ['COD', 'Online', 'UPI', 'Card'],
+      enum: ['COD'],
       default: 'COD',
     },
     paymentStatus: {
