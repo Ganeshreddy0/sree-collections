@@ -1,5 +1,6 @@
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
+import Settings from '../models/Settings.js';
 import {
   sendOrderConfirmation,
   sendOrderStatusUpdate,
@@ -21,9 +22,11 @@ export const createOrder = async (req, res, next) => {
       whatsappConsent = true,
       items,
       shippingAddress,
-      paymentMethod = 'COD',
       notes = '',
     } = req.body;
+
+    // Only COD is supported – reject any online payment attempt
+    const paymentMethod = 'COD';
 
     // 1. Basic validation
     if (!customerName || !customerName.trim()) {
@@ -161,8 +164,24 @@ export const createOrder = async (req, res, next) => {
       });
     }
 
-    // Shipping fee rule: Free above ₹1999, else ₹99 (or 0 for COD demo)
-    const shippingFee = subtotal >= 1999 ? 0 : 0; // Free delivery for Sree Collections sarees
+    // Shipping fee: fetch from admin settings
+    let storeShippingFee = 0;
+    let storeFreeShippingThreshold = 0;
+    try {
+      const storeSettings = await Settings.findOne({ _key: 'store_settings' });
+      if (storeSettings) {
+        storeShippingFee = storeSettings.shippingFee || 0;
+        storeFreeShippingThreshold = storeSettings.freeShippingThreshold || 0;
+      }
+    } catch (settingsErr) {
+      console.warn('[Order] Could not fetch store settings, defaulting shipping fee to 0:', settingsErr.message);
+    }
+
+    // Apply free-shipping threshold rule
+    const shippingFee =
+      storeFreeShippingThreshold > 0 && subtotal >= storeFreeShippingThreshold
+        ? 0
+        : storeShippingFee;
     const totalAmount = subtotal + shippingFee;
 
     // 3. Generate unique human-readable Order Number
@@ -192,8 +211,8 @@ export const createOrder = async (req, res, next) => {
       shippingFee,
       discount: 0,
       totalAmount,
-      paymentMethod,
-      paymentStatus: paymentMethod === 'COD' ? 'Pending' : 'Completed',
+      paymentMethod: 'COD',
+      paymentStatus: 'Pending',
       orderStatus: 'Confirmed',
       notes: notes || '',
       whatsappNotification: {
