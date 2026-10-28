@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   FiSearch,
   FiShoppingCart,
@@ -364,14 +364,16 @@ function ProductCard({
         )}
 
         <div
+          className="cat-card-footer"
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
           }}
         >
-          <div style={{ display: "flex", alignItems: "baseline", gap: "6px", flexWrap: "wrap" }}>
+          <div className="cat-card-price-wrap" style={{ display: "flex", alignItems: "baseline", gap: "6px", flexWrap: "wrap" }}>
             <span
+              className="cat-card-price-label"
               style={{
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
                 fontSize: "11px",
@@ -384,6 +386,7 @@ function ProductCard({
               Price:
             </span>
             <span
+              className="cat-card-price-val"
               style={{
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
                 fontWeight: 700,
@@ -395,6 +398,7 @@ function ProductCard({
             </span>
             {showMrp && (
               <span
+                className="cat-card-price-mrp"
                 style={{
                   fontFamily: "'Plus Jakarta Sans', sans-serif",
                   fontSize: "11px",
@@ -797,6 +801,39 @@ export default function CategoriesPage() {
   }, [syncUrl]);
 
   const isParticularCategory = Boolean(selectedCategory && selectedCategory !== "All Products");
+
+  const pillsBarRef = useRef<HTMLDivElement>(null);
+  const subPillsBarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && pillsBarRef.current) {
+      const activeEl = pillsBarRef.current.querySelector(".cat-mobile-pill-active") as HTMLElement | null;
+      if (activeEl) {
+        activeEl.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+      }
+    }
+  }, [selectedCategory]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && subPillsBarRef.current) {
+      const activeEl = subPillsBarRef.current.querySelector(".cat-mobile-subpill-active") as HTMLElement | null;
+      if (activeEl) {
+        activeEl.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+      }
+    }
+  }, [selectedSubCategory]);
+
+  useEffect(() => {
+    if (!sortOpen) return;
+    const handleOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target?.closest(".cat-sort-wrap")) {
+        setSortOpen(false);
+      }
+    };
+    document.addEventListener("click", handleOutside);
+    return () => document.removeEventListener("click", handleOutside);
+  }, [sortOpen]);
 
   const handleCategorySelect = (cat: string) => {
     if (cat === selectedCategory) return;
@@ -1239,6 +1276,20 @@ export default function CategoriesPage() {
     }
   });
 
+  // Mobile 2 columns: balanced alternating tall/short distribution
+  const mobCol1: Product[] = [];
+  const mobCol2: Product[] = [];
+
+  products.forEach((p, idx) => {
+    if (idx % 2 === 0) {
+      const i = mobCol1.length;
+      mobCol1.push({ ...p, isTall: i % 2 === 1 });
+    } else {
+      const i = mobCol2.length;
+      mobCol2.push({ ...p, isTall: i % 2 === 0 });
+    }
+  });
+
   return (
     <div
       style={{
@@ -1376,7 +1427,10 @@ export default function CategoriesPage() {
           )}
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", width: "100%", justifyContent: "flex-end" }}>
+        <div
+          className="cat-actions-row"
+          style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", width: "100%", justifyContent: "flex-end" }}
+        >
           <button
             type="button"
             onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
@@ -1411,7 +1465,7 @@ export default function CategoriesPage() {
             )}
           </button>
 
-          <div style={{ position: "relative" }}>
+          <div className="cat-sort-wrap" style={{ position: "relative" }}>
             <button
               id="sort-dropdown-btn"
               onClick={() => setSortOpen(!sortOpen)}
@@ -1452,6 +1506,7 @@ export default function CategoriesPage() {
             </button>
             {sortOpen && (
               <div
+                className="cat-sort-dropdown"
                 style={{
                   position: "absolute",
                   top: "68px",
@@ -1497,13 +1552,14 @@ export default function CategoriesPage() {
 
       {/* Quick Mobile Category Pill Slider */}
       <div
+        ref={pillsBarRef}
         className="cat-mobile-pills-bar"
         style={{
           display: "none",
           width: "100%",
           maxWidth: "1440px",
-          margin: "0 auto 12px auto",
-          padding: "6px 16px 14px 16px",
+          margin: "0 auto 10px auto",
+          padding: "6px 16px 10px 16px",
           boxSizing: "border-box",
           overflowX: "auto",
           WebkitOverflowScrolling: "touch",
@@ -1520,6 +1576,7 @@ export default function CategoriesPage() {
               key={cat}
               type="button"
               onClick={() => handleCategorySelect(cat)}
+              className={`cat-mobile-pill-btn ${active ? "cat-mobile-pill-active" : ""}`}
               style={{
                 flexShrink: 0,
                 padding: "8px 18px",
@@ -1540,6 +1597,78 @@ export default function CategoriesPage() {
           );
         })}
       </div>
+
+      {/* Quick Mobile Subcategory Pill Slider */}
+      {isParticularCategory && subCategoriesList.length > 0 && (
+        <div
+          ref={subPillsBarRef}
+          className="cat-mobile-subpills-bar"
+          style={{
+            display: "none",
+            width: "100%",
+            maxWidth: "1440px",
+            margin: "0 auto 12px auto",
+            padding: "0 16px 8px 16px",
+            boxSizing: "border-box",
+            overflowX: "auto",
+            WebkitOverflowScrolling: "touch",
+            scrollbarWidth: "none",
+            gap: "8px",
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setSelectedSubCategory("")}
+            className={`cat-mobile-subpill-btn ${!selectedSubCategory ? "cat-mobile-subpill-active" : ""}`}
+            style={{
+              flexShrink: 0,
+              padding: "6px 14px",
+              borderRadius: "999px",
+              backgroundColor: !selectedSubCategory ? "#5D2030" : "#FFFFFF",
+              color: !selectedSubCategory ? "#FFFFFF" : "#5D2030",
+              border: !selectedSubCategory ? "1.5px solid #5D2030" : "1px solid #DECDBE",
+              fontFamily: "'Playfair Display', Georgia, serif",
+              fontWeight: !selectedSubCategory ? 700 : 500,
+              fontSize: "12px",
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+            }}
+          >
+            All {selectedCategory}
+          </button>
+          {subCategoriesList.map((sub) => {
+            const active = selectedSubCategory.toLowerCase() === sub.toLowerCase();
+            return (
+              <button
+                key={sub}
+                type="button"
+                onClick={() =>
+                  setSelectedSubCategory((prev) =>
+                    prev.toLowerCase() === sub.toLowerCase() ? "" : sub
+                  )
+                }
+                className={`cat-mobile-subpill-btn ${active ? "cat-mobile-subpill-active" : ""}`}
+                style={{
+                  flexShrink: 0,
+                  padding: "6px 14px",
+                  borderRadius: "999px",
+                  backgroundColor: active ? "#5D2030" : "#FFFFFF",
+                  color: active ? "#FFFFFF" : "#5D2030",
+                  border: active ? "1.5px solid #5D2030" : "1px solid #DECDBE",
+                  fontFamily: "'Playfair Display', Georgia, serif",
+                  fontWeight: active ? 700 : 500,
+                  fontSize: "12px",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                  boxShadow: active ? "0 2px 6px rgba(93,32,48,0.2)" : "none",
+                }}
+              >
+                {sub}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* MAIN LAYOUT */}
       <div
@@ -2158,8 +2287,9 @@ export default function CategoriesPage() {
             </div>
           ) : (
             <>
-              {/* Column 1: Short, Short, Tall, Short, Short, Tall */}
+              {/* Desktop Column 1: Short, Short, Tall, Short, Short, Tall */}
               <div
+                className="cat-desktop-col-1"
                 style={{
                   display: "flex",
                   flexDirection: "column",
@@ -2177,8 +2307,9 @@ export default function CategoriesPage() {
                 ))}
               </div>
 
-              {/* Column 2: Tall, Short, Short, Tall, Short, Short */}
+              {/* Desktop Column 2: Tall, Short, Short, Tall, Short, Short */}
               <div
+                className="cat-desktop-col-2"
                 style={{
                   display: "flex",
                   flexDirection: "column",
@@ -2196,8 +2327,9 @@ export default function CategoriesPage() {
                 ))}
               </div>
 
-              {/* Column 3: Short, Tall, Short, Short, Tall, Short */}
+              {/* Desktop Column 3: Short, Tall, Short, Short, Tall, Short */}
               <div
+                className="cat-desktop-col-3"
                 style={{
                   display: "flex",
                   flexDirection: "column",
@@ -2208,6 +2340,46 @@ export default function CategoriesPage() {
                 {col3.map((p) => (
                   <ProductCard
                     key={p.id}
+                    product={p}
+                    qty={cartMap[p.id]?.quantity || 0}
+                    onQtyChange={(delta) => handleQtyChange(p, delta)}
+                  />
+                ))}
+              </div>
+
+              {/* Mobile Column 1: balanced alternating tall/short distribution */}
+              <div
+                className="cat-mobile-col-1"
+                style={{
+                  display: "none",
+                  flexDirection: "column",
+                  gap: "12px",
+                  minWidth: 0,
+                }}
+              >
+                {mobCol1.map((p) => (
+                  <ProductCard
+                    key={`mob1-${p.id}`}
+                    product={p}
+                    qty={cartMap[p.id]?.quantity || 0}
+                    onQtyChange={(delta) => handleQtyChange(p, delta)}
+                  />
+                ))}
+              </div>
+
+              {/* Mobile Column 2: balanced alternating tall/short distribution */}
+              <div
+                className="cat-mobile-col-2"
+                style={{
+                  display: "none",
+                  flexDirection: "column",
+                  gap: "12px",
+                  minWidth: 0,
+                }}
+              >
+                {mobCol2.map((p) => (
+                  <ProductCard
+                    key={`mob2-${p.id}`}
                     product={p}
                     qty={cartMap[p.id]?.quantity || 0}
                     onQtyChange={(delta) => handleQtyChange(p, delta)}
@@ -2316,7 +2488,20 @@ export default function CategoriesPage() {
           .mobile-header-actions { display: none !important; }
           .cat-mobile-filter-btn { display: none !important; }
           .cat-mobile-pills-bar { display: none !important; }
+          .cat-mobile-subpills-bar { display: none !important; }
           .cat-sidebar { display: flex !important; }
+          .cat-desktop-col-1,
+          .cat-desktop-col-2,
+          .cat-desktop-col-3 {
+            display: flex !important;
+          }
+          .cat-mobile-col-1,
+          .cat-mobile-col-2 {
+            display: none !important;
+          }
+          .cat-product-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+          }
         }
         @media (max-width: 991px) {
           .cat-desktop-nav { display: none !important; }
@@ -2325,65 +2510,280 @@ export default function CategoriesPage() {
           .mobile-header-actions { display: flex !important; }
           .cat-hamburger { display: flex !important; }
           .cat-mobile-filter-btn { display: inline-flex !important; }
-          .cat-mobile-pills-bar { display: flex !important; }
+          .cat-mobile-pills-bar {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+            scroll-behavior: smooth !important;
+          }
+          .cat-mobile-pills-bar::-webkit-scrollbar {
+            display: none !important;
+          }
+          .cat-mobile-subpills-bar {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+            scroll-behavior: smooth !important;
+          }
+          .cat-mobile-subpills-bar::-webkit-scrollbar {
+            display: none !important;
+          }
+          .cat-mobile-pill-btn,
+          .cat-mobile-subpill-btn {
+            flex-shrink: 0 !important;
+            white-space: nowrap !important;
+          }
           .cat-logo { height: 50px !important; max-width: 200px !important; }
-          .cat-top-bar { margin: 12px auto 14px !important; padding: 0 16px !important; gap: 12px !important; }
-          .cat-page-title { font-size: 30px !important; }
-          .cat-results-count { font-size: 14px !important; }
-          .cat-title-row { gap: 10px !important; width: 100% !important; justify-content: space-between !important; }
-          .cat-sort-btn { width: 150px !important; height: 46px !important; border-radius: 12px !important; }
-          .cat-sort-btn span { font-size: 14px !important; }
-          .cat-main-layout { flex-direction: column !important; padding: 0 16px !important; gap: 20px !important; margin-bottom: 48px !important; }
-          .cat-sidebar { width: 100% !important; min-width: 100% !important; max-width: 100% !important; position: static !important; gap: 22px !important; }
+          .cat-top-bar {
+            margin: 12px auto 14px !important;
+            padding: 0 16px !important;
+            gap: 12px !important;
+            box-sizing: border-box !important;
+            width: 100% !important;
+          }
+          .cat-page-title {
+            font-size: clamp(24px, 6.5vw, 32px) !important;
+            line-height: 1.15 !important;
+            word-break: break-word !important;
+          }
+          .cat-results-count {
+            font-size: 13px !important;
+            white-space: nowrap !important;
+          }
+          .cat-title-row {
+            gap: 8px !important;
+            width: 100% !important;
+            justify-content: space-between !important;
+            align-items: baseline !important;
+          }
+          .cat-actions-row {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 10px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+          }
+          .cat-mobile-filter-btn {
+            display: inline-flex !important;
+            flex: 1 1 0% !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            height: 46px !important;
+            border-radius: 12px !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 0 10px !important;
+            font-size: 13.5px !important;
+            box-sizing: border-box !important;
+          }
+          .cat-sort-wrap {
+            flex: 1 1 0% !important;
+            min-width: 0 !important;
+            width: 100% !important;
+          }
+          .cat-sort-btn {
+            width: 100% !important;
+            height: 46px !important;
+            border-radius: 12px !important;
+            padding: 0 14px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            box-sizing: border-box !important;
+          }
+          .cat-sort-btn span {
+            font-size: 13.5px !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+          }
+          .cat-sort-dropdown {
+            top: 52px !important;
+            width: 100% !important;
+            min-width: 180px !important;
+            right: 0 !important;
+            border-radius: 14px !important;
+            z-index: 90 !important;
+          }
+          .cat-main-layout {
+            flex-direction: column !important;
+            padding: 0 16px !important;
+            gap: 16px !important;
+            margin-bottom: 48px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+          }
+          .cat-sidebar {
+            width: 100% !important;
+            min-width: 100% !important;
+            max-width: 100% !important;
+            position: static !important;
+            gap: 20px !important;
+            box-sizing: border-box !important;
+          }
           .cat-sidebar.cat-sidebar-closed { display: none !important; }
           .cat-sidebar.cat-sidebar-open {
             display: flex !important;
             background-color: #FFFFFF !important;
-            padding: 22px 18px !important;
-            border-radius: 18px !important;
+            padding: 20px 16px !important;
+            border-radius: 16px !important;
             border: 1.5px solid #DECDBE !important;
             box-shadow: 0 8px 24px rgba(93,32,48,0.06) !important;
+            box-sizing: border-box !important;
+            max-width: 100% !important;
+            overflow: hidden !important;
           }
           .cat-sidebar-heading { font-size: 20px !important; margin-bottom: 12px !important; }
-          .cat-product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 12px !important; width: 100% !important; }
-          .cat-card-wrap { padding: 8px !important; border-radius: 12px !important; }
-          .cat-card-tall .cat-card-img { height: 260px !important; }
+          .cat-product-grid {
+            display: grid !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 12px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+          }
+          .cat-desktop-col-1,
+          .cat-desktop-col-2,
+          .cat-desktop-col-3 {
+            display: none !important;
+          }
+          .cat-mobile-col-1,
+          .cat-mobile-col-2 {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 12px !important;
+            min-width: 0 !important;
+            width: 100% !important;
+          }
+          .cat-card-wrap {
+            padding: 8px !important;
+            border-radius: 12px !important;
+            box-sizing: border-box !important;
+            min-width: 0 !important;
+            overflow: hidden !important;
+          }
+          .cat-card-tall .cat-card-img { height: 230px !important; }
           .cat-card-short .cat-card-img { height: 160px !important; }
-          .cat-card-title { font-size: 13.5px !important; line-height: 18px !important; height: 18px !important; }
+          .cat-card-img {
+            width: 100% !important;
+            display: block !important;
+            box-sizing: border-box !important;
+          }
+          .cat-card-title {
+            font-size: 13px !important;
+            line-height: 1.25 !important;
+            min-height: 32px !important;
+            height: auto !important;
+            display: -webkit-box !important;
+            -webkit-line-clamp: 2 !important;
+            -webkit-box-orient: vertical !important;
+            overflow: hidden !important;
+            white-space: normal !important;
+            word-break: break-word !important;
+            margin: 0 0 6px 0 !important;
+          }
           .cat-card-body { padding: 8px 2px 2px !important; }
+          .cat-card-footer {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 4px !important;
+            margin-top: 4px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+          }
+          .cat-card-price-wrap {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 1px !important;
+            min-width: 0 !important;
+            overflow: hidden !important;
+            flex: 1 1 auto !important;
+          }
+          .cat-card-price-label { display: none !important; }
+          .cat-card-price-val {
+            font-size: 13.5px !important;
+            font-weight: 700 !important;
+            color: #5D2030 !important;
+            white-space: nowrap !important;
+            line-height: 1.2 !important;
+          }
+          .cat-card-price-mrp {
+            font-size: 10.5px !important;
+            color: #8A7B6F !important;
+            text-decoration: line-through !important;
+            white-space: nowrap !important;
+            line-height: 1 !important;
+          }
+          .cat-cart-icon-btn {
+            width: 32px !important;
+            height: 32px !important;
+            min-width: 32px !important;
+            border-radius: 50% !important;
+            flex-shrink: 0 !important;
+          }
+          .cat-qty-stepper {
+            padding: 3px 6px !important;
+            gap: 4px !important;
+            flex-shrink: 0 !important;
+          }
+          .cat-qty-stepper button {
+            width: 20px !important;
+            height: 20px !important;
+          }
+          .cat-qty-stepper span {
+            font-size: 12px !important;
+            min-width: 14px !important;
+          }
         }
         @media (max-width: 640px) {
           .cat-logo { height: 42px !important; max-width: 170px !important; }
           .cat-top-bar { margin: 8px auto 12px !important; padding: 0 12px !important; }
-          .cat-page-title { font-size: 24px !important; }
-          .cat-results-count { font-size: 12.5px !important; }
-          .cat-sort-btn { width: auto !important; flex: 1 !important; max-width: 100% !important; height: 44px !important; }
-          .cat-mobile-filter-btn { flex: 1 !important; height: 44px !important; justify-content: center !important; }
-          .cat-main-layout { padding: 0 12px !important; gap: 16px !important; }
+          .cat-mobile-pills-bar { padding-left: 12px !important; padding-right: 12px !important; }
+          .cat-mobile-subpills-bar { padding-left: 12px !important; padding-right: 12px !important; }
+          .cat-main-layout { padding: 0 12px !important; gap: 14px !important; }
           .cat-sidebar-heading { font-size: 18px !important; margin-bottom: 10px !important; }
-          .cat-product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important; }
+          .cat-product-grid { gap: 10px !important; }
+          .cat-mobile-col-1,
+          .cat-mobile-col-2 { gap: 10px !important; }
           .cat-card-wrap { padding: 6px !important; border-radius: 10px !important; }
-          .cat-card-tall .cat-card-img { height: 190px !important; }
-          .cat-card-short .cat-card-img { height: 130px !important; }
-          .cat-card-title { font-size: 12px !important; line-height: 16px !important; height: 16px !important; }
+          .cat-card-tall .cat-card-img { height: 195px !important; }
+          .cat-card-short .cat-card-img { height: 140px !important; }
+          .cat-card-title { font-size: 12px !important; line-height: 15px !important; min-height: 30px !important; }
+          .cat-card-price-val { font-size: 12.5px !important; }
+          .cat-card-price-mrp { font-size: 10px !important; }
+          .cat-cart-icon-btn { width: 30px !important; height: 30px !important; min-width: 30px !important; }
+          .cat-cart-icon-btn svg { width: 14px !important; height: 14px !important; }
+          .cat-qty-stepper { padding: 2px 5px !important; gap: 3px !important; }
+          .cat-qty-stepper button { width: 18px !important; height: 18px !important; }
+          .cat-qty-stepper span { font-size: 11px !important; min-width: 12px !important; }
           .cat-card-img { border-radius: 8px !important; }
           .cat-float-cart {
-            bottom: 14px !important;
+            bottom: 12px !important;
             padding: 8px 12px !important;
             gap: 8px !important;
             width: calc(100vw - 20px) !important;
-            max-width: 420px !important;
+            max-width: 400px !important;
             justify-content: space-between !important;
           }
           .cat-float-cart-label { font-size: 11px !important; gap: 5px !important; }
           .cat-float-cart-label svg { width: 14px !important; height: 14px !important; }
           .cat-float-cart-btn { font-size: 11px !important; padding: 6px 10px !important; }
         }
-        @media (max-width: 380px) {
-          .cat-product-grid { grid-template-columns: 1fr !important; }
-          .cat-card-tall .cat-card-img,
-          .cat-card-short .cat-card-img { height: 220px !important; }
-          .cat-card-title { font-size: 14px !important; line-height: 18px !important; height: 18px !important; }
+        @media (max-width: 360px) {
+          .cat-card-tall .cat-card-img { height: 175px !important; }
+          .cat-card-short .cat-card-img { height: 125px !important; }
+          .cat-card-title { font-size: 11.5px !important; min-height: 28px !important; }
+          .cat-card-price-val { font-size: 11.5px !important; }
+          .cat-card-price-mrp { font-size: 9.5px !important; }
+          .cat-cart-icon-btn { width: 28px !important; height: 28px !important; min-width: 28px !important; }
         }
         .cat-nav-link {
           transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1) !important;
