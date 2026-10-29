@@ -818,6 +818,7 @@ export default function CategoriesMosaicShowcase({
               className="hover:scale-105"
             />
             <div
+              className="mosaic-tall-overlay"
               style={{
                 position: "absolute",
                 bottom: 0,
@@ -1149,6 +1150,8 @@ export default function CategoriesMosaicShowcase({
           .categories-mosaic-section {
             padding: 0 16px !important;
             margin: 30px auto 60px auto !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
           }
           .mosaic-top-container {
             grid-template-columns: 1fr !important;
@@ -1161,7 +1164,16 @@ export default function CategoriesMosaicShowcase({
           }
           .mosaic-right-tall {
             width: 100% !important;
-            height: clamp(260px, 65vw, 420px) !important;
+            height: clamp(280px, 65vw, 420px) !important;
+            overflow: hidden !important;
+          }
+          .mosaic-tall-overlay {
+            padding: 24px 18px !important;
+          }
+          .mosaic-tall-overlay h3 {
+            font-size: clamp(20px, 5.5vw, 28px) !important;
+            margin-bottom: 12px !important;
+            line-height: 1.2 !important;
           }
           .mosaic-bottom-container {
             grid-template-columns: 1fr !important;
@@ -1170,7 +1182,7 @@ export default function CategoriesMosaicShowcase({
           .mosaic-bottom-small {
             width: 100% !important;
             height: auto !important;
-            min-height: 320px !important;
+            min-height: 300px !important;
           }
           .mosaic-bottom-wide {
             width: 100% !important;
@@ -1185,6 +1197,7 @@ export default function CategoriesMosaicShowcase({
           .mosaic-bottom-wide .mosaic-bottom-img-wrap {
             width: 100% !important;
             height: 180px !important;
+            order: -1 !important;
           }
           .mosaic-split-card {
             flex-direction: column !important;
@@ -1193,7 +1206,7 @@ export default function CategoriesMosaicShowcase({
           .mosaic-split-card .mosaic-card-img-wrap {
             width: 100% !important;
             height: 200px !important;
-            order: -1;
+            order: -1 !important;
           }
           .mosaic-split-card .mosaic-card-text-wrap {
             width: 100% !important;
@@ -1216,16 +1229,28 @@ export default function CategoriesMosaicShowcase({
             margin: 24px auto 48px auto !important;
           }
           .mosaic-split-card .mosaic-card-img-wrap {
-            height: 160px !important;
+            height: 170px !important;
           }
           .mosaic-split-card .mosaic-card-title {
             font-size: 18px !important;
           }
           .mosaic-right-tall {
-            height: 260px !important;
+            height: 280px !important;
           }
           .mosaic-bottom-wide .mosaic-bottom-img-wrap {
-            height: 150px !important;
+            height: 160px !important;
+          }
+        }
+        @media (max-width: 380px) {
+          .categories-mosaic-section {
+            padding: 0 8px !important;
+          }
+          .mosaic-split-card .mosaic-card-text-wrap,
+          .mosaic-bottom-wide .mosaic-bottom-text-wrap {
+            padding: 16px 12px !important;
+          }
+          .mosaic-tall-overlay {
+            padding: 18px 12px !important;
           }
         }
       `}</style>
