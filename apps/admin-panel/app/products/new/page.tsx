@@ -355,12 +355,8 @@ export default function CreateProductPage() {
   const [brands, setBrands] = useState<string[]>(["Zara", "Chanderi", "Pochampally", "Caratlane", "---"]);
 
   // Gallery images & featured image
-  const [images, setImages] = useState<string[]>([
-    "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=400&q=80",
-  ]);
-  const [featuredImage, setFeaturedImage] = useState<string>(
-    "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=400&q=80"
-  );
+  const [images, setImages] = useState<string[]>([]);
+  const [featuredImage, setFeaturedImage] = useState<string>("");
 
   // Size / colour presets (loaded from Variant Attributes admin when available)
   const [PRESET_SIZES, setPresetSizes] = useState<string[]>(DEFAULT_PRESET_SIZES);
@@ -377,18 +373,7 @@ export default function CreateProductPage() {
   const [variants, setVariants] = useState<VariantRow[]>([]);
 
   // Per-colour image galleries
-  const [colourImages, setColourImages] = useState<ColourImageGroup[]>([
-    {
-      colour: "Black",
-      images: ["https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=400&q=80"],
-      primaryImage: "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=400&q=80",
-    },
-    {
-      colour: "Red",
-      images: ["https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=400&q=80"],
-      primaryImage: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=400&q=80",
-    },
-  ]);
+  const [colourImages, setColourImages] = useState<ColourImageGroup[]>([]);
 
   // Loading & feedback states
   const [uploadingGallery, setUploadingGallery] = useState(false);
@@ -962,7 +947,7 @@ export default function CreateProductPage() {
       variants: finalVariants,
 
       // Images
-      images: images.length > 0 ? images : ["https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=400&q=80"],
+      images: images.length > 0 ? images : activeColourImages.flatMap((c) => c.images),
       colourImages: activeColourImages,
 
       // Additional info
