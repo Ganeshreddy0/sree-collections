@@ -805,6 +805,7 @@ export default function HomePage() {
             </div>
 
             <div
+              className="delivery-badge"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -837,6 +838,7 @@ export default function HomePage() {
           6. EDITORIAL BANNER: "Your Style [img] / [img] Your Rules / Empower Your Fashion"
          ========================================================================= */}
       <section
+        className="editorial-section"
         style={{
           width: "100%",
           background: "#F5EBD3",
@@ -1662,6 +1664,23 @@ export default function HomePage() {
             grid-template-columns: 1fr !important;
             gap: 16px !important;
           }
+          .hero-three-cols > div:first-child,
+          .hero-three-cols > div:last-child {
+            min-height: 220px !important;
+          }
+          .hero-three-cols > div:first-child img,
+          .hero-three-cols > div:last-child img {
+            height: auto !important;
+            min-height: 200px !important;
+          }
+          .hero-three-cols > div:nth-child(2) {
+            position: relative !important;
+            z-index: 5 !important;
+          }
+          .primary-btn, .secondary-outline-btn {
+            position: relative !important;
+            z-index: 10 !important;
+          }
 
           /* Delivery Banner */
           .delivery-banner {
@@ -1842,9 +1861,23 @@ export default function HomePage() {
           }
           .hero-three-cols > div:first-child img,
           .hero-three-cols > div:last-child img {
+            height: auto !important;
             max-height: 220px !important;
+            min-height: 180px !important;
             width: 100% !important;
             object-fit: cover !important;
+          }
+          .hero-three-cols > div:first-child,
+          .hero-three-cols > div:last-child {
+            min-height: 200px !important;
+          }
+          .hero-three-cols > div:nth-child(2) {
+            position: relative !important;
+            z-index: 5 !important;
+          }
+          .primary-btn, .secondary-outline-btn {
+            position: relative !important;
+            z-index: 10 !important;
           }
           .hero-main-title,
           .hero-second-title {
@@ -2063,7 +2096,9 @@ export default function HomePage() {
           }
           .hero-three-cols > div:first-child img,
           .hero-three-cols > div:last-child img {
+            height: auto !important;
             max-height: 190px !important;
+            min-height: 160px !important;
           }
           .hero-main-title,
           .hero-second-title {

@@ -122,6 +122,85 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
   const img2 = normalizeSrc(rawImg2, defaultImg2);
   const img3 = normalizeSrc(rawImg3, defaultImg3);
 
+  const spotlightStyles = (
+    <style>{`
+      @media (max-width: 991px) {
+        .category-spotlight-section {
+          padding: 0 16px !important;
+          margin-bottom: 56px !important;
+        }
+        .category-section-header {
+          flex-direction: column !important;
+          gap: 16px !important;
+          margin-bottom: 24px !important;
+        }
+        .category-section-header .header-text-right {
+          text-align: left !important;
+        }
+        .saree-header .header-text-right {
+          order: -1 !important;
+        }
+        .category-section-grid {
+          grid-template-columns: 1fr !important;
+          gap: 32px !important;
+        }
+        .category-spotlight-col-left {
+          max-width: 100% !important;
+        }
+        .category-spotlight-col-right {
+          align-items: center !important;
+          justify-content: center !important;
+        }
+        .category-spotlight-dual-wrap {
+          max-width: 100% !important;
+          height: clamp(260px, 68vw, 360px) !important;
+          margin: 0 auto;
+          overflow: hidden !important;
+        }
+        .category-spotlight-dual-wrap > div:first-child {
+          width: 65% !important;
+          height: 88% !important;
+        }
+        .category-spotlight-dual-wrap > div:last-child {
+          width: 58% !important;
+          height: 58% !important;
+        }
+        .cat-explore-pill-btn {
+          position: relative !important;
+          z-index: 5 !important;
+          display: inline-flex !important;
+          pointer-events: auto !important;
+        }
+        .category-tall-img-wrap {
+          height: clamp(300px, 80vw, 440px) !important;
+          max-width: 100% !important;
+          overflow: hidden !important;
+        }
+      }
+      @media (max-width: 480px) {
+        .category-spotlight-section {
+          padding: 0 12px !important;
+          margin-bottom: 44px !important;
+        }
+        .category-tall-img-wrap {
+          height: 290px !important;
+        }
+        .category-spotlight-dual-wrap {
+          height: 250px !important;
+          overflow: hidden !important;
+        }
+        .category-spotlight-dual-wrap > div:first-child {
+          width: 68% !important;
+          height: 88% !important;
+        }
+        .category-spotlight-dual-wrap > div:last-child {
+          width: 62% !important;
+          height: 60% !important;
+        }
+      }
+    `}</style>
+  );
+
   // ── Layout A: Left Tall Image + Right Overlapping Images (e.g. Casual Wear) ──
   if (layout === "left-tall") {
     return (
@@ -136,6 +215,7 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
         }}
         className="category-spotlight-section"
       >
+        {spotlightStyles}
         {/* Top Header Row */}
         <div
           className="category-section-header"
@@ -212,7 +292,7 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
           className="category-section-grid"
         >
           {/* Left Column */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "20px", maxWidth: "420px", width: "100%" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px", maxWidth: "420px", width: "100%" }} className="category-spotlight-col-left">
             <div
               style={{
                 width: "100%",
@@ -252,6 +332,7 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
               alignItems: "flex-end",
               gap: "28px",
             }}
+            className="category-spotlight-col-right"
           >
             {/* Overlapping Dual Cards */}
             <div style={{ position: "relative", width: "100%", maxWidth: "380px", height: "380px" }} className="category-spotlight-dual-wrap">
@@ -344,6 +425,7 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
         }}
         className="category-spotlight-section"
       >
+        {spotlightStyles}
         {/* Top Header Row */}
         <div
           className="category-section-header saree-header"
@@ -551,6 +633,7 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
       }}
       className="category-spotlight-section"
     >
+      {spotlightStyles}
       {/* Top Header Row */}
       <div
         className="category-section-header"
@@ -627,7 +710,7 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
         className="category-section-grid"
       >
         {/* Left Column: Explore Button + Paragraph */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "28px", maxWidth: "430px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "28px", maxWidth: "430px" }} className="category-spotlight-col-left">
           <div>
             <Link
               href={ctaLink}
@@ -664,7 +747,7 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
         </div>
 
         {/* Right Column: Overlapping Dual Cards */}
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <div style={{ display: "flex", justifyContent: "flex-end" }} className="category-spotlight-col-right">
           <div style={{ position: "relative", width: "100%", maxWidth: "390px", height: "350px" }} className="category-spotlight-dual-wrap">
             {/* Back image */}
             <div
@@ -715,67 +798,6 @@ export default function CategorySpotlightSection({ section }: { section: Spotlig
           </div>
         </div>
       </div>
-
-      <style>{`
-        @media (max-width: 768px) {
-          .category-spotlight-section {
-            padding: 0 16px !important;
-            margin-bottom: 60px !important;
-          }
-          .category-section-header {
-            flex-direction: column !important;
-            gap: 16px !important;
-            margin-bottom: 24px !important;
-          }
-          .category-section-header .header-text-right {
-            text-align: left !important;
-          }
-          .saree-header .header-text-right {
-            order: -1 !important;
-          }
-          .category-section-grid {
-            grid-template-columns: 1fr !important;
-            gap: 32px !important;
-          }
-          .category-spotlight-dual-wrap {
-            max-width: 100% !important;
-            height: clamp(260px, 68vw, 360px) !important;
-            margin: 0 auto;
-          }
-          .category-spotlight-dual-wrap > div:first-child {
-            width: 65% !important;
-            height: 88% !important;
-          }
-          .category-spotlight-dual-wrap > div:last-child {
-            width: 58% !important;
-            height: 58% !important;
-          }
-          .category-tall-img-wrap {
-            height: clamp(300px, 80vw, 440px) !important;
-            max-width: 100% !important;
-          }
-        }
-        @media (max-width: 480px) {
-          .category-spotlight-section {
-            padding: 0 12px !important;
-            margin-bottom: 44px !important;
-          }
-          .category-tall-img-wrap {
-            height: 290px !important;
-          }
-          .category-spotlight-dual-wrap {
-            height: 250px !important;
-          }
-          .category-spotlight-dual-wrap > div:first-child {
-            width: 68% !important;
-            height: 88% !important;
-          }
-          .category-spotlight-dual-wrap > div:last-child {
-            width: 62% !important;
-            height: 60% !important;
-          }
-        }
-      `}</style>
     </section>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
+import ScrollToTop from "@/components/ScrollToTop";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -38,6 +39,9 @@ export default function RootLayout({
           flexDirection: "column",
         }}
       >
+        {/* ── Scroll to top handler for all page navigations ── */}
+        <ScrollToTop />
+
         {/* ── One global header ── sticky at top, appears on every page ── */}
         <SiteHeader />
 
